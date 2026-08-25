@@ -16,7 +16,7 @@ export default function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path="/" element={<Navigate to="/onboarding" replace />} />
+				{/* <Route path="/" element={<Navigate to="/onboarding" replace />} /> */}
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/onboarding" element={<Onboarding />} />
@@ -27,8 +27,6 @@ export default function App() {
 					<Route path="kesehatan-karier" element={<KesehatanKarier />} />
 					<Route path="risiko-karier" element={<RisikoKarier />} />
 				</Route>
-
-				<Route path="*" element={<Navigate to="/onboarding" replace />} />
 			</Routes>
 		</Router>
 	);
