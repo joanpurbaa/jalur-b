@@ -1,0 +1,127 @@
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+	Home,
+	HeartPulse,
+	AlertTriangle,
+	Zap,
+	GitFork,
+	ClipboardList,
+	FolderCheck,
+	Wallet,
+	PlaySquare,
+	User,
+	LogOut,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
+
+export default function Sidebar() {
+	const [isCollapsed, setIsCollapsed] = useState(false);
+	const location = useLocation();
+	const navigate = useNavigate();
+
+	const currentPath = location.pathname.split("/")[2] || "beranda";
+
+	const mainNavItems = [
+		{ id: "beranda", label: "Beranda", icon: Home },
+		{ id: "kesehatan-karier", label: "Kesehatan Karier", icon: HeartPulse },
+		{ id: "risiko-karier", label: "Risiko Karier", icon: AlertTriangle },
+		{ id: "skill", label: "Skill", icon: Zap },
+		{ id: "jalur", label: "Jalur Karier", icon: GitFork },
+		{ id: "misi", label: "Misi", icon: ClipboardList },
+		{ id: "bukti", label: "Bukti Karier", icon: FolderCheck },
+		{ id: "finansial", label: "Finansial", icon: Wallet },
+		{ id: "simulasi", label: "Simulasi", icon: PlaySquare },
+	];
+
+	const bottomNavItems = [
+		{ id: "profil", label: "Profil", icon: User },
+		{ id: "keluar", label: "Keluar", icon: LogOut },
+	];
+
+	const handleNavigation = (id: string) => {
+		navigate(`/dashboard/${id}`);
+	};
+
+	return (
+		<aside
+			className={`sticky top-0 h-screen bg-white border-r border-neutral/10 flex flex-col justify-between transition-all duration-300 p-4 shrink-0 z-30 ${
+				isCollapsed ? "w-20" : "w-64"
+			}`}>
+			<button
+				type="button"
+				onClick={() => setIsCollapsed(!isCollapsed)}
+				className="absolute -right-3 top-7 bg-white border border-neutral/20 rounded-full p-1 text-neutral/60 hover:text-primary shadow-sm transition z-40 cursor-pointer">
+				{isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+			</button>
+
+			<div className="flex flex-col min-h-0">
+				<div className="flex items-center gap-3 px-2 py-3 mb-6 shrink-0">
+					<div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm shrink-0">
+						J
+					</div>
+					{!isCollapsed && (
+						<div>
+							<h2 className="font-bold text-neutral leading-tight">Jalur B</h2>
+							<p className="text-[10px] text-neutral/50 font-medium">
+								Career Resilience
+							</p>
+						</div>
+					)}
+				</div>
+
+				<nav className="space-y-1 overflow-y-auto pr-1">
+					{mainNavItems.map((item) => {
+						const Icon = item.icon;
+						const isActive = currentPath === item.id;
+						return (
+							<button
+								key={item.id}
+								type="button"
+								onClick={() => handleNavigation(item.id)}
+								className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer ${
+									isActive
+										? "bg-primary text-white shadow-sm"
+										: "text-neutral/70 hover:bg-neutral/5 hover:text-neutral"
+								}`}>
+								<Icon
+									size={18}
+									className={isActive ? "text-white" : "text-neutral/60"}
+								/>
+								{!isCollapsed && <span>{item.label}</span>}
+							</button>
+						);
+					})}
+				</nav>
+			</div>
+
+			<div className="space-y-4 pt-4 border-t border-neutral/10 shrink-0">
+				<nav className="space-y-1">
+					{bottomNavItems.map((item) => {
+						const Icon = item.icon;
+						const isActive = currentPath === item.id;
+						return (
+							<button
+								key={item.id}
+								type="button"
+								onClick={() => handleNavigation(item.id)}
+								className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer ${
+									isActive
+										? "bg-primary text-white shadow-sm"
+										: "text-neutral/70 hover:bg-neutral/5 hover:text-neutral"
+								}`}
+								title={isCollapsed ? item.label : undefined}>
+								<Icon
+									size={18}
+									className={isActive ? "text-white" : "text-neutral/60"}
+								/>
+								{!isCollapsed && <span>{item.label}</span>}
+							</button>
+						);
+					})}
+				</nav>
+			</div>
+		</aside>
+	);
+}
