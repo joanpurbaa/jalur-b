@@ -14,7 +14,9 @@ export default function InsightCard() {
 					<strong className="text-neutral">"{weeklyFocus.skill}"</strong>{" "}
 					{weeklyFocus.description}
 				</p>
-				<SecondaryButton>Pelajari kenapa →</SecondaryButton>
+				<a href="/dashboard/risiko-karier">
+					<SecondaryButton>Pelajari kenapa →</SecondaryButton>
+				</a>
 			</div>
 		</div>
 	);

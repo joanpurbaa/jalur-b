@@ -4,9 +4,7 @@ import {
 	Home,
 	HeartPulse,
 	AlertTriangle,
-	Zap,
 	GitFork,
-	ClipboardList,
 	FolderCheck,
 	Wallet,
 	PlaySquare,
@@ -14,10 +12,12 @@ import {
 	LogOut,
 	ChevronLeft,
 	ChevronRight,
+  Zap,
 } from "lucide-react";
 
 export default function Sidebar() {
 	const [isCollapsed, setIsCollapsed] = useState(false);
+	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 	const location = useLocation();
 	const navigate = useNavigate();
 
@@ -28,9 +28,8 @@ export default function Sidebar() {
 		{ id: "kesehatan-karier", label: "Kesehatan Karier", icon: HeartPulse },
 		{ id: "risiko-karier", label: "Risiko Karier", icon: AlertTriangle },
 		{ id: "skill", label: "Skill", icon: Zap },
-		{ id: "jalur", label: "Jalur Karier", icon: GitFork },
-		{ id: "misi", label: "Misi", icon: ClipboardList },
-		{ id: "bukti", label: "Bukti Karier", icon: FolderCheck },
+		{ id: "jalur-karier", label: "Jalur Karier", icon: GitFork },
+		{ id: "bukti-karier", label: "Bukti Karier", icon: FolderCheck },
 		{ id: "finansial", label: "Finansial", icon: Wallet },
 		{ id: "simulasi", label: "Simulasi", icon: PlaySquare },
 	];
@@ -41,7 +40,16 @@ export default function Sidebar() {
 	];
 
 	const handleNavigation = (id: string) => {
+		if (id === "keluar") {
+			setIsLogoutModalOpen(true);
+			return;
+		}
 		navigate(`/dashboard/${id}`);
+	};
+
+	const handleLogout = () => {
+		setIsLogoutModalOpen(false);
+		navigate("/login");
 	};
 
 	return (
@@ -122,6 +130,59 @@ export default function Sidebar() {
 					})}
 				</nav>
 			</div>
+
+			{isLogoutModalOpen && (
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral/40 backdrop-blur-sm"
+					onClick={() => setIsLogoutModalOpen(false)}>
+					<div
+						className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-neutral/5"
+						onClick={(e) => e.stopPropagation()}>
+						<div className="flex items-start justify-between mb-4">
+							<div>
+								<h2 className="text-xl font-bold text-neutral">
+									Keluar dari Jalur B?
+								</h2>
+								<p className="text-sm text-neutral/60 mt-1">
+									Kamu akan diarahkan ke halaman login. Lanjutkan?
+								</p>
+							</div>
+							<button
+								type="button"
+								onClick={() => setIsLogoutModalOpen(false)}
+								className="text-neutral/40 hover:text-neutral transition cursor-pointer">
+								<svg
+									className="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24">
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
+							</button>
+						</div>
+
+						<div className="flex items-center justify-end gap-3 mt-6">
+							<button
+								type="button"
+								onClick={() => setIsLogoutModalOpen(false)}
+								className="px-5 py-2.5 text-sm font-medium rounded-full border border-neutral/20 text-neutral hover:bg-tertiary transition cursor-pointer">
+								Batal
+							</button>
+							<button
+								type="button"
+								onClick={handleLogout}
+								className="px-5 py-2.5 bg-red-500 text-white text-sm font-semibold rounded-full hover:opacity-90 transition shadow-sm cursor-pointer">
+								Keluar
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</aside>
 	);
 }

@@ -59,3 +59,16 @@ export function getLevelStatus(level: RiskLevel): StatusVariant {
 	if (level === "Sedang") return "warning";
 	return "risk";
 }
+
+export type FinanceTone = "indigo" | "violet" | "rose" | "amber" | "slate";
+
+export const financeToneStyles: Record<
+	FinanceTone,
+	{ iconBg: string; iconText: string }
+> = {
+	indigo: { iconBg: "bg-indigo-50", iconText: "text-indigo-600" },
+	violet: { iconBg: "bg-violet-50", iconText: "text-violet-600" },
+	rose: { iconBg: "bg-rose-50", iconText: "text-rose-600" },
+	amber: { iconBg: "bg-amber-50", iconText: "text-amber-600" },
+	slate: { iconBg: "bg-slate-100", iconText: "text-slate-600" },
+};

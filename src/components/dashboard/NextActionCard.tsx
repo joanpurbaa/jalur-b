@@ -9,12 +9,14 @@ export default function NextActionCard() {
 				<p className="text-sm text-neutral/80 leading-relaxed">
 					{nextAction.description}
 				</p>
-				<button
-					type="button"
-					className="self-start flex items-center gap-1.5 text-xs font-semibold text-primary hover:gap-2.5 transition-all">
-					{nextAction.ctaLabel}
-					<ArrowRight size={14} />
-				</button>
+				<a href="/dashboard/kesehatan-karier">
+					<button
+						type="button"
+						className="self-start flex items-center gap-1.5 text-xs font-semibold text-primary hover:gap-2.5 transition-all">
+						{nextAction.ctaLabel}
+						<ArrowRight size={14} />
+					</button>
+				</a>
 			</div>
 		</div>
 	);

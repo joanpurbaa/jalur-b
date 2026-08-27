@@ -5,6 +5,7 @@ interface ButtonProps {
 	icon?: ReactNode;
 	onClick?: () => void;
 	fullWidth?: boolean;
+	disabled?: boolean;
 }
 
 export function PrimaryButton({
@@ -12,12 +13,16 @@ export function PrimaryButton({
 	icon,
 	onClick,
 	fullWidth,
+	disabled,
 }: ButtonProps) {
 	return (
 		<button
 			type="button"
 			onClick={onClick}
-			className={`${fullWidth ? "w-full" : ""} py-2.5 px-4 bg-primary text-white text-xs font-semibold rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2 shadow-sm`}>
+			disabled={disabled}
+			className={`${fullWidth ? "w-full" : ""} py-2.5 px-4 bg-primary text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-sm ${
+				disabled ? "opacity-40 cursor-not-allowed" : "hover:opacity-90"
+			}`}>
 			{icon}
 			{children}
 		</button>

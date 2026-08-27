@@ -23,11 +23,12 @@ export default function CareerHealthCard() {
 				</p>
 			</div>
 
-			<button
+			<a
+				href="/dashboard/kesehatan-karier"
 				type="button"
 				className="px-5 py-2.5 bg-primary text-white text-xs font-semibold rounded-xl hover:opacity-90 transition shadow-sm self-end sm:self-auto">
 				Lihat Analisis
-			</button>
+			</a>
 		</div>
 	);
 }

@@ -1,28 +1,23 @@
 import { useState } from "react";
-import { Bot, TrendingDown, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
-import { riskData } from "../../data/dashboardDummyData";
-import RiskStatusCard from "./RiskStatusCard";
-import RiskDimensionCard from "./RiskDimensionCard";
-import AIAnalysisPanel from "./AIAnalysisPanel";
-import EarlyWarningCard from "./EarlyWarningCard";
+import CareerPathMap from "./CareerPathMap";
+import RoleDetailPanel from "./RoleDetailPanel";
+import PrepTimeCard from "./PrepTimeCard";
 import { PrimaryButton } from "../ui/PrimaryButton";
-
-const icons = [Bot, TrendingDown];
 
 interface OnboardingData {
 	role?: string;
-	industry?: string;
 	dailyActivities?: string;
 	skills?: string[];
 }
 
-interface RiskForm {
+interface JalurKarierForm {
 	role: string;
-	industry: string;
 	responsibilities: string;
 	skills: string;
-	work_changes: string;
+	tools_and_methods: string;
+	work_experience: string;
 	job_description: string;
 }
 
@@ -38,64 +33,52 @@ function getOnboardingData(): OnboardingData {
 	}
 }
 
-export default function RisikoKarier() {
+export default function JalurKarier() {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	const onboarding = getOnboardingData();
-	const [form, setForm] = useState<RiskForm>({
+	const [form, setForm] = useState<JalurKarierForm>({
 		role: onboarding.role ?? "",
-		industry: onboarding.industry ?? "",
 		responsibilities: onboarding.dailyActivities ?? "",
 		skills: onboarding.skills?.join(", ") ?? "",
-		work_changes: "",
+		tools_and_methods: "",
+		work_experience: "",
 		job_description: "",
 	});
 	const [jobFileName, setJobFileName] = useState<string>("");
 
-	const updateField = (key: keyof RiskForm, value: string) =>
+	const updateField = (key: keyof JalurKarierForm, value: string) =>
 		setForm((prev) => ({ ...prev, [key]: value }));
 
 	const handleSubmit = () => {
-		console.log("Risk data:", form);
+		console.log("Jalur karier data:", form);
 		setIsModalOpen(false);
 	};
 
 	return (
 		<div>
 			<PageHeader
-				title="Risiko Karier"
-				subtitle="Pantau lanskap industri dan persiapkan dirimu menghadapi perubahan tren yang berpotensi memengaruhi peranmu saat ini."
+				title="Jalur Karier"
+				subtitle="Kalau suatu hari kamu harus berpindah, kamu bisa ke mana?"
 			/>
 
 			<div className="mb-6">
 				<PrimaryButton
 					icon={<Upload size={14} />}
 					onClick={() => setIsModalOpen(true)}>
-					Lengkapi Data Risiko
+					Lengkapi Data Jalur Karier
 				</PrimaryButton>
 			</div>
 
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 items-start">
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 				<div className="lg:col-span-2">
-					<RiskStatusCard />
-					<h3 className="text-sm font-bold text-neutral mb-3">Dimensi Risiko</h3>
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						{riskData.dimensions.map((item, index) => (
-							<RiskDimensionCard
-								key={item.title}
-								title={item.title}
-								description={item.description}
-								level={item.level}
-								icon={icons[index]}
-							/>
-						))}
-					</div>
+					<CareerPathMap />
 				</div>
-
-				<AIAnalysisPanel />
+				<div>
+					<RoleDetailPanel />
+					<PrepTimeCard />
+				</div>
 			</div>
-
-			<EarlyWarningCard />
 
 			{isModalOpen && (
 				<div
@@ -107,7 +90,7 @@ export default function RisikoKarier() {
 						<div className="flex items-start justify-between mb-6">
 							<div>
 								<h2 className="text-xl sm:text-2xl font-bold text-neutral">
-									Lengkapi Data Risiko
+									Lengkapi Data Jalur Karier
 								</h2>
 								<p className="text-sm text-neutral/60 mt-1">
 									Data yang sama dengan onboarding sudah kami isi otomatis.
@@ -148,20 +131,8 @@ export default function RisikoKarier() {
 
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Bidang / Industri <span className="text-red-500">*</span>
-								</label>
-								<input
-									type="text"
-									value={form.industry}
-									onChange={(e) => updateField("industry", e.target.value)}
-									placeholder="Contoh: Technology, Finance"
-									className={inputClass}
-								/>
-							</div>
-
-							<div>
-								<label className="block text-xs font-semibold text-neutral mb-2">
-									Tanggung Jawab & Pekerjaan <span className="text-red-500">*</span>
+									Tanggung Jawab & Pekerjaan{" "}
+									<span className="text-red-500">*</span>
 								</label>
 								<textarea
 									rows={4}
@@ -192,15 +163,33 @@ export default function RisikoKarier() {
 
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Perubahan yang Dirasakan (opsional)
+									Tools & Metode (opsional)
+								</label>
+								<input
+									type="text"
+									value={form.tools_and_methods}
+									onChange={(e) =>
+										updateField("tools_and_methods", e.target.value)
+									}
+									placeholder="Pisahkan dengan koma. Contoh: Figma, Agile, SQL"
+									className={inputClass}
+								/>
+								<p className="text-xs text-neutral/50 mt-2">
+									Pisahkan tiap tools/metode dengan koma (,).
+								</p>
+							</div>
+
+							<div>
+								<label className="block text-xs font-semibold text-neutral mb-2">
+									Pengalaman Kerja (opsional)
 								</label>
 								<textarea
 									rows={3}
-									value={form.work_changes}
+									value={form.work_experience}
 									onChange={(e) =>
-										updateField("work_changes", e.target.value)
+										updateField("work_experience", e.target.value)
 									}
-									placeholder="Perubahan di tempat kerja, industri, atau pekerjaanmu."
+									placeholder="Pengalaman yang relevan dengan pekerjaan saat ini."
 									className={`${inputClass} resize-none`}
 								/>
 							</div>

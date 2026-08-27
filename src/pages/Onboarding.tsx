@@ -719,7 +719,13 @@ export default function Onboarding() {
 					) : (
 						<button
 							type="button"
-							onClick={() => navigate("/dashboard")}
+							onClick={() => {
+								localStorage.setItem(
+									"jalurB_onboarding",
+									JSON.stringify(formData),
+								);
+								navigate("/dashboard");
+							}}
 							className="px-6 py-2.5 bg-primary text-white text-sm font-medium rounded-full hover:opacity-90 transition flex items-center gap-2 shadow-sm cursor-pointer">
 							Lihat Dashboard
 							<svg

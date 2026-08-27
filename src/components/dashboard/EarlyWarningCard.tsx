@@ -21,7 +21,9 @@ export default function EarlyWarningCard() {
 					</p>
 				</div>
 			</div>
-			<SecondaryButton>{riskData.earlyWarning.ctaLabel}</SecondaryButton>
+			<a href="/dashboard/simulasi">
+				<SecondaryButton>{riskData.earlyWarning.ctaLabel}</SecondaryButton>
+			</a>
 		</div>
 	);
 }
