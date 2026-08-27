@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface FormData {
+	fullName: string;
 	role: string;
 	industry: string;
 	experience: string;
@@ -23,6 +24,7 @@ export default function Onboarding() {
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
 	const [formData, setFormData] = useState<FormData>({
+		fullName: "",
 		role: "",
 		industry: "",
 		experience: "",
@@ -91,16 +93,18 @@ export default function Onboarding() {
 	const isStepValid = (): boolean => {
 		switch (step) {
 			case 1:
-				return formData.role.trim() !== "";
+				return formData.fullName.trim() !== "";
 			case 2:
-				return formData.industry.trim() !== "";
+				return formData.role.trim() !== "";
 			case 3:
-				return formData.experience !== "" && formData.isFirstJob !== "";
+				return formData.industry.trim() !== "";
 			case 4:
-				return formData.dailyActivities.trim() !== "";
+				return formData.experience !== "" && formData.isFirstJob !== "";
 			case 5:
-				return formData.skills.length > 0;
+				return formData.dailyActivities.trim() !== "";
 			case 6:
+				return formData.skills.length > 0;
+			case 7:
 				return formData.careerGoal !== "";
 			default:
 				return true;
@@ -134,7 +138,7 @@ export default function Onboarding() {
 				</div>
 				<div className="flex items-center gap-4">
 					<div className="flex gap-1.5">
-						{[1, 2, 3, 4, 5, 6].map((i) => (
+						{[1, 2, 3, 4, 5, 6, 7].map((i) => (
 							<div
 								key={i}
 								className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -144,7 +148,7 @@ export default function Onboarding() {
 						))}
 					</div>
 					<span className="text-xs text-neutral/50 font-medium">
-						{step > 6 ? "6 dari 6" : `${step} dari 6`}
+						{step > 7 ? "7 dari 7" : `${step} dari 7`}
 					</span>
 				</div>
 			</div>
@@ -154,6 +158,46 @@ export default function Onboarding() {
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
 							Langkah 1
+						</span>
+						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
+							Halo, kenalan dulu yuk!
+						</h1>
+						<p className="text-sm text-neutral/60 mt-1">
+							Boleh tahu nama lengkapmu? Kami akan memanggilmu dengan nama ini.
+						</p>
+
+						<div className="mt-8">
+							<label className="block text-xs font-semibold text-neutral mb-2">
+								Nama Lengkap
+							</label>
+							<input
+								type="text"
+								placeholder="Contoh: Joan Orlando Purba"
+								value={formData.fullName}
+								onChange={(e) => {
+									setFormData({ ...formData, fullName: e.target.value });
+									if (errorMessage) setErrorMessage("");
+								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" && isStepValid()) {
+										e.preventDefault();
+										handleNext();
+									}
+								}}
+								className="w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-neutral placeholder:text-neutral/40"
+							/>
+							<p className="text-xs text-neutral/50 mt-2">
+								Nama kamu akan digunakan untuk mempersonalisasi dashboard dan
+								rekomendasi kariermu.
+							</p>
+						</div>
+					</div>
+				)}
+
+				{step === 2 && (
+					<div>
+						<span className="text-xs font-bold text-primary tracking-wider uppercase">
+							Langkah 2
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
 							Kenalan dulu dengan kariermu.
@@ -183,10 +227,10 @@ export default function Onboarding() {
 					</div>
 				)}
 
-				{step === 2 && (
+				{step === 3 && (
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 2
+							Langkah 3
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
 							Kamu bekerja di bidang apa?
@@ -275,10 +319,10 @@ export default function Onboarding() {
 					</div>
 				)}
 
-				{step === 3 && (
+				{step === 4 && (
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 3
+							Langkah 4
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
 							Seberapa lama kamu sudah bekerja?
@@ -380,10 +424,10 @@ export default function Onboarding() {
 					</div>
 				)}
 
-				{step === 4 && (
+				{step === 5 && (
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 4
+							Langkah 5
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
 							Sehari-hari kamu mengerjakan apa?
@@ -414,10 +458,10 @@ export default function Onboarding() {
 					</div>
 				)}
 
-				{step === 5 && (
+				{step === 6 && (
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 5
+							Langkah 6
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
 							Apa yang paling kamu kuasai?
@@ -495,10 +539,10 @@ export default function Onboarding() {
 					</div>
 				)}
 
-				{step === 6 && (
+				{step === 7 && (
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 6
+							Langkah 7
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
 							Kamu ingin membawa kariermu ke mana?
@@ -593,13 +637,17 @@ export default function Onboarding() {
 					</div>
 				)}
 
-				{step === 7 && (
+				{step === 8 && (
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
 							SELESAI
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Profil kariermu sudah siap.
+							Profil kariermu sudah siap,{" "}
+							{formData.fullName.trim()
+								? formData.fullName.split(" ")[0]
+								: ""}{" "}
+							👋
 						</h1>
 						<p className="text-sm text-neutral/60 mt-1">
 							Ini gambaran awal yang kami dapat dari jawabanmu.
@@ -608,11 +656,12 @@ export default function Onboarding() {
 						<div className="mt-6 p-6 rounded-2xl bg-tertiary/60 border border-neutral/10 space-y-4">
 							<div>
 								<h3 className="text-lg font-bold text-neutral capitalize">
-									{formData.role || "Belum diisi"}
+									{formData.fullName.trim() || "Belum diisi"}
 								</h3>
 								<p className="text-xs text-neutral/60 mt-0.5">
-									{formData.industry || "Belum diisi"} · {formData.experience || "-"}{" "}
-									pengalaman
+									{formData.role || "Belum diisi"} ·{" "}
+									{formData.industry || "Belum diisi"} ·{" "}
+									{formData.experience || "-"} pengalaman
 								</p>
 							</div>
 
@@ -692,7 +741,7 @@ export default function Onboarding() {
 						<div />
 					)}
 
-					{step < 7 ? (
+					{step < 8 ? (
 						<button
 							type="button"
 							onClick={handleNext}

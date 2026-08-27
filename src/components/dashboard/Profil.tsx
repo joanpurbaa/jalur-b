@@ -43,7 +43,7 @@ export default function Profil() {
 				</ProfileSection>
 
 				<ProfileSection title="Profil Risiko Karier">
-					<RiskSummaryCard onSeeMore={() => navigate("/dashboard/risiko")} />
+					<RiskSummaryCard onSeeMore={() => navigate("/dashboard/risiko-karier")} />
 				</ProfileSection>
 
 				<ProfileSection title="Skill & AI">
@@ -51,11 +51,11 @@ export default function Profil() {
 				</ProfileSection>
 
 				<ProfileSection title="Jalur Karier">
-					<CareerPathSummaryCard onSeeMore={() => navigate("/dashboard/jalur")} />
+					<CareerPathSummaryCard onSeeMore={() => navigate("/dashboard/jalur-karier")} />
 				</ProfileSection>
 
 				<ProfileSection title="Bukti Karier">
-					<EvidenceSummaryCard onSeeMore={() => navigate("/dashboard/bukti")} />
+					<EvidenceSummaryCard onSeeMore={() => navigate("/dashboard/bukti-karier")} />
 				</ProfileSection>
 
 				<ProfileSection title="Informasi Finansial">

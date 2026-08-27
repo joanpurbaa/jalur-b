@@ -31,6 +31,7 @@ export default function RiskSummaryCard({ onSeeMore }: RiskSummaryCardProps) {
 				})}
 			</div>
 
+
 			<button
 				type="button"
 				onClick={onSeeMore}
