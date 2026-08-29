@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../layouts/PageHeader";
 import ProfileHeaderCard from "../profile/ProfileHeaderCard";
@@ -14,12 +14,40 @@ import SimulationSummaryCard from "../profile/SimulationSummaryCard";
 import { EditProfileModal } from "../profile/EditProfileModal";
 import { EditCareerModal } from "../profile/EditCareerModal";
 import { EditFinancialModal } from "../profile/EditFinancialModal";
+import { profileApi } from "../../services/profile";
+import type { OnboardingProfile } from "../../types/onboarding";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Profil() {
 	const navigate = useNavigate();
+	const { user } = useAuth();
+	const [profile, setProfile] = useState<OnboardingProfile | null>(null);
+	const [profileLoading, setProfileLoading] = useState(true);
 	const [editProfileOpen, setEditProfileOpen] = useState(false);
 	const [editCareerOpen, setEditCareerOpen] = useState(false);
 	const [editFinancialOpen, setEditFinancialOpen] = useState(false);
+	const [financialVersion, setFinancialVersion] = useState(0);
+
+	useEffect(() => {
+		let active = true;
+		profileApi
+			.get()
+			.then((res) => {
+				if (active) setProfile(res.profile);
+			})
+			.catch(() => {
+				// profil belum tersedia (mis. onboarding belum selesai) — biarkan null
+			})
+			.finally(() => {
+				if (active) setProfileLoading(false);
+			});
+		return () => {
+			active = false;
+		};
+	}, []);
+
+	const handleProfileSaved = (p: OnboardingProfile) => setProfile(p);
+	const handleCareerSaved = (p: OnboardingProfile) => setProfile(p);
 
 	return (
 		<div>
@@ -29,7 +57,12 @@ export default function Profil() {
 			/>
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 items-stretch">
-				<ProfileHeaderCard onEdit={() => setEditProfileOpen(true)} />
+				<ProfileHeaderCard
+					profile={profile}
+					user={user}
+					loading={profileLoading}
+					onEdit={() => setEditProfileOpen(true)}
+				/>
 				<div className="lg:col-span-2">
 					<ProfileSection title="Ringkasan Karier">
 						<CareerSummaryCard />
@@ -39,7 +72,11 @@ export default function Profil() {
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<ProfileSection title="Informasi Karier">
-					<CareerInfoCard onEdit={() => setEditCareerOpen(true)} />
+					<CareerInfoCard
+						profile={profile}
+						loading={profileLoading}
+						onEdit={() => setEditCareerOpen(true)}
+					/>
 				</ProfileSection>
 
 				<ProfileSection title="Profil Risiko Karier">
@@ -59,7 +96,10 @@ export default function Profil() {
 				</ProfileSection>
 
 				<ProfileSection title="Informasi Finansial">
-					<FinancialSummaryCard onEdit={() => setEditFinancialOpen(true)} />
+					<FinancialSummaryCard
+						onEdit={() => setEditFinancialOpen(true)}
+						refreshKey={financialVersion}
+					/>
 				</ProfileSection>
 
 				<div className="lg:col-span-2">
@@ -74,14 +114,20 @@ export default function Profil() {
 			<EditProfileModal
 				open={editProfileOpen}
 				onClose={() => setEditProfileOpen(false)}
+				profile={profile}
+				user={user}
+				onSaved={handleProfileSaved}
 			/>
 			<EditCareerModal
 				open={editCareerOpen}
 				onClose={() => setEditCareerOpen(false)}
+				profile={profile}
+				onSaved={handleCareerSaved}
 			/>
 			<EditFinancialModal
 				open={editFinancialOpen}
 				onClose={() => setEditFinancialOpen(false)}
+				onSaved={() => setFinancialVersion((v) => v + 1)}
 			/>
 		</div>
 	);

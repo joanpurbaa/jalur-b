@@ -1,13 +1,53 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
+import { authApi } from "../services/auth";
+import { ApiError } from "../types/api";
+import { isOnboardingComplete } from "../lib/auth";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const { login } = useAuth();
+	const from = (location.state as { from?: string } | null)?.from;
+	const redirectError = (location.state as { error?: string } | null)?.error;
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [googleLoading, setGoogleLoading] = useState(false);
+	const [error, setError] = useState(redirectError ?? "");
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		navigate("/onboarding");
+		setError("");
+		setLoading(true);
+		try {
+			await login(email, password);
+			// Existing user with completed onboarding -> dashboard. Otherwise onboarding.
+			navigate(
+				isOnboardingComplete()
+					? from || "/dashboard"
+					: from || "/onboarding",
+			);
+		} catch (err) {
+			setError(
+				err instanceof ApiError
+					? err.message
+					: "Terjadi kesalahan. Silakan coba lagi.",
+			);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleGoogle = () => {
+		setError("");
+		setGoogleLoading(true);
+		window.location.href = authApi.googleStart(
+			`${window.location.origin}/auth/callback`,
+		);
 	};
 
 	return (
@@ -21,6 +61,8 @@ export default function Login() {
 					</label>
 					<input
 						type="email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
 						placeholder="nama@email.com"
 						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
 						required
@@ -36,16 +78,21 @@ export default function Login() {
 					</div>
 					<input
 						type="password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
 						placeholder="••••••••"
 						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
 						required
 					/>
 				</div>
 
+				{error && <p className="text-xs text-red-500 font-medium">{error}</p>}
+
 				<button
 					type="submit"
-					className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:opacity-90 transition shadow-sm">
-					Masuk
+					disabled={loading}
+					className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:opacity-90 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+					{loading ? "Masuk..." : "Masuk"}
 				</button>
 			</form>
 
@@ -60,8 +107,9 @@ export default function Login() {
 
 			<button
 				type="button"
-				onClick={() => navigate("/onboarding")}
-				className="w-full py-2.5 border border-neutral/20 rounded-lg flex items-center justify-center gap-2 font-medium text-sm hover:bg-tertiary transition">
+				onClick={handleGoogle}
+				disabled={googleLoading}
+				className="w-full py-2.5 border border-neutral/20 rounded-lg flex items-center justify-center gap-2 font-medium text-sm hover:bg-tertiary transition disabled:opacity-60 disabled:cursor-not-allowed">
 				<svg className="w-4 h-4" viewBox="0 0 24 24">
 					<path
 						fill="#4285F4"
@@ -80,7 +128,7 @@ export default function Login() {
 						d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
 					/>
 				</svg>
-				Lanjutkan dengan Google
+				{googleLoading ? "Menghubungkan Google..." : "Lanjutkan dengan Google"}
 			</button>
 
 			<p className="text-center text-sm text-neutral/70 mt-6">

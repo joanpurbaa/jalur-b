@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ApiError } from "../types/api";
+import { onboardingApi } from "../services/onboarding";
+import { masterApi } from "../services/master";
+import type { CareerGoal, OnboardingPayload } from "../types/onboarding";
 
 interface FormData {
 	fullName: string;
@@ -22,6 +26,11 @@ export default function Onboarding() {
 	const [industrySearch, setIndustrySearch] = useState<string>("");
 	const [skillInput, setSkillInput] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+	const [masterIndustries, setMasterIndustries] = useState<string[]>([]);
+	const [masterSkillSuggestions, setMasterSkillSuggestions] = useState<string[]>(
+		[],
+	);
 
 	const [formData, setFormData] = useState<FormData>({
 		fullName: "",
@@ -125,7 +134,105 @@ export default function Onboarding() {
 		setStep((prev) => prev - 1);
 	};
 
-	const filteredIndustries = industries.filter((i) =>
+	const experienceToMonths = (exp: string): number => {
+		switch (exp) {
+			case "Belum 1 tahun":
+				return 6;
+			case "1–3 tahun":
+				return 24;
+			case "3–5 tahun":
+				return 48;
+			case "5–10 tahun":
+				return 90;
+			case "Lebih dari 10 tahun":
+				return 144;
+			default:
+				return 0;
+		}
+	};
+
+	const careerGoalToEnum = (title: string): CareerGoal => {
+		switch (title) {
+			case "Tetap berkembang":
+				return "grow_current";
+			case "Naik level":
+				return "level_up";
+			case "Pindah role":
+				return "change_role";
+			case "Pindah industri":
+				return "change_industry";
+			case "Belum tahu":
+				return "undecided";
+			default:
+				return "undecided";
+		}
+	};
+
+	const handleFinish = async () => {
+		setIsSubmitting(true);
+		setErrorMessage("");
+		try {
+			const payload: OnboardingPayload = {
+				full_name: formData.fullName,
+				current_role_name: formData.role,
+				industry_name: formData.industry,
+				work_duration_months: experienceToMonths(formData.experience),
+				is_first_job: formData.isFirstJob === "Ya",
+				daily_activities: formData.dailyActivities,
+				career_goal: careerGoalToEnum(formData.careerGoal),
+				target_role_name: formData.targetRole.trim() || null,
+				target_industry_name: formData.targetIndustry.trim() || null,
+				skills: formData.skills,
+			};
+			await onboardingApi.complete(payload);
+			// Sync lokal agar modul dashboard tetap membaca data onboarding.
+			localStorage.setItem("jalurB_onboarding", JSON.stringify(formData));
+			navigate("/dashboard");
+		} catch (err) {
+			setErrorMessage(
+				err instanceof ApiError
+					? err.message
+					: "Gagal menyimpan profil. Silakan coba lagi.",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	useEffect(() => {
+		let active = true;
+		(async () => {
+			try {
+				const [opts, skillsRes] = await Promise.all([
+					onboardingApi.options(),
+					masterApi.skills({ limit: 20 }).catch(() => null),
+				]);
+				if (!active) return;
+				if (opts?.industries?.length) {
+					setMasterIndustries(opts.industries);
+				}
+				const skillNames =
+					skillsRes?.items?.map((s) => s.name).filter(Boolean) ?? [];
+				if (skillNames.length) {
+					setMasterSkillSuggestions(skillNames);
+				} else if (opts?.skills?.length) {
+					setMasterSkillSuggestions(opts.skills.map((s) => s.name));
+				}
+			} catch {
+				// biarkan daftar bawaan sebagai fallback
+			}
+		})();
+		return () => {
+			active = false;
+		};
+	}, []);
+
+	const industrySource = masterIndustries.length ? masterIndustries : industries;
+	const skillSource = masterSkillSuggestions.length
+		? masterSkillSuggestions
+		: skillSuggestions;
+
+	const filteredIndustries = industrySource.filter((i) =>
 		i.toLowerCase().includes(industrySearch.toLowerCase()),
 	);
 
@@ -521,7 +628,7 @@ export default function Onboarding() {
 							<div className="flex items-center gap-2 mt-4 text-xs flex-wrap">
 								<span className="text-neutral/50">Saran:</span>
 								<div className="flex flex-wrap gap-2">
-									{skillSuggestions.map((sug) => (
+									{skillSource.map((sug) => (
 										<button
 											key={sug}
 											type="button"
@@ -768,27 +875,28 @@ export default function Onboarding() {
 					) : (
 						<button
 							type="button"
-							onClick={() => {
-								localStorage.setItem(
-									"jalurB_onboarding",
-									JSON.stringify(formData),
-								);
-								navigate("/dashboard");
-							}}
-							className="px-6 py-2.5 bg-primary text-white text-sm font-medium rounded-full hover:opacity-90 transition flex items-center gap-2 shadow-sm cursor-pointer">
-							Lihat Dashboard
-							<svg
-								className="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24">
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M9 5l7 7-7 7"
-								/>
-							</svg>
+							onClick={() => handleFinish()}
+							disabled={isSubmitting}
+							className={`px-6 py-2.5 text-white text-sm font-medium rounded-full transition flex items-center gap-2 shadow-sm ${
+								isSubmitting
+									? "bg-primary/70 cursor-not-allowed"
+									: "bg-primary hover:opacity-90 cursor-pointer"
+							}`}>
+							{isSubmitting ? "Menyimpan..." : "Lihat Dashboard"}
+							{isSubmitting ? null : (
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24">
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 5l7 7-7 7"
+									/>
+								</svg>
+							)}
 						</button>
 					)}
 				</div>

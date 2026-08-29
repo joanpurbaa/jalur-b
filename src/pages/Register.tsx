@@ -1,13 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
+import { authApi } from "../services/auth";
+import { ApiError } from "../types/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
 	const navigate = useNavigate();
+	const { register } = useAuth();
+	const [username, setUsername] = useState("");
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		navigate("/login");
+		setError("");
+		setLoading(true);
+		try {
+			await register({ username, email, password });
+			navigate("/onboarding");
+		} catch (err) {
+			setError(
+				err instanceof ApiError
+					? err.message
+					: "Terjadi kesalahan. Silakan coba lagi.",
+			);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleGoogle = () => {
+		setError("");
+		window.location.href = authApi.googleStart(
+			`${window.location.origin}/auth/callback`,
+		);
 	};
 
 	return (
@@ -21,6 +50,8 @@ export default function Register() {
 					</label>
 					<input
 						type="text"
+						value={username}
+						onChange={(e) => setUsername(e.target.value)}
 						placeholder="johndoe"
 						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
 						required
@@ -33,6 +64,8 @@ export default function Register() {
 					</label>
 					<input
 						type="email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
 						placeholder="nama@email.com"
 						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
 						required
@@ -45,16 +78,22 @@ export default function Register() {
 					</label>
 					<input
 						type="password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
 						placeholder="Minimal 8 karakter"
 						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
 						required
+						minLength={8}
 					/>
 				</div>
 
+				{error && <p className="text-xs text-red-500 font-medium">{error}</p>}
+
 				<button
 					type="submit"
-					className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:opacity-90 transition shadow-sm mt-2">
-					Daftar Sekarang
+					disabled={loading}
+					className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:opacity-90 transition shadow-sm mt-2 disabled:opacity-60 disabled:cursor-not-allowed">
+					{loading ? "Mendaftarkan..." : "Daftar Sekarang"}
 				</button>
 			</form>
 
@@ -69,6 +108,7 @@ export default function Register() {
 
 			<button
 				type="button"
+				onClick={handleGoogle}
 				className="w-full py-2.5 border border-neutral/20 rounded-lg flex items-center justify-center gap-2 font-medium text-sm hover:bg-tertiary transition">
 				<svg className="w-4 h-4" viewBox="0 0 24 24">
 					<path

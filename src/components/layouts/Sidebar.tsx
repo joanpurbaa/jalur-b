@@ -14,12 +14,14 @@ import {
 	ChevronRight,
   Zap,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Sidebar() {
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 	const location = useLocation();
 	const navigate = useNavigate();
+	const { logout } = useAuth();
 
 	const currentPath = location.pathname.split("/")[2] || "beranda";
 
@@ -47,8 +49,9 @@ export default function Sidebar() {
 		navigate(`/dashboard/${id}`);
 	};
 
-	const handleLogout = () => {
+	const handleLogout = async () => {
 		setIsLogoutModalOpen(false);
+		await logout();
 		navigate("/login");
 	};
 
