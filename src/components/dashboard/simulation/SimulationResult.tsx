@@ -26,8 +26,8 @@ interface ReadinessItem {
 
 const scenarioLabels: Record<string, string> = {
 	tomorrow: "Besok",
-	"1_month": "1 Bulan Lagi",
-	"3_months": "3 Bulan Lagi",
+	one_month: "1 Bulan Lagi",
+	three_months: "3 Bulan Lagi",
 };
 
 function clampScore(value: string): number {

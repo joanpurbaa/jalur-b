@@ -18,8 +18,8 @@ const scenarioOptions: {
 	description: string;
 }[] = [
 	{ id: "tomorrow", label: "Besok", description: "Impact maksimal" },
-	{ id: "1_month", label: "1 Bulan Lagi", description: "Ada waktu bersiap" },
-	{ id: "3_months", label: "3 Bulan Lagi", description: "Transisi terkontrol" },
+	{ id: "one_month", label: "1 Bulan Lagi", description: "Ada waktu bersiap" },
+	{ id: "three_months", label: "3 Bulan Lagi", description: "Transisi terkontrol" },
 ];
 
 export default function Simulasi() {

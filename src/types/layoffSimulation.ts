@@ -1,4 +1,4 @@
-export type LayoffScenario = "tomorrow" | "1_month" | "3_months";
+export type LayoffScenario = "tomorrow" | "one_month" | "three_months";
 
 export interface LayoffSimulationResult {
 	id: number;
