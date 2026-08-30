@@ -13,7 +13,6 @@ import FinancialSummaryCard from "../profile/FinancialSummaryCard";
 import SimulationSummaryCard from "../profile/SimulationSummaryCard";
 import { EditProfileModal } from "../profile/EditProfileModal";
 import { EditCareerModal } from "../profile/EditCareerModal";
-import { EditFinancialModal } from "../profile/EditFinancialModal";
 import { profileApi } from "../../services/profile";
 import type { OnboardingProfile } from "../../types/onboarding";
 import { useAuth } from "../../context/AuthContext";
@@ -25,8 +24,6 @@ export default function Profil() {
 	const [profileLoading, setProfileLoading] = useState(true);
 	const [editProfileOpen, setEditProfileOpen] = useState(false);
 	const [editCareerOpen, setEditCareerOpen] = useState(false);
-	const [editFinancialOpen, setEditFinancialOpen] = useState(false);
-	const [financialVersion, setFinancialVersion] = useState(0);
 
 	useEffect(() => {
 		let active = true;
@@ -96,10 +93,7 @@ export default function Profil() {
 				</ProfileSection>
 
 				<ProfileSection title="Informasi Finansial">
-					<FinancialSummaryCard
-						onEdit={() => setEditFinancialOpen(true)}
-						refreshKey={financialVersion}
-					/>
+					<FinancialSummaryCard />
 				</ProfileSection>
 
 				<div className="lg:col-span-2">
@@ -112,6 +106,7 @@ export default function Profil() {
 			</div>
 
 			<EditProfileModal
+				key={`edit-profile:${editProfileOpen}`}
 				open={editProfileOpen}
 				onClose={() => setEditProfileOpen(false)}
 				profile={profile}
@@ -119,15 +114,11 @@ export default function Profil() {
 				onSaved={handleProfileSaved}
 			/>
 			<EditCareerModal
+				key={`edit-career:${editCareerOpen}`}
 				open={editCareerOpen}
 				onClose={() => setEditCareerOpen(false)}
 				profile={profile}
 				onSaved={handleCareerSaved}
-			/>
-			<EditFinancialModal
-				open={editFinancialOpen}
-				onClose={() => setEditFinancialOpen(false)}
-				onSaved={() => setFinancialVersion((v) => v + 1)}
 			/>
 		</div>
 	);

@@ -1,6 +1,7 @@
 import { Mail, AtSign } from "lucide-react";
 import { SecondaryButton } from "../ui/PrimaryButton";
 import Skeleton, { SkeletonText, SkeletonButton } from "../ui/Skeleton";
+import TruncatedText from "../ui/TruncatedText";
 import type { OnboardingProfile } from "../../types/onboarding";
 import type { UserResponse } from "../../types/auth";
 
@@ -53,17 +54,33 @@ export default function ProfileHeaderCard({
 					/>
 				)}
 			</div>
-			<h2 className="text-lg font-bold text-neutral">{name}</h2>
-			<p className="text-sm text-neutral/50">{role}</p>
+			<TruncatedText
+				as="h2"
+				text={name}
+				className="text-lg font-bold text-neutral"
+			/>
+			<TruncatedText
+				as="p"
+				text={role}
+				className="text-sm text-neutral/50"
+			/>
 
 			<div className="w-full mt-5 space-y-2.5 text-left">
 				<div className="flex items-center gap-2.5 text-sm text-neutral/70">
-					<Mail size={14} className="text-neutral/40" />
-					<span>{email}</span>
+					<Mail size={14} className="text-neutral/40 shrink-0" />
+					<TruncatedText
+						text={email}
+						wrapperClassName="flex-1 min-w-0"
+						className="text-sm text-neutral/70"
+					/>
 				</div>
 				<div className="flex items-center gap-2.5 text-sm text-neutral/70">
-					<AtSign size={14} className="text-neutral/40" />
-					<span>{username}</span>
+					<AtSign size={14} className="text-neutral/40 shrink-0" />
+					<TruncatedText
+						text={username}
+						wrapperClassName="flex-1 min-w-0"
+						className="text-sm text-neutral/70"
+					/>
 				</div>
 			</div>
 

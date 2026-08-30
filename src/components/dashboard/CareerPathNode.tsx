@@ -8,6 +8,7 @@ interface CareerPathNodeProps {
 	icon: LucideIcon;
 	selected?: boolean;
 	variant?: "center" | "node";
+	float?: string;
 	style?: React.CSSProperties;
 }
 
@@ -18,6 +19,7 @@ export default function CareerPathNode({
 	icon: Icon,
 	selected,
 	variant = "node",
+	float,
 	style,
 }: CareerPathNodeProps) {
 	if (variant === "center") {
@@ -41,7 +43,7 @@ export default function CareerPathNode({
 				selected
 					? "border-2 border-primary shadow-md"
 					: "border border-neutral/10 shadow-sm"
-			}`}>
+			} ${float || ""} motion-reduce:animate-none`}>
 			<Icon
 				size={16}
 				className={selected ? "text-primary shrink-0" : "text-neutral/50 shrink-0"}
@@ -54,7 +56,7 @@ export default function CareerPathNode({
 				</p>
 			</div>
 			{selected && (
-				<div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-sm">
+				<div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-sm animate-pulse-soft motion-reduce:animate-none">
 					<Sparkles size={11} className="text-white" />
 				</div>
 			)}

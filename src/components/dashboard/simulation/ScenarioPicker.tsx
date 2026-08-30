@@ -1,17 +1,25 @@
-import { simulationData } from "../../../data/dashboardDummyData";
+import type { LayoffScenario } from "../../../types/layoffSimulation";
+
+export interface ScenarioOption {
+	id: LayoffScenario;
+	label: string;
+	description: string;
+}
 
 interface ScenarioPickerProps {
-	selected: string;
-	onSelect: (id: string) => void;
+	selected: LayoffScenario;
+	options: ScenarioOption[];
+	onSelect: (id: LayoffScenario) => void;
 }
 
 export default function ScenarioPicker({
 	selected,
+	options,
 	onSelect,
 }: ScenarioPickerProps) {
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-			{simulationData.scenarioOptions.map((option) => {
+			{options.map((option) => {
 				const active = option.id === selected;
 				return (
 					<button

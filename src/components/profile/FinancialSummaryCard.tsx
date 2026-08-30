@@ -5,10 +5,8 @@ import type { FinancialProfileResponse } from "../../types/financial";
 import { getScoreStatus, statusStyles } from "../../lib/status";
 import ProgressBar from "../ui/ProgressBar";
 import Skeleton from "../ui/Skeleton";
-import { SecondaryButton } from "../ui/PrimaryButton";
 
 interface FinancialSummaryCardProps {
-	onEdit: () => void;
 	refreshKey?: number;
 }
 
@@ -19,13 +17,13 @@ function formatRupiah(raw?: string | null): string {
 }
 
 export default function FinancialSummaryCard({
-	onEdit,
 	refreshKey = 0,
 }: FinancialSummaryCardProps) {
 	const [profile, setProfile] = useState<FinancialProfileResponse | null>(null);
-	const [runway, setRunway] = useState<{ current: number; target: number } | null>(
-		null,
-	);
+	const [runway, setRunway] = useState<{
+		current: number;
+		target: number;
+	} | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -72,8 +70,7 @@ export default function FinancialSummaryCard({
 					},
 					{
 						label: "Jumlah Tanggungan",
-						value:
-							profile.dependents != null ? String(profile.dependents) : "-",
+						value: profile.dependents != null ? String(profile.dependents) : "-",
 					},
 				]
 			: [];
@@ -118,9 +115,7 @@ export default function FinancialSummaryCard({
 							key={item.label}
 							className="flex items-center justify-between py-2.5">
 							<span className="text-sm text-neutral/60">{item.label}</span>
-							<span className="text-sm font-semibold text-neutral">
-								{item.value}
-							</span>
+							<span className="text-sm font-semibold text-neutral">{item.value}</span>
 						</div>
 					))}
 				</div>
@@ -134,7 +129,13 @@ export default function FinancialSummaryCard({
 				</p>
 			</div>
 
-			<SecondaryButton onClick={onEdit}>Edit Data Finansial</SecondaryButton>
+			<a
+				href="/dashboard/finansial"
+				type="button"
+				// onClick={onSeeMore}
+				className="text-xs font-semibold text-primary hover:opacity-70 transition">
+				Lihat Data Finansial →
+			</a>
 		</div>
 	);
 }

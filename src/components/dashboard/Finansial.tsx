@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Lock } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
 import FinancialRunwayHero from "./FinancialRunwayHero";
+import FinancialProfileCard from "./FinancialProfileCard";
 import FinancialParameters from "./FinancialParameters";
 import { financialApi, parseRunwayMonths } from "../../services/financial";
 
@@ -71,6 +72,7 @@ export default function Finansial() {
 				}
 				loading={loading}
 			/>
+			<FinancialProfileCard onChanged={refresh} />
 			<FinancialParameters onChanged={refresh} />
 
 			<div className="flex items-center justify-center gap-2 mt-10 pt-6 border-t border-neutral/10">

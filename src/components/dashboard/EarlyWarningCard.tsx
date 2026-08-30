@@ -1,8 +1,11 @@
 import { AlertTriangle } from "lucide-react";
-import { riskData } from "../../data/dashboardDummyData";
 import { SecondaryButton } from "../ui/PrimaryButton";
 
-export default function EarlyWarningCard() {
+interface EarlyWarningCardProps {
+	description?: string;
+}
+
+export default function EarlyWarningCard({ description }: EarlyWarningCardProps) {
 	return (
 		<div className="bg-white rounded-2xl p-6 border border-neutral/5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
 			<div className="flex items-start gap-4">
@@ -14,15 +17,15 @@ export default function EarlyWarningCard() {
 						Early Warning
 					</p>
 					<h4 className="text-sm font-bold text-neutral mb-1">
-						{riskData.earlyWarning.title}
+						Perhatian Dini
 					</h4>
 					<p className="text-xs text-neutral/60 leading-relaxed max-w-xl">
-						{riskData.earlyWarning.description}
+						{description || "Belum ada perhatian dini untuk saat ini."}
 					</p>
 				</div>
 			</div>
 			<a href="/dashboard/simulasi">
-				<SecondaryButton>{riskData.earlyWarning.ctaLabel}</SecondaryButton>
+				<SecondaryButton>Lihat dampaknya ke pekerjaanmu</SecondaryButton>
 			</a>
 		</div>
 	);

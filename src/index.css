@@ -8,4 +8,37 @@
 	--color-tertiary: #f8f8f6;
 
 	--color-neutral: #171717;
+
+	--animate-float: float 6s ease-in-out infinite;
+	--animate-float-slow: float 7.5s ease-in-out -2.25s infinite;
+	--animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
+	--animate-dash-flow: dash-flow 18s linear infinite;
+
+	@keyframes float {
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-6px);
+		}
+	}
+
+	@keyframes pulse-soft {
+		0%,
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 0.65;
+			transform: scale(0.85);
+		}
+	}
+
+	@keyframes dash-flow {
+		to {
+			stroke-dashoffset: -48;
+		}
+	}
 }

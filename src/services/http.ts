@@ -92,7 +92,10 @@ export async function request<T>(
 	}
 
 	const headers: Record<string, string> = {};
-	if (body !== undefined) headers["Content-Type"] = "application/json";
+	const isFormData =
+		typeof FormData !== "undefined" && body instanceof FormData;
+	if (body !== undefined && !isFormData)
+		headers["Content-Type"] = "application/json";
 	if (auth) {
 		const token = getToken();
 		if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -103,7 +106,12 @@ export async function request<T>(
 		response = await fetch(`${API_BASE_URL}${path}`, {
 			method,
 			headers,
-			body: body !== undefined ? JSON.stringify(body) : undefined,
+			body:
+				body !== undefined
+					? isFormData
+						? body
+						: JSON.stringify(body)
+					: undefined,
 		});
 	} catch {
 		throw new ApiError(

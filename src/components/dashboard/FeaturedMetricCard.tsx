@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { statusStyles, type StatusVariant } from "../../lib/status";
+import ExpandableText from "../ui/ExpandableText";
 
 interface FeaturedMetricCardProps {
 	title: string;
@@ -31,7 +32,11 @@ export default function FeaturedMetricCard({
 				<span className="text-5xl font-extrabold text-neutral">{value}</span>
 				<span className="text-2xl font-bold text-neutral/40">%</span>
 			</div>
-			<p className="text-sm text-neutral/60 mt-3 leading-relaxed">{description}</p>
+			<ExpandableText
+				text={description}
+				maxLines={2}
+				className="text-sm text-neutral/60 mt-3 leading-relaxed"
+			/>
 		</div>
 	);
 }

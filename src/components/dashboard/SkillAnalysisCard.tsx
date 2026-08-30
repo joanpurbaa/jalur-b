@@ -28,11 +28,15 @@ export default function SkillAnalysisCard({
 				</div>
 				<h4 className="text-sm font-bold text-neutral">{title}</h4>
 			</div>
-			<div className="flex flex-wrap gap-2">
-				{skills.map((skill) => (
-					<SkillPill key={skill} label={skill} tone={pillTone} />
-				))}
-			</div>
+			{skills.length > 0 ? (
+				<div className="flex flex-wrap gap-2">
+					{skills.map((skill) => (
+						<SkillPill key={skill} label={skill} tone={pillTone} />
+					))}
+				</div>
+			) : (
+				<p className="text-xs text-neutral/40">Belum ada data.</p>
+			)}
 		</div>
 	);
 }

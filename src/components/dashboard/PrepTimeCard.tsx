@@ -1,9 +1,22 @@
 import { Clock } from "lucide-react";
-import { careerPathData } from "../../data/dashboardDummyData";
 
-export default function PrepTimeCard() {
-	const { roleDetail } = careerPathData;
+interface PrepTimeCardProps {
+	months: number;
+	description: string;
+}
 
+function formatMonths(months: number): string {
+	if (!Number.isFinite(months) || months <= 0) return "Kurang dari 1 bulan";
+	const years = Math.floor(months / 12);
+	const rem = months % 12;
+	if (years >= 1) return rem > 0 ? `${years} tahun ${rem} bulan` : `${years} tahun`;
+	return `${Math.round(months)} bulan`;
+}
+
+export default function PrepTimeCard({
+	months,
+	description,
+}: PrepTimeCardProps) {
 	return (
 		<div className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-6">
 			<div className="flex items-center gap-3 mb-3">
@@ -14,11 +27,11 @@ export default function PrepTimeCard() {
 					<p className="text-xs text-neutral/50 font-medium">
 						Estimasi Waktu Persiapan
 					</p>
-					<p className="text-lg font-bold text-neutral">{roleDetail.prepTime}</p>
+					<p className="text-lg font-bold text-neutral">{formatMonths(months)}</p>
 				</div>
 			</div>
 			<p className="text-xs text-neutral/60 leading-relaxed">
-				{roleDetail.prepDescription}
+				{description || "Belum ada perkiraan untuk saat ini."}
 			</p>
 		</div>
 	);

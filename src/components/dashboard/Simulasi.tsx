@@ -4,12 +4,30 @@ import SimulationIntro from "./simulation/SimulationIntro";
 import SimulationSetup from "./simulation/SimulationSetup";
 import SimulationLoading from "./simulation/SimulationLoading";
 import SimulationResult from "./simulation/SimulationResult";
+import { layoffSimulationApi } from "../../services/layoffSimulation";
+import type {
+	LayoffScenario,
+	LayoffSimulationResult,
+} from "../../types/layoffSimulation";
 
 type SimulationStep = "intro" | "setup" | "loading" | "result";
 
+const scenarioOptions: {
+	id: LayoffScenario;
+	label: string;
+	description: string;
+}[] = [
+	{ id: "tomorrow", label: "Besok", description: "Impact maksimal" },
+	{ id: "1_month", label: "1 Bulan Lagi", description: "Ada waktu bersiap" },
+	{ id: "3_months", label: "3 Bulan Lagi", description: "Transisi terkontrol" },
+];
+
 export default function Simulasi() {
 	const [step, setStep] = useState<SimulationStep>("intro");
-	const [selectedScenario, setSelectedScenario] = useState("besok");
+	const [selectedScenario, setSelectedScenario] =
+		useState<LayoffScenario>("tomorrow");
+	const [result, setResult] = useState<LayoffSimulationResult | null>(null);
+	const [runKey, setRunKey] = useState(0);
 
 	const headerContent: Record<
 		SimulationStep,
@@ -35,6 +53,11 @@ export default function Simulasi() {
 		},
 	};
 
+	const runSimulation = async () => {
+		const res = await layoffSimulationApi.create(selectedScenario);
+		setResult(res);
+	};
+
 	return (
 		<div>
 			<PageHeader
@@ -46,14 +69,21 @@ export default function Simulasi() {
 			{step === "setup" && (
 				<SimulationSetup
 					selectedScenario={selectedScenario}
+					scenarioOptions={scenarioOptions}
 					onSelectScenario={setSelectedScenario}
 					onStart={() => setStep("loading")}
 				/>
 			)}
 			{step === "loading" && (
-				<SimulationLoading onComplete={() => setStep("result")} />
+				<SimulationLoading
+					key={runKey}
+					onRun={runSimulation}
+					onSuccess={() => setStep("result")}
+					onBack={() => setStep("setup")}
+					onRetry={() => setRunKey((k) => k + 1)}
+				/>
 			)}
-			{step === "result" && <SimulationResult />}
+			{step === "result" && result && <SimulationResult result={result} />}
 		</div>
 	);
 }

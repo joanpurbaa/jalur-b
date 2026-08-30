@@ -54,6 +54,15 @@ export function getScoreStatus(score: number): StatusVariant {
 
 export type RiskLevel = "Rendah" | "Sedang" | "Tinggi";
 
+export function normalizeRiskLevel(
+	value: string | null | undefined,
+): RiskLevel {
+	const v = (value ?? "").toLowerCase();
+	if (v.includes("rendah") || v.includes("low")) return "Rendah";
+	if (v.includes("tinggi") || v.includes("high")) return "Tinggi";
+	return "Sedang";
+}
+
 export function getLevelStatus(level: RiskLevel): StatusVariant {
 	if (level === "Rendah") return "healthy";
 	if (level === "Sedang") return "warning";
