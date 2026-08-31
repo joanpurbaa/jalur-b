@@ -22,13 +22,14 @@ import Finansial from "./components/dashboard/Finansial";
 import Skill from "./components/dashboard/Skill";
 import Simulasi from "./components/dashboard/Simulasi";
 import Profil from "./components/dashboard/Profil";
+import Home from "./pages/Home";
 
 export default function App() {
 	return (
 		<Router>
 			<AuthProvider>
 				<Routes>
-					<Route path="/" element={<Navigate to="/login" replace />} />
+					<Route path="/" element={<Home />} />
 					<Route
 						path="/login"
 						element={
