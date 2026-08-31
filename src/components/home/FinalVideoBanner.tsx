@@ -4,7 +4,7 @@ export default function FinalVideoBanner() {
 	const navigate = useNavigate();
 
 	return (
-		<section className="mt-16">
+		<section className="mt-12">
 			<div className="relative w-full overflow-hidden bg-neutral/5">
 				<video
 					src="/video3.mp4"

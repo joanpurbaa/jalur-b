@@ -1,6 +1,6 @@
 export default function VideoBanner() {
 	return (
-		<section className="mt-16">
+		<section className="mt-12">
 			<div className="relative w-full overflow-hidden bg-neutral/5">
 				<video
 					src="/video1.mp4"

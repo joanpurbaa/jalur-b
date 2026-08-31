@@ -16,7 +16,7 @@ const ROLES = [
 
 export default function RoleTicker() {
 	return (
-		<section className="mt-16 px-5 sm:px-10 lg:px-20 xl:px-32 2xl:px-72">
+		<section className="mt-12 px-5 sm:px-10 lg:px-20 xl:px-32 2xl:px-72">
 			<div className="mb-5 flex items-center gap-3">
 				<a
 					href={SOURCE_URL}

@@ -78,7 +78,7 @@ export default function Hero() {
 	const formatted = new Intl.NumberFormat("id-ID").format(count);
 
 	return (
-		<section id="masalah" className="pb-24 pt-32 px-5 sm:px-10 lg:px-20 xl:px-32 2xl:px-72 lg:pt-48">
+		<section id="masalah" className="pb-12 pt-28 px-5 sm:px-10 lg:px-20 xl:px-32 2xl:px-72 lg:pt-32">
 			<Reveal>
 			<div className="mx-auto flex justify-between items-start flex-col-reverse lg:flex-row gap-14 lg:gap-0">
 				<div className="max-w-xl">
