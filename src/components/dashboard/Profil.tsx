@@ -11,16 +11,19 @@ import CareerPathSummaryCard from "../profile/CareerPathSummaryCard";
 import EvidenceSummaryCard from "../profile/EvidenceSummaryCard";
 import FinancialSummaryCard from "../profile/FinancialSummaryCard";
 import SimulationSummaryCard from "../profile/SimulationSummaryCard";
+import CareerExperienceCard from "../profile/CareerExperienceCard";
 import { EditProfileModal } from "../profile/EditProfileModal";
 import { EditCareerModal } from "../profile/EditCareerModal";
 import { profileApi } from "../../services/profile";
 import type { OnboardingProfile } from "../../types/onboarding";
+import type { OnboardingSkill } from "../../types/onboarding";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Profil() {
 	const navigate = useNavigate();
 	const { user } = useAuth();
 	const [profile, setProfile] = useState<OnboardingProfile | null>(null);
+	const [skills, setSkills] = useState<OnboardingSkill[]>([]);
 	const [profileLoading, setProfileLoading] = useState(true);
 	const [editProfileOpen, setEditProfileOpen] = useState(false);
 	const [editCareerOpen, setEditCareerOpen] = useState(false);
@@ -30,7 +33,10 @@ export default function Profil() {
 		profileApi
 			.get()
 			.then((res) => {
-				if (active) setProfile(res.profile);
+				if (active) {
+					setProfile(res.profile);
+					setSkills(res.skills ?? []);
+				}
 			})
 			.catch(() => {
 				// profil belum tersedia (mis. onboarding belum selesai) — biarkan null
@@ -83,6 +89,17 @@ export default function Profil() {
 				<ProfileSection title="Skill & AI">
 					<SkillSummaryCard onSeeMore={() => navigate("/dashboard/skill")} />
 				</ProfileSection>
+
+				<div className="lg:col-span-2">
+					<ProfileSection
+						title="Pengalaman Karier & Skill"
+						description="Riwayat pekerjaan, skill, dan berkas CV yang melengkapi profil kariermu.">
+						<CareerExperienceCard
+							skills={skills}
+							loading={profileLoading}
+						/>
+					</ProfileSection>
+				</div>
 
 				<ProfileSection title="Jalur Karier">
 					<CareerPathSummaryCard onSeeMore={() => navigate("/dashboard/jalur-karier")} />

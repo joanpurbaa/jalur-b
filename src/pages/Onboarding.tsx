@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { ApiError } from "../types/api";
 import { onboardingApi } from "../services/onboarding";
 import { masterApi } from "../services/master";
+import {
+	saveLocalCv,
+	formatFileSize,
+	type CvMeta,
+} from "../lib/careerExtras";
 import type { CareerGoal, OnboardingPayload } from "../types/onboarding";
 
 interface FormData {
@@ -16,6 +21,7 @@ interface FormData {
 	careerGoal: string;
 	targetRole: string;
 	targetIndustry: string;
+	cv: File | null;
 }
 
 export default function Onboarding() {
@@ -43,6 +49,7 @@ export default function Onboarding() {
 		careerGoal: "",
 		targetRole: "",
 		targetIndustry: "",
+		cv: null,
 	});
 
 	const industries = [
@@ -115,6 +122,8 @@ export default function Onboarding() {
 				return formData.skills.length > 0;
 			case 7:
 				return formData.careerGoal !== "";
+			case 8:
+				return true;
 			default:
 				return true;
 		}
@@ -187,6 +196,14 @@ export default function Onboarding() {
 			await onboardingApi.complete(payload);
 			// Sync lokal agar modul dashboard tetap membaca data onboarding.
 			localStorage.setItem("jalurB_onboarding", JSON.stringify(formData));
+			if (formData.cv) {
+				const meta: CvMeta = {
+					fileName: formData.cv.name,
+					fileSize: formData.cv.size,
+					uploadedAt: new Date().toISOString(),
+				};
+				saveLocalCv(meta);
+			}
 			navigate("/dashboard");
 		} catch (err) {
 			setErrorMessage(
@@ -245,7 +262,7 @@ export default function Onboarding() {
 				</div>
 				<div className="flex items-center gap-4">
 					<div className="flex gap-1.5">
-						{[1, 2, 3, 4, 5, 6, 7].map((i) => (
+						{[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
 							<div
 								key={i}
 								className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -255,7 +272,7 @@ export default function Onboarding() {
 						))}
 					</div>
 					<span className="text-xs text-neutral/50 font-medium">
-						{step > 7 ? "7 dari 7" : `${step} dari 7`}
+						{step > 8 ? "8 dari 8" : `${step} dari 8`}
 					</span>
 				</div>
 			</div>
@@ -747,6 +764,100 @@ export default function Onboarding() {
 				{step === 8 && (
 					<div>
 						<span className="text-xs font-bold text-primary tracking-wider uppercase">
+							Langkah 8
+						</span>
+						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
+							Lampirkan CV kamu? (opsional)
+						</h1>
+						<p className="text-sm text-neutral/60 mt-1">
+							Bisa membantu Jalur B membaca pengalaman kariermu lebih detail.
+							Boleh dilewati dulu, kamu bisa mengunggahnya nanti dari halaman
+							Profil.
+						</p>
+
+						<div className="mt-8">
+							{formData.cv ? (
+								<div className="flex items-center gap-4 p-4 rounded-2xl border border-primary/20 bg-primary/5">
+									<div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+										<svg
+											className="w-5 h-5"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24">
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+											/>
+										</svg>
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-sm font-semibold text-neutral truncate">
+											{formData.cv.name}
+										</p>
+										<p className="text-xs text-neutral/50">
+											{formatFileSize(formData.cv.size)}
+										</p>
+									</div>
+									<button
+										type="button"
+										onClick={() =>
+											setFormData({ ...formData, cv: null })
+										}
+										className="text-xs font-semibold text-primary hover:opacity-70">
+										Hapus
+									</button>
+								</div>
+							) : (
+								<div>
+									<input
+										id="cv-upload"
+										type="file"
+										accept=".pdf,.doc,.docx"
+										onChange={(e) => {
+											const file = e.target.files?.[0] ?? null;
+											setFormData({ ...formData, cv: file });
+											if (errorMessage) setErrorMessage("");
+										}}
+										className="sr-only"
+									/>
+									<label
+										htmlFor="cv-upload"
+										className="flex flex-col items-center justify-center w-full p-8 rounded-2xl border-2 border-dashed border-neutral/20 hover:border-primary/40 transition cursor-pointer text-center">
+										<svg
+											className="w-8 h-8 text-neutral/40 mb-3"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24">
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+											/>
+										</svg>
+										<p className="text-sm font-semibold text-neutral">
+											Klik untuk memilih file CV
+										</p>
+										<p className="text-xs text-neutral/50 mt-1">
+											PDF, DOC, atau DOCX — maksimal 5 MB
+										</p>
+									</label>
+								</div>
+							)}
+						</div>
+
+						<p className="text-xs text-neutral/50 mt-3">
+							Unggah CV bersifat opsional. Kamu tetap bisa melanjutkan tanpa
+							melampirkan CV.
+						</p>
+					</div>
+				)}
+
+				{step === 9 && (
+					<div>
+						<span className="text-xs font-bold text-primary tracking-wider uppercase">
 							SELESAI
 						</span>
 						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
@@ -848,7 +959,7 @@ export default function Onboarding() {
 						<div />
 					)}
 
-					{step < 8 ? (
+					{step < 9 ? (
 						<button
 							type="button"
 							onClick={handleNext}
