@@ -24,6 +24,13 @@ export default function ProfileHeaderCard({
 	const username = user?.username || "-";
 	const avatarUrl = profile?.avatar_url;
 
+	const initials = name
+		.split(/\s+/)
+		.filter(Boolean)
+		.slice(0, 2)
+		.map((w) => w[0]?.toUpperCase() ?? "")
+		.join("");
+
 	if (loading) {
 		return (
 			<div className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-8 flex flex-col items-center text-center h-full">
@@ -45,13 +52,17 @@ export default function ProfileHeaderCard({
 
 	return (
 		<div className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-8 flex flex-col items-center text-center h-full">
-			<div className="w-24 h-24 rounded-full overflow-hidden border border-neutral/10 mb-4 bg-neutral/10">
-				{avatarUrl && (
+			<div className="w-24 h-24 rounded-full overflow-hidden border border-neutral/10 mb-4 bg-primary flex items-center justify-center">
+				{avatarUrl ? (
 					<img
 						src={avatarUrl}
 						alt={name}
 						className="w-full h-full object-cover"
 					/>
+				) : (
+					<span className="text-2xl font-bold text-white select-none">
+						{initials}
+					</span>
 				)}
 			</div>
 			<TruncatedText
