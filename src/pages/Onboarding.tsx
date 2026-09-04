@@ -3,12 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { ApiError } from "../types/api";
 import { onboardingApi } from "../services/onboarding";
 import { masterApi } from "../services/master";
-import {
-	saveLocalCv,
-	formatFileSize,
-	type CvMeta,
-} from "../lib/careerExtras";
+import { cvApi } from "../services/cv";
 import type { CareerGoal, OnboardingPayload } from "../types/onboarding";
+import type { CvPreviewResponse } from "../types/cv";
 
 interface FormData {
 	fullName: string;
@@ -21,7 +18,6 @@ interface FormData {
 	careerGoal: string;
 	targetRole: string;
 	targetIndustry: string;
-	cv: File | null;
 }
 
 export default function Onboarding() {
@@ -38,6 +34,10 @@ export default function Onboarding() {
 		[],
 	);
 
+	const [cvPreview, setCvPreview] = useState<CvPreviewResponse | null>(null);
+	const [cvLoading, setCvLoading] = useState<boolean>(false);
+	const [cvError, setCvError] = useState<string>("");
+
 	const [formData, setFormData] = useState<FormData>({
 		fullName: "",
 		role: "",
@@ -49,7 +49,6 @@ export default function Onboarding() {
 		careerGoal: "",
 		targetRole: "",
 		targetIndustry: "",
-		cv: null,
 	});
 
 	const industries = [
@@ -194,15 +193,14 @@ export default function Onboarding() {
 				skills: formData.skills,
 			};
 			await onboardingApi.complete(payload);
-			// Sync lokal agar modul dashboard tetap membaca data onboarding.
 			localStorage.setItem("jalurB_onboarding", JSON.stringify(formData));
-			if (formData.cv) {
-				const meta: CvMeta = {
-					fileName: formData.cv.name,
-					fileSize: formData.cv.size,
-					uploadedAt: new Date().toISOString(),
-				};
-				saveLocalCv(meta);
+			if (cvPreview) {
+				await cvApi.confirm({
+					preview_token: cvPreview.preview_token,
+					profile: cvPreview.profile,
+					skills: cvPreview.skills,
+					experiences: cvPreview.experiences,
+				});
 			}
 			navigate("/dashboard");
 		} catch (err) {
@@ -776,38 +774,83 @@ export default function Onboarding() {
 						</p>
 
 						<div className="mt-8">
-							{formData.cv ? (
-								<div className="flex items-center gap-4 p-4 rounded-2xl border border-primary/20 bg-primary/5">
-									<div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-										<svg
-											className="w-5 h-5"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24">
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-											/>
-										</svg>
+							{cvPreview ? (
+								<div>
+									<div className="flex items-center gap-3 mb-4">
+										<div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+											<svg
+												className="w-5 h-5"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24">
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+												/>
+											</svg>
+										</div>
+										<div>
+											<p className="text-sm font-bold text-neutral">
+												CV berhasil dibaca
+											</p>
+											<p className="text-xs text-neutral/50">
+												{cvPreview.file_name}
+											</p>
+										</div>
 									</div>
-									<div className="flex-1 min-w-0">
-										<p className="text-sm font-semibold text-neutral truncate">
-											{formData.cv.name}
-										</p>
-										<p className="text-xs text-neutral/50">
-											{formatFileSize(formData.cv.size)}
-										</p>
-									</div>
-									<button
-										type="button"
-										onClick={() =>
-											setFormData({ ...formData, cv: null })
-										}
-										className="text-xs font-semibold text-primary hover:opacity-70">
-										Hapus
-									</button>
+
+									{cvPreview.experiences.length > 0 && (
+										<div className="mb-4">
+											<p className="text-xs font-bold text-neutral mb-2">
+												Pengalaman yang ditemukan:
+											</p>
+											<div className="space-y-2">
+												{cvPreview.experiences.map((exp, i) => (
+													<div
+														key={`exp-${i}`}
+														className="border-l-2 border-primary/20 pl-3 py-1">
+														<p className="text-sm font-semibold text-neutral">
+															{exp.role}
+														</p>
+														<p className="text-xs text-neutral/50">
+															{exp.company} · {exp.start_date} — {exp.end_date}
+														</p>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+
+									{cvPreview.skills.length > 0 && (
+										<div className="mb-4">
+											<p className="text-xs font-bold text-neutral mb-2">
+												Skill yang ditemukan:
+											</p>
+											<div className="flex flex-wrap gap-1.5">
+												{cvPreview.skills.map((skill) => (
+													<span
+														key={skill}
+														className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+														{skill}
+													</span>
+												))}
+											</div>
+										</div>
+									)}
+
+									<p className="text-xs text-neutral/50 mt-3">
+										Jalur B akan menggunakan data ini untuk memperkaya profil
+										kariermu.
+									</p>
+								</div>
+							) : cvLoading ? (
+								<div className="flex flex-col items-center py-8">
+									<div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-3" />
+									<p className="text-sm text-neutral/60">
+										Membaca CV dengan AI…
+									</p>
 								</div>
 							) : (
 								<div>
@@ -816,9 +859,25 @@ export default function Onboarding() {
 										type="file"
 										accept=".pdf,.doc,.docx"
 										onChange={(e) => {
-											const file = e.target.files?.[0] ?? null;
-											setFormData({ ...formData, cv: file });
-											if (errorMessage) setErrorMessage("");
+											const file = e.target.files?.[0];
+											if (!file) return;
+											setCvError("");
+											setCvLoading(true);
+											cvApi
+												.preview(file)
+												.then((res) => {
+													setCvPreview(res);
+												})
+												.catch((err) => {
+													setCvError(
+														err instanceof ApiError
+															? err.message
+															: "Gagal membaca CV. Coba dengan file lain.",
+													);
+												})
+												.finally(() => {
+													setCvLoading(false);
+												});
 										}}
 										className="sr-only"
 									/>
@@ -847,6 +906,12 @@ export default function Onboarding() {
 								</div>
 							)}
 						</div>
+
+						{cvError && (
+							<p className="text-xs text-red-500 font-medium mt-3">
+								{cvError}
+							</p>
+						)}
 
 						<p className="text-xs text-neutral/50 mt-3">
 							Unggah CV bersifat opsional. Kamu tetap bisa melanjutkan tanpa

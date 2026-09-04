@@ -72,9 +72,7 @@ export default function Sidebar() {
 
 			<div className="flex flex-col min-h-0">
 				<div className="flex items-center gap-3 px-2 py-3 mb-6 shrink-0">
-					<div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm shrink-0">
-						J
-					</div>
+      <img src="/icon.png" className="w-10 h-10 rounded-full" alt="" />
 					{!isCollapsed && (
 						<div>
 							<h2 className="font-bold text-neutral leading-tight">Jalur B</h2>
