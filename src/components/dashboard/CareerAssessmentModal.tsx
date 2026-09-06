@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Check, Loader2 } from "lucide-react";
 import { PrimaryButton } from "../ui/PrimaryButton";
 import { careerHealthApi } from "../../services/careerHealth";
 import { careerRiskApi } from "../../services/careerRisk";
@@ -187,11 +188,87 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 					</button>
 				</div>
 
-				<div className="space-y-5">
-					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
-							Role / Jabatan <span className="text-red-500">*</span>
-						</label>
+				{submitting && !submitError ? (
+					<div className="py-6 flex flex-col items-center text-center">
+						<div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+							<Loader2 size={26} className="text-primary animate-spin" />
+						</div>
+						<h3 className="text-lg font-bold text-neutral">
+							Menganalisis data kariermu…
+						</h3>
+						<p className="text-sm text-neutral/50 mt-1 mb-7">
+							Semua modul penilaian sedang diproses satu per satu secara
+							real-time.
+						</p>
+
+						<div className="w-full max-w-sm space-y-3">
+							{ASSESSMENT_STEPS.map((step, i) => {
+								const done = i < (currentStep ?? -1);
+								const running = i === currentStep;
+								return (
+									<div
+										key={step.label}
+										className={`flex items-center gap-3 p-3.5 rounded-2xl border transition ${
+											running
+												? "border-primary/40 bg-primary/5"
+												: done
+													? "border-emerald-200 bg-emerald-50/60"
+													: "border-neutral/10 bg-white"
+										}`}>
+										<div
+											className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+												done
+													? "bg-emerald-500"
+													: running
+														? "bg-primary"
+														: "bg-neutral/10"
+											}`}>
+											{done ? (
+												<Check size={15} className="text-white" />
+											) : running ? (
+												<Loader2 size={15} className="text-white animate-spin" />
+											) : (
+												<span className="text-xs font-semibold text-neutral/40">
+													{i + 1}
+												</span>
+											)}
+										</div>
+										<div className="flex-1 text-left min-w-0">
+											<p
+												className={`text-sm font-semibold ${
+													running
+														? "text-neutral"
+														: done
+															? "text-emerald-700"
+															: "text-neutral/40"
+												}`}>
+												{step.label}
+											</p>
+											{running && (
+												<p className="text-xs text-primary">
+													Sedang menganalisis…
+												</p>
+											)}
+											{done && (
+												<p className="text-xs text-emerald-600">Selesai</p>
+											)}
+										</div>
+										{done && (
+											<span className="text-xs font-semibold text-emerald-600 shrink-0">
+												Berhasil
+											</span>
+										)}
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				) : (
+					<div className="space-y-5">
+						<div>
+							<label className="block text-xs font-semibold text-neutral mb-2">
+								Role / Jabatan <span className="text-red-500">*</span>
+							</label>
 						<input
 							type="text"
 							value={form.role_name}
@@ -337,6 +414,7 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 						</p>
 					</div>
 				</div>
+				)}
 
 				{submitError && (
 					<div className="mt-4 px-4 py-3 rounded-2xl bg-red-50 border border-red-100">
@@ -348,34 +426,6 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 				)}
 
 				<div className="mt-8 pt-6 border-t border-neutral/10">
-					{submitting && (
-						<div className="mb-4 space-y-1.5">
-							{ASSESSMENT_STEPS.map((step, i) => (
-								<div
-									key={step.label}
-									className="flex items-center gap-2 text-xs">
-									<span
-										className={`w-2 h-2 rounded-full ${
-											i < (currentStep ?? -1)
-												? "bg-emerald-500"
-												: i === currentStep
-													? "bg-primary animate-pulse"
-													: "bg-neutral/20"
-										}`}
-									/>
-									<span
-										className={
-											i <= (currentStep ?? -1)
-												? "text-neutral/70"
-												: "text-neutral/40"
-										}>
-										{step.label}
-									</span>
-								</div>
-							))}
-						</div>
-					)}
-
 					<div className="flex items-center justify-end gap-3">
 						<button
 							type="button"
@@ -387,11 +437,7 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 						<PrimaryButton
 							onClick={() => void handleSubmit()}
 							disabled={!canSubmit || submitting}>
-							{submitting
-								? currentStep != null
-									? `Menganalisis ${ASSESSMENT_STEPS[currentStep].label}...`
-									: "Menyimpan..."
-								: "Simpan Data"}
+							{submitting ? "Memproses…" : "Simpan Data"}
 						</PrimaryButton>
 					</div>
 				</div>
