@@ -26,7 +26,7 @@ export default function AIAnalysisPanel({
 				<Info size={14} className="text-neutral/40 shrink-0 mt-0.5" />
 				<p className="text-[11px] text-neutral/50 leading-relaxed">
 					{confidence != null && confidence > 0
-						? `Akurasi estimasi ${confidence}%. Jalur B menganalisis data role, performa, industri, dan makro-tren terkini. Hasil analisis bersifat panduan probabilistik, bukan pernyataan absolut.`
+						? `Kelengkapan data ${confidence}%. Jalur B menganalisis data role, performa, industri, dan makro-tren terkini. Hasil analisis bersifat panduan probabilistik, bukan pernyataan absolut.`
 						: "Jalur B menganalisis data role, performa, industri, dan makro-tren terkini untuk memberikan estimasi ini. Hasil analisis bersifat panduan probabilistik dan bukan pernyataan absolut mengenai masa depan karier kamu."}
 				</p>
 			</div>

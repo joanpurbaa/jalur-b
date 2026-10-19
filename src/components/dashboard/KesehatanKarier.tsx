@@ -16,6 +16,7 @@ import ProgressBar from "../ui/ProgressBar";
 import Skeleton from "../ui/Skeleton";
 import ExpandableText from "../ui/ExpandableText";
 import { PrimaryButton } from "../ui/PrimaryButton";
+import InfoTooltip from "../ui/InfoTooltip";
 import FactorCard from "./FactorCard";
 import { careerHealthApi } from "../../services/careerHealth";
 import { parseDecimal } from "../../lib/parseNumeric";
@@ -156,7 +157,10 @@ export default function KesehatanKarier() {
 						{result && (
 							<div className="mt-4">
 								<div className="flex justify-between items-center text-xs mb-1.5 font-medium">
-									<span className="text-neutral/60">Akurasi analisismu</span>
+									<span className="text-neutral/60 flex items-center gap-1">
+										Kelengkapan data
+										<InfoTooltip text="Seberapa lengkap data yang kamu isi. Bukan ukuran ketepatan prediksi." />
+									</span>
 									<span className="text-primary font-bold">{confidence}%</span>
 								</div>
 								<ProgressBar value={confidence} variant="insight" />

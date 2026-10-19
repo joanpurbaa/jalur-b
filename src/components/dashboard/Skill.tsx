@@ -47,7 +47,7 @@ export default function Skill() {
 		? clampPercent(parseDecimal(result.data_confidence))
 		: 0;
 	const panelDescription = result
-		? `${result.summary} (Akurasi analisis ${confidence}%).`
+		? `${result.summary} (Kelengkapan data ${confidence}%).`
 		: "";
 
 	return (

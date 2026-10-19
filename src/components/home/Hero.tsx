@@ -1,139 +1,137 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Reveal from "./Reveal";
 
-const TARGET_VALUE = 43805;
-const ANIMATION_DURATION_MS = 2000;
+// TODO: Isi detail persona dari paper (profesi, gaji, tabungan, pesangon, dll)
+// dan nama tiap cara keluar. Angka months (2,5 dan 13,7) sudah sesuai paper.
+// Field `detail` opsional: kosongkan string-nya kalau belum ada.
+const PERSONA = {
+	caption: "Contoh persona",
+	description: "Kondisi finansial yang sama, tapi cara keluarnya berbeda.",
+	scenarios: [
+		{
+			label: "Cara keluar A",
+			detail: "",
+			months: 2.5,
+			barClass: "bg-red-500",
+			numberClass: "text-red-500",
+		},
+		{
+			label: "Cara keluar B",
+			detail: "",
+			months: 13.7,
+			barClass: "bg-primary",
+			numberClass: "text-primary",
+		},
+	],
+};
 
-function easeOutQuint(t: number): number {
-	return 1 - Math.pow(1 - t, 5);
-}
+// Skala bar: 14 bulan = bar penuh.
+const MAX_MONTHS = 14;
 
-function useCountUp(target: number, shouldStart: boolean): number {
-	const [value, setValue] = useState(0);
-	const hasRun = useRef(false);
-
-	useEffect(() => {
-		if (!shouldStart || hasRun.current) return;
-		hasRun.current = true;
-
-		const prefersReducedMotion = window.matchMedia(
-			"(prefers-reduced-motion: reduce)",
-		).matches;
-
-		if (prefersReducedMotion) {
-			const frameId = requestAnimationFrame(() => setValue(target));
-			return () => cancelAnimationFrame(frameId);
-		}
-
-		let frame: number;
-		const start = performance.now();
-
-		const tick = (now: number) => {
-			const elapsed = now - start;
-			const progress = Math.min(elapsed / ANIMATION_DURATION_MS, 1);
-			setValue(Math.round(easeOutQuint(progress) * target));
-
-			if (progress < 1) {
-				frame = requestAnimationFrame(tick);
-			}
-		};
-
-		frame = requestAnimationFrame(tick);
-		return () => cancelAnimationFrame(frame);
-	}, [shouldStart, target]);
-
-	return value;
-}
-
-function useInView<T extends HTMLElement>() {
-	const ref = useRef<T | null>(null);
-	const [isInView, setIsInView] = useState(false);
-
-	useEffect(() => {
-		const node = ref.current;
-		if (!node) return;
-
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry.isIntersecting) {
-					setIsInView(true);
-					observer.disconnect();
-				}
-			},
-			{ threshold: 0.4 },
-		);
-
-		observer.observe(node);
-		return () => observer.disconnect();
-	}, []);
-
-	return { ref, isInView };
-}
+const formatMonths = (value: number) =>
+	value.toLocaleString("id-ID", {
+		minimumFractionDigits: 1,
+		maximumFractionDigits: 1,
+	});
 
 export default function Hero() {
 	const navigate = useNavigate();
-	const { ref, isInView } = useInView<HTMLDivElement>();
-	const count = useCountUp(TARGET_VALUE, isInView);
-	const formatted = new Intl.NumberFormat("id-ID").format(count);
+	const [animated, setAnimated] = useState(false);
+
+	useEffect(() => {
+		const id = requestAnimationFrame(() => setAnimated(true));
+		return () => cancelAnimationFrame(id);
+	}, []);
 
 	return (
-		<section id="masalah" className="pb-12 pt-28 px-5 sm:px-10 lg:px-20 xl:px-32 2xl:px-72 lg:pt-32">
+		<section
+			id="masalah"
+			className="px-5 pb-12 pt-28 sm:px-10 lg:px-20 lg:pt-32 xl:px-32 2xl:px-72">
 			<Reveal>
-			<div className="mx-auto flex justify-between items-start flex-col-reverse lg:flex-row gap-14 lg:gap-0">
-				<div className="max-w-xl">
-					<p className="mt-6 text-base text-neutral/60">
-						Kenali risiko kariermu sebelum kamu dipaksa menghadapinya.
-					</p>
+				<div className="mx-auto grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+					{/* Kiri: headline + CTA */}
+					<div>
+						<p className="mt-6 text-base text-neutral/60">
+							Kenali risiko kariermu sebelum kamu dipaksa menghadapinya.
+						</p>
 
-					<h1 className="mt-8 leading-[0.95] tracking-tight text-neutral">
-						<span className="block text-4xl font-bold sm:text-5xl lg:text-7xl">
-							Banyak pekerja
-							<br />
-							sudah kena PHK.
-						</span>
-						<span className="mt-5 block text-4xl font-semibold sm:text-6xl lg:text-4xl">
-							Kalau besok giliranmu?
-						</span>
-					</h1>
+						<h1 className="mt-6 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight text-neutral sm:text-5xl lg:text-6xl">
+							Kalau besok kehilangan pekerjaan, uangmu cukup berapa bulan?
+						</h1>
 
-					<div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
-						<button
-							type="button"
-							onClick={() => navigate("/login")}
-							className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
-							Cek kondisi karierku
-						</button>
-						<a
-							href="#solusi"
-							className="text-sm text-neutral/50 transition hover:text-primary">
-							Lihat cara kerjanya
-						</a>
+						<p className="mt-5 text-xl text-neutral/70 sm:text-2xl">
+							Jawabannya tergantung{" "}
+							<span className="font-[Georgia,serif] italic text-primary">
+								cara kamu keluar.
+							</span>
+						</p>
+
+						<div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+							<button
+								type="button"
+								onClick={() => navigate("/login")}
+								className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
+								Hitung runway-ku
+							</button>
+							<a
+								href="#solusi"
+								className="text-sm text-neutral/50 transition hover:text-primary">
+								Lihat cara kerjanya
+							</a>
+						</div>
+					</div>
+
+					{/* Kanan: kartu persona */}
+					<div className="w-full rounded-2xl border border-neutral/10 bg-white p-6 shadow-sm sm:p-8 lg:ml-auto lg:max-w-md">
+						<p className="text-xs font-semibold uppercase tracking-widest text-neutral/40">
+							{PERSONA.caption}
+						</p>
+						<p className="mt-2 text-sm text-neutral/60">{PERSONA.description}</p>
+
+						<ul className="mt-6 space-y-7">
+							{PERSONA.scenarios.map((scenario) => {
+								const width = Math.min((scenario.months / MAX_MONTHS) * 100, 100);
+								return (
+									<li key={scenario.label}>
+										<div className="flex items-end justify-between gap-4">
+											<div>
+												<p className="text-sm font-semibold text-neutral">
+													{scenario.label}
+												</p>
+												{scenario.detail ? (
+													<p className="mt-0.5 text-xs text-neutral/50">{scenario.detail}</p>
+												) : null}
+											</div>
+											<p className="shrink-0 tabular-nums">
+												<span
+													className={`text-4xl font-extrabold tracking-tight sm:text-5xl ${scenario.numberClass}`}>
+													{formatMonths(scenario.months)}
+												</span>
+												<span className="ml-1.5 text-base text-neutral/50">bulan</span>
+											</p>
+										</div>
+
+										<div
+											className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-neutral/10"
+											role="img"
+											aria-label={`${scenario.label}: uang cukup ${formatMonths(scenario.months)} bulan`}>
+											<div
+												className={`h-full rounded-full transition-[width] duration-1000 ease-out ${scenario.barClass}`}
+												style={{ width: animated ? `${width}%` : "0%" }}
+											/>
+										</div>
+									</li>
+								);
+							})}
+						</ul>
+
+						<p className="mt-7 border-t border-neutral/10 pt-4 text-xs text-neutral/45">
+							Runway = berapa bulan uangmu cukup menutup pengeluaran saat tidak ada
+							penghasilan.
+						</p>
 					</div>
 				</div>
-
-				<div ref={ref} className="flex flex-col justify-center items-start lg:items-end">
-					<p
-						aria-hidden="true"
-						className="mt-3 text-6xl font-extrabold tabular-nums tracking-tight text-red-500 sm:text-7xl lg:text-8xl">
-						{formatted}
-					</p>
-					<span className="sr-only">
-						43.805 orang terkena PHK, per 25 Agustus 2026
-					</span>
-
-					<p className="mt-2 text-lg text-neutral/70">orang terkena PHK</p>
-					<p className="mt-1 text-lg text-neutral/45">Per 25 Agustus 2026</p>
-
-					<a
-						href="https://www.cnbcindonesia.com/news/20260824194129-4-762060/43805-warga-ri-kena-phk-buruh-dan-pengusaha-ungkap-hal-tak-terduga"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="mt-6 inline-block text-lg text-neutral/60 underline decoration-neutral/20 underline-offset-2 transition hover:text-primary">
-						Sumber: CNBC Indonesia ↗
-					</a>
-				</div>
-			</div>
 			</Reveal>
 		</section>
 	);

@@ -4,6 +4,7 @@ import CareerPathMap from "./CareerPathMap";
 import RoleDetailPanel from "./RoleDetailPanel";
 import PrepTimeCard from "./PrepTimeCard";
 import Skeleton from "../ui/Skeleton";
+import InfoTooltip from "../ui/InfoTooltip";
 import { careerPivotApi } from "../../services/careerPivot";
 import { parseDecimal } from "../../lib/parseNumeric";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
@@ -55,9 +56,10 @@ export default function JalurKarier() {
 						<strong className="text-neutral">Rekomendasi:</strong>{" "}
 						{result.summary}
 					</p>
-					<p className="text-xs text-neutral/50 mt-2">
-						Akurasi analisis {confidence}%
-					</p>
+				<p className="text-xs text-neutral/50 mt-2 flex items-center gap-1">
+					Kelengkapan data {confidence}%
+					<InfoTooltip text="Seberapa lengkap data yang kamu isi. Bukan ukuran ketepatan prediksi." />
+				</p>
 				</div>
 			)}
 
