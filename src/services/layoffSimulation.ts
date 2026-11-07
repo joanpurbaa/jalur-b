@@ -1,14 +1,14 @@
 import { request } from "./http";
 import type {
-	LayoffScenario,
+	LayoffSimulationRequest,
 	LayoffSimulationResult,
 } from "../types/layoffSimulation";
 
 export const layoffSimulationApi = {
-	create: (scenario: LayoffScenario) =>
+	create: (data?: LayoffSimulationRequest) =>
 		request<LayoffSimulationResult>("/api/layoff-simulations", {
 			method: "POST",
-			body: { scenario },
+			body: data ?? {},
 			auth: true,
 		}),
 

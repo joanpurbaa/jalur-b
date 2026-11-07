@@ -126,19 +126,19 @@ export default function SimulationLoading({
 					<p className="text-xs font-semibold text-red-600 mb-0.5">
 						Gagal menjalankan simulasi
 					</p>
-					<p className="text-xs text-red-500">{runError}</p>
+					<p className="text-xs text-red-500 leading-relaxed">{runError}</p>
 					<div className="flex items-center gap-2 mt-4">
 						<button
 							type="button"
-							onClick={onRetry}
+							onClick={onBack}
 							className="px-4 py-2 text-xs font-semibold rounded-full bg-primary text-white hover:opacity-90 transition cursor-pointer">
-							Coba Lagi
+							Lengkapi Konfigurasi / Ketentuan Kerja
 						</button>
 						<button
 							type="button"
-							onClick={onBack}
+							onClick={onRetry}
 							className="px-4 py-2 text-xs font-medium rounded-full border border-neutral/20 text-neutral hover:bg-tertiary transition cursor-pointer">
-							Kembali ke Konfigurasi
+							Coba Lagi
 						</button>
 					</div>
 				</div>

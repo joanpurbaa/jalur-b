@@ -1,5 +1,21 @@
 export type LayoffScenario = "tomorrow" | "one_month" | "three_months";
 
+export type ExitType =
+	| "efficiency_prevent_loss"
+	| "efficiency_due_to_loss"
+	| "closure_not_loss"
+	| "bankruptcy"
+	| "pkwt_ends_on_schedule"
+	| "resign";
+
+export interface LayoffSimulationRequest {
+	exit_type?: ExitType;
+	normative_rights_collectable?: boolean | null;
+	search_time_months?: number | string;
+	horizon_months?: number | string;
+	preferred_role_name?: string | null;
+}
+
 export interface LayoffSimulationResult {
 	id: number;
 	scenario: string;
@@ -17,4 +33,13 @@ export interface LayoffSimulationResult {
 	action_items: Array<Record<string, unknown>>;
 	model: string;
 	scoring_version: string;
+	exit_type?: ExitType | null;
+	regulation_version?: string | null;
+	search_time_months?: string | null;
+	preparation_time_months?: string | null;
+	transition_role_name?: string | null;
+	transition_gap_months?: string | null;
+	transition_gap_status?: string | null;
+	role_transitions?: Array<Record<string, unknown>>;
+	insufficient_data?: string[];
 }

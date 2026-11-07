@@ -122,17 +122,39 @@ export async function request<T>(
 
 	if (!response.ok) {
 		let message = "Terjadi kesalahan pada server.";
+		let data: unknown;
 		try {
-			const data = await response.json();
-			if (data && typeof data.detail === "string") {
-				message = data.detail;
-			} else if (Array.isArray(data?.detail)) {
-				message = data.detail.map((d: { msg: string }) => d.msg).join(", ");
+			data = await response.json();
+			if (data && typeof data === "object") {
+				const detail = (data as { detail?: unknown }).detail;
+				if (typeof detail === "string") {
+					message = detail;
+				} else if (Array.isArray(detail)) {
+					message = detail
+						.map((d: { msg?: string }) => d.msg ?? JSON.stringify(d))
+						.join(", ");
+				} else if (detail && typeof detail === "object") {
+					const d = detail as Record<string, unknown>;
+					if (d.code === "simulation_prerequisites_missing") {
+						const missingList = Array.isArray(d.missing)
+							? d.missing
+									.map((m) =>
+										m === "employment_terms" ? "ketentuan kerja (upah & status kerja)" : m,
+									)
+									.join(", ")
+							: "ketentuan kerja";
+						message = `Prasyarat simulasi belum lengkap: data ${missingList} belum diisi.`;
+					} else if (typeof d.message === "string") {
+						message = d.message;
+					} else if (typeof d.msg === "string") {
+						message = d.msg;
+					}
+				}
 			}
 		} catch {
 			// ignore non-JSON error body
 		}
-		throw new ApiError(message, response.status);
+		throw new ApiError(message, response.status, data);
 	}
 
 	let result: T = undefined as T;

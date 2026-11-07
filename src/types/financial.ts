@@ -82,3 +82,6 @@ export interface RunwayCalculationResponse {
 	financial_runway_months: string;
 	calculated_at: string;
 }
+
+export * from "./employmentTerms";
+

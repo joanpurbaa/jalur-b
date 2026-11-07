@@ -7,6 +7,7 @@ import {
 	Zap,
 	Compass,
 	Wallet as WalletIcon,
+	CheckSquare,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { getScoreStatus } from "../../../lib/status";
@@ -28,6 +29,15 @@ const scenarioLabels: Record<string, string> = {
 	tomorrow: "Besok",
 	one_month: "1 Bulan Lagi",
 	three_months: "3 Bulan Lagi",
+};
+
+const exitTypeLabels: Record<string, string> = {
+	efficiency_due_to_loss: "Efisiensi karena Rugi",
+	efficiency_prevent_loss: "Efisiensi Cegah Rugi",
+	closure_not_loss: "Penutupan Perusahaan",
+	bankruptcy: "Kepailitan",
+	pkwt_ends_on_schedule: "PKWT Berakhir",
+	resign: "Resign Sukarela",
 };
 
 function clampScore(value: string): number {
@@ -132,7 +142,16 @@ export default function SimulationResult({
 					{result.summary || "Belum ada ringkasan untuk simulasi ini."}
 				</p>
 				<p className="text-xs text-neutral/40 mt-2">
-					Skenario: {scenarioLabels[result.scenario] ?? result.scenario}
+					Skenario:{" "}
+					{result.exit_type
+						? (exitTypeLabels[result.exit_type] ?? result.exit_type)
+						: (scenarioLabels[result.scenario] ?? result.scenario)}
+					{result.search_time_months
+						? ` · Estimasi cari kerja: ${Math.round(parseDecimal(result.search_time_months))} bulan`
+						: ""}
+					{result.regulation_version
+						? ` · Dasar regulasi: ${result.regulation_version}`
+						: ""}
 					{simulatedDate ? ` · Disimulasikan ${simulatedDate}` : ""}
 				</p>
 			</div>
@@ -189,6 +208,26 @@ export default function SimulationResult({
 			</div>
 
 			<div className="space-y-6">
+				{result.transition_role_name && (
+					<div className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-6">
+						<div className="flex items-center gap-2 text-primary font-bold text-sm mb-3">
+							<Compass size={16} />
+							<span>Target Transisi Karier</span>
+						</div>
+						<p className="text-base font-bold text-neutral">
+							{result.transition_role_name}
+						</p>
+						{result.transition_gap_months != null && (
+							<p className="text-xs text-neutral/60 mt-1.5">
+								Estimasi gap transisi: {parseDecimal(result.transition_gap_months).toFixed(1)} bulan
+								{result.transition_gap_status
+									? ` (${result.transition_gap_status})`
+									: ""}
+							</p>
+						)}
+					</div>
+				)}
+
 				<div className="bg-primary/5 rounded-2xl border border-primary/20 border-l-4 border-l-primary p-6">
 					<div className="flex items-center gap-2 text-primary font-bold text-sm mb-4">
 						<Sparkles size={16} />
@@ -256,6 +295,42 @@ export default function SimulationResult({
 					</p>
 				</div>
 			</div>
+
+			{result.action_items && result.action_items.length > 0 && (
+				<div className="lg:col-span-3 bg-white rounded-2xl border border-neutral/5 shadow-sm p-6">
+					<h4 className="text-sm font-bold text-neutral mb-4 flex items-center gap-2">
+						<CheckSquare size={16} className="text-primary" />
+						<span>Rekomendasi Langkah Aksi (Action Items)</span>
+					</h4>
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+						{result.action_items.map((item, idx) => {
+							const rec = item as Record<string, unknown>;
+							const title =
+								(rec.title ||
+									rec.action ||
+									rec.name ||
+									`Langkah ${idx + 1}`) as string;
+							const desc =
+								(rec.description ||
+									rec.detail ||
+									rec.summary ||
+									"") as string;
+							return (
+								<div
+									key={idx}
+									className="p-4 bg-neutral/5 rounded-xl border border-neutral/10">
+									<p className="text-sm font-semibold text-neutral">{title}</p>
+									{desc && (
+										<p className="text-xs text-neutral/60 mt-1 leading-relaxed">
+											{desc}
+										</p>
+									)}
+								</div>
+							);
+						})}
+					</div>
+				</div>
+			)}
 
 			<div className="lg:col-span-3 bg-white rounded-2xl border border-neutral/5 shadow-sm p-8 text-center">
 				<h3 className="text-xl font-bold text-neutral mb-2">
