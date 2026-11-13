@@ -29,6 +29,8 @@ dist-ssr
 *.py
 scripts/
 tinytroupe-testing/
+founder/
 .venv/
 venv/
 config.ini
+

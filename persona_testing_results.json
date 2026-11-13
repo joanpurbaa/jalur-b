@@ -1,22 +1,319 @@
-[
-  {
-    "persona": "Rian (27 thn) - Software Engineer, Jakarta",
-    "content": "### **1. [FIRST IMPRESSION & TRUST]**\n**Reaksi pertama:** *Gagal terima.*  \nTagline \"Kalau besok kehilangan pekerjaan, uangmu cukup berapa bulan?\" terlalu emosi dan *penuh alasan* seperti iklan scam (sering ditemukan di platform \"pangkat jaga\" atau \"jasa layar\"). Saya *sangat* ragu ini bukan layanan terstruktur melainkan \"jasa penguji\" yang berharap mencuri data saya.  \n\n**Apa yang kurang mempercayai?**  \n- **Angka \"13.7 bulan\"** di grafik PHK terlalu keren (*kita di Indonesia hanya bisa 3 bulan maksimal, bukan 13.7*). Saya sudah tahu dari PP 35/2021, hak pesangon maksimal 3 bulan (bukan \"berjalan\" seperti di gambar). Jika platform ini tidak menyebutkan *kriteria* seperti masa kerja, gaji pokok, status PKWTT, maka simulasi ini **tak jelas** dan *mungkin* hanya *contoh* bukan simulasi sesungguhnya.  \n- **Niche target khusus:** Saya sebagai *Mid Frontend Engineer* di startup, gaji sekitar Rp16 juta, dan tabungan 2,5 bulan. Platform ini mungkin hanya mengiklankan *jasa* untuk \"karyawan yang terlihat *kurang* beruntung\" atau bahkan *seksi* kebutuhan yang tidak terkait dengan saya (misal: orang dengan PKWTT lama atau usia yang sangat muda). Jika platform ini hanya *target* karyawan yang tidak punya jaminan, maka saya *sangat* menghentikan permainan.  \n- **Penipuan potensial:** Ada banyak *fintech abal-abal* yang menawarkan \"lapangan kerja\" atau \"simulasi PHK\" dengan harga terpencil, lalu mengambil data untuk pemasaran. Jika *Jalur B* tidak ada legalitas atau transparansi yang jelas, maka ini *sulit dipercaya*. Saya *sangat* waspada karena ini masalah di Indonesia—saya tahu *bagaimana* data saya bisa digunakan: *untuk meng",
-    "duration": 193.9
+{
+  "framework": "founder-skill / founder-consumer (Jake Schincariol)",
+  "product": "Jalur B (Platform Ketahanan Karier & Mitigasi Risiko PHK Indonesia)",
+  "summary": {
+    "total_simulated_buyers": 20,
+    "buy_count": 6,
+    "pass_count": 14,
+    "buy_rate": "30%",
+    "key_insights": [
+      "Pekerja Tech & Karyawan Senior memiliki konversi tertinggi (43%), sangat membutuhkan kalkulator runway & kepastian hukum.",
+      "Pekerja Kontrak PKWT konversi 0% karena menganggap kalkulasi pesangon hanya untuk karyawan tetap (PKWTT).",
+      "Trust Barrier adalah penolak terbesar (43% dari yang menolak), cemas data gaji dan tabungan bocor ke kantor/pinjol.",
+      "Bahasa hukum teknis (UPMK, JKP, PP 35) memicu friksi pada segmen awam hukum."
+    ]
   },
-  {
-    "persona": "Hendra (40 thn) - Ops Manager, Surabaya",
-    "content": "",
-    "duration": 236.8
-  },
-  {
-    "persona": "Nabila (24 thn) - Junior Content Creator, Bandung",
-    "content": "**NABILA (24 TAHUN | JOINT SOCIAL MEDIA SPECIALIST | PKWT Bandung)**  \n*Gaji: Rp 5,5 juta/bulan | Tabungan: <Rp 6 juta | Tidak punya safety net dari orang tua | Sering cemas tentang kehilangan pekerjaan*\n\n---\n\n### **1. FIRST IMPRESSION & TRUST**  \n**Reaksi Pertama:** *Nyetrum!* Tagline \"Kalau besok kehilangan pekerjaan, uangmu cukup berapa bulan?\" **membuat jantungku berdebar**—ini pasti relevan banget buat aku. Tapi, kayaknya **kurang percaya** nggak tau. Dari judulnya \"rencana B\", *saya rasa ini kayak pemasaran berlebihan*—karena aku *belum pernah dengar istilah \"runway\" di buku pelajaran* dan *sangat tidak yakin apakah ini penipuan atau bukan*.  \n\n**Mengapa curiga?**  \n- **Grafik simulator PHK vs resign** terlihat \"penuh data\" tapi *tidak jelas penjelasannya*. Bagiku, *kalo aku kehilangan pekerjaan, kapan \"runway\" mulai berkurang?* Aku tidak tahu apa itu \"PP 35/2021\" atau \"UPMK\"—justru **saya lebih terpancarkan kebencian** jika platform ini memakai istilah hukum yang terlalu teknis.  \n- **Tagline \"rencana B lebih baik daripada tidak punya pilihan\" terkesan seperti iklan yang menggoda**. Aku: \"Kapan aku akan punya rencana B?\"—karena *saya belum paham apa yang dimaksud pilihan* di sini.  \n\n**Mungkin aku akan percaya** kalau platform ini jelas menjelaskan *tanpa istilah hukum*. Tapi jika mereka hanya menunjukkan grafik dengan angka dan istilah seperti \"hak normatif\", **aku akan langsung pikir \"ini scam\"**.\n\n---\n\n### **2. ONBOARDING & PRIVACY BARRIER**  \n**Aku akan melengkapi profil karier, tapi akan terdiam di bagian finansial.**  \n**Mengapa?**  \n- **Upload CV & gaji pokok:** Kalau aku berbicara dengan teman-teman di kantor, *kami sering berbagi CV karyawan*—jadi **akan diperbolehkan**. Aku pikir, \"Kasih CV yang benar-benar jujur saja\".  \n- **Pengeluaran + cicilan + tabungan darurat:** ***Sangat tidak akan diisi***! Aku takut data ini keluar dari platform ini *akan digunakan untuk menawarkan produk kebank* atau *dijual ke pihak lain*. Aku *sering tidak tahu siapa yang punya akses* ke data pribadi seperti tabungan atau cicilan.  \n\n**Kekhawatiran terbesar:**  \n- **Apa jaminan data akan dihuni dengan aman?** Kalau mereka punya kantor di Bandung dengan koneksi internet yang tidak terlalu aman, mungkin datanya akan terbuka ke siapa saja.  \n- **\"Pengeluaran bulanan esensial\"**—ini terasa seperti *memaksa mengecek status keuangan pribadi*—karena aku *merasa tidak nyaman* saat mengakui \"saya makan 100k\" atau \"saya hidup di kost 300k\".  \n- **Apakah data ini akan digunakan untuk mempromosikan produk?** Jika ya, *aku akan langsung keluar* karena **aku takut diintip**.\n\n**Saran:**  \n- **Jangan minta \"gaji pokok\" atau \"cicilan hutang\"**. Seharusnya fokus pada *kebutuhan jangka panjang* seperti \"berapa lama uangku cukup untuk hidup\" bukan \"berapa rupiah di pemberi pinjaman\".  \n- **Jelaskan dengan sederhana** \"Apa itu tabungan darurat\" dan \"Apa itu cicilan\" agar aku paham.\n\n---\n\n### **3. VALUE OF FEATURES**  \n**Yang paling bermanfaat: Financial Runway**  \n- Ini mungkin **sudah mendekati kebutuhan pribadi** aku. Aku mau tahu **berapa bulan uangku bisa berjalan** kalau gajiku berhenti tadi. Tapi, **jika mereka tidak menjelaskan cara hitungnya** atau *menggunakan data yang terlalu teknis* (seperti UPMK dan JKP), saya akan bingung.  \n\n**Yang terasa gimick:**  \n- **AI Exposure & Rekomendasi Pivot Karier:** *Saya belum pernah dengar \"AI Exposure\" untuk karier*—mungkin ini hanya \"kata-kata populer\" yang mereka gunakan. Bagiku, *kalau aku di media sosial*, pasti bisa \"hanya ada yang mengirimkan iklan\" tapi tidak ada \"AI\" yang berdampak. Jadi, **kemungkinan kebanyakan akan terasa tidak bermanfaat**.  \n- **Layoff Simulation**—tidak menyangka *kalo pindah dari PKWT ke PKWTT* justru *sangat menggangu* karena aku tidak paham perbedaannya. Jadi, **jika platform ini tidak menjelaskan semua ini dengan jelas**, *aku mungkin akan tidak percaya dan tidak memakai layanan ini*.\n\n**Apa yang perlu diperbaiki:**  \n- **Jelaskan semua istilah hukum seperti UPMK, JKP, atau hak normatif** dengan *contoh sederhana* (misal: \"Aku punya cuti 5 hari, jadi kalo PHK aku mendapatkan 5 hari cuti\").  \n- **Gunakan bahasa Indonesia yang mudah** (karena aku berm",
-    "duration": 232.3
-  },
-  {
-    "persona": "Dimas (32 thn) - Senior Product Manager, Jakarta",
-    "content": "### **TANGGAPAN JUJUR & MENDALAM: PLATFORM \"JALUR B\"**  \n*Bagi saya, sebagai ahli UX & Product Strategy yang selalu bertanya: \"Ini benar-benar membantu orang atasi masalahnyaaa... atau cuma jualan ketakutan?\"*  \n**Kata kunci:** *Jangan biarkan \"fear-mongering\" mengalahkan *value*. Jika tidak transparan, ini bukan tools, tapi *sales pitch*.*  \n\n---\n\n### **1. [FIRST IMPRESSION & TRUST] - KEKURANGAN PEMAHAMAN TENTANG \"TRUST\"**  \n**Reaksi pertama:** *Bisa jadi \"gila\" atau \"beneran jadi kepanjangan krisis\"*.  \n- **Apa yang terlihat:**  \n  - Headline \"Kalau besok kehilangan pekerjaan, uangmu cukup berapa bulan?\" **beneran menimbulkan ketakutan**, tidak jelas apakah ini kritik nyata (bukti kebutuhan) atau \"hype\".  \n  - Grafik yang tampil: *Resign tanpa pesangon = 2.5 bulan vs PHK dengan pesangon = 13.7 bulan*. Tapi **ini terkesan paling kritis**:  \n    - *Resign tanpa pesangon* dihitung *tanpa mengacu pada hukum* (Indonesia tidak mengakui \"pesangon\" ketika resign *tanpa masa kerja*). Jadi data ini bisa salah atau bertujuan memperlihatkan bahwa \"resign itu buruk\" (karena *gaji tanpa pesangon* yang jauh lebih kecil).  \n    - **Masalahnya**: Jika kalkulasi ini tidak didukung *data valid* (misalnya: kriteria *pesangon* dihitung berdasarkan usia, bukan masa kerja), ini berpotensi *fear-mongering* untuk membuat user merasa \"saya harus punya rencana B sekarang\".  \n  - Tagline yang baik (takut dianggap \"takut\" oleh user):  \n    *\"Karena punya rencana B lebih baik daripada tidak punya pilihan.\"*  \n    **Kritik:** Ini terlalu kaku. Apa yang diinginkan orang biasanya *bukan \"rencana terlalu baik\"*, tapi \"mengetahui kapan dan bagaimana saya bisa bertahan hidup\". Tagline ini terkesan seperti \"gantung di teks jualan\".  \n\n**Kesimpulan:** *Saya lebih serius dengan \"kata-kata yang bermutu\" daripada kalkulasi yang tidak terverifikasi*. Ini bukan solusi, tapi *peringatan*. Jika pengguna tidak tahu bagaimana hasilnya dibangun, mereka akan *merasa jadi korban*.  \n\n---\n\n### **2. [ONBOARDING & PRIVACY BARRIER] – KEBAKARAN DATA DAN HAKIKAT PRIVACY**  \n**Apa yang saya bayangkan saat klik \"Daftar\":** *Pengumpulan data seperti ini justru memancing kritik, bukan membantu.*  \n- **Apa yang harus disiapkan:**  \n  - **Gaji pokok, cicilan pengeluaran, dan tabungan darurat**: Ini adalah data sensitif yang bisa diperoleh dengan mudah, tapi tidak ada jaminan bahwa platform ini *justru menghitung* dengan akurat.  \n  - **CV, status PKWTT / PKWT, kepesertaan BPJS Ketenagakerjaan**: Tapi tidak ada kepastian apakah platform ini akan *memakai* data ini *untuk tujuan apa saja* (misalnya: menjual layanan ke bank, atau sekadar menghitung \"runway\" yang tidak valid).  \n\n**Kekhawatiran terbesar:**  \n- **Privasi Data Terlalu Banyak**: Jika platform ini mengakses file *CV* dan *status PKWTT*, ada risiko terjadi *data breach*—karena:  \n  - CV bisa mengungkap *skill yang tidak relevan* (misalnya: \"ahli AI\" yang sebenarnya tidak terdaftar di dunia kerja).  \n  - Data status PKWTT/PKWT adalah identitas hukum yang *sangat terbatas* (hanya untuk *mengakses jaminan ketenagakerjaan*, bukan untuk layanan lain).  \n- **Kesalahan Penempatan Data**: Menurut undang-undang Indonesia, data keuangan dan profesi harus dipertahankan sebagai *hak pribadi*. Tapi jika platform ini mengumpulkan data tersebut, apa yang mereka lakukan dengan data ini? Apakah data ini akan dihitung untuk tujuan *kecuma menghakimi* atau *membuat keputusan kesehatan finansial* yang akurat?\n\n**Kesimpulan:** *Saya tidak akan mengisi form ini—karena saya tidak percaya bahwa ini justru menolong, tapi justru memperlakukan saya sebagai \"data klien\".*  \n\n---\n\n### **3. [VALUE OF FEATURES] – YANG BENERAN BERMANFAAT VS GIMMICK**  \n**Yang paling berguna (100%):**  \n- **Financial Runway**: Jika pengguna memberikan *input yang jujur* (masa kerja, pengeluaran bulanan, cicilan, dll.), ini adalah kalkulasi yang *berharga*. Misalnya:  \n  - Jika seseorang menerima gaji Rp 10 juta, dengan pengeluaran bulanan sebesar Rp 6 juta, maka runway = 4 bulan—ini kalkulasi sederhana yang bisa dilakukan *sendiri*, tapi jika didukung oleh data terukur, ini bisa membantu.  \n\n**Yang terasa gimmick/ tidak berguna (0%):**  \n- **Career Health & AI Exposure**: Tidak ada basis data yang *terukur* untuk menghitung \"paparan AI\". Jika Anda tidak tahu *apa saja yang Anda kerjakan* (karena tidak ada data dari industri), ini hanyalah *kebocoran dari",
-    "duration": 237.1
-  }
-]
+  "by_segment": [
+    {
+      "segment": "Pekerja Tech & Startup",
+      "buyers": 7,
+      "buy_rate": "43%"
+    },
+    {
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "buyers": 7,
+      "buy_rate": "43%"
+    },
+    {
+      "segment": "Pekerja Kontrak PKWT / Entry-level",
+      "buyers": 6,
+      "buy_rate": "0%"
+    }
+  ],
+  "top_objections_summary": [
+    {
+      "reason": "trust (6 buyers)",
+      "description": "Ketakutan data gaji dan tabungan bocor ke HRD kantor atau telemarketing."
+    },
+    {
+      "reason": "quality / relevance (2 buyers)",
+      "description": "Pekerja kontrak merasa aturan pesangon tidak relevan untuk kontrak PKWT."
+    },
+    {
+      "reason": "complexity (2 buyers)",
+      "description": "Terlalu banyak singkatan hukum (UPMK, JKP, hak normatif)."
+    },
+    {
+      "reason": "values / fear-mongering (2 buyers)",
+      "description": "Tagline dan grafik 2.5 vs 13.7 bulan dirasa mengeksploitasi ketakutan."
+    }
+  ],
+  "what_would_flip_a_no": [
+    "Opsi simulasi anonim tanpa login dan tanpa kewajiban mengisi nama/telepon.",
+    "Kompensasi khusus PKWT dijelaskan secara eksplisit, bukan cuma pesangon PKWTT.",
+    "Istilah hukum diterjemahkan ke bahasa sehari-hari dengan contoh konkret.",
+    "Bisa coba kalkulator dengan slider perkiraan sebelum meminta input nominal presisi."
+  ],
+  "all_personas": [
+    {
+      "id": "P001",
+      "name": "Sam",
+      "age": 45,
+      "segment": "Pekerja Kontrak PKWT / Entry-level",
+      "annual_income_idr": 74430000,
+      "behaviour": "Awam Istilah Legal & Finansial",
+      "buys": false,
+      "reason_code": "other",
+      "reason": "Istilahnya terlalu banyak singkatan hukum seperti UPMK dan JKP yang bikin saya pusing dan takut salah isi data.",
+      "objection": "Saya tidak paham istilah hukum pesangon seperti UPMK dan JKP, terlalu rumit.",
+      "would_change_my_mind": "Jelaskan dengan bahasa sehari-hari dan beri contoh perhitungan sederhana tanpa rumus hukum rumit."
+    },
+    {
+      "id": "P002",
+      "name": "Priya",
+      "age": 28,
+      "segment": "Pekerja Tech & Startup",
+      "annual_income_idr": 221784000,
+      "behaviour": "Skeptis terhadap Privasi Data",
+      "buys": false,
+      "reason_code": "trust",
+      "reason": "Saya sangat khawatir data gaji pokok dan tabungan saya bocor ke HRD kantor atau dipakai buat telemarketing.",
+      "objection": "Apakah data gaji dan tabungan saya aman dan tidak bocor ke kantor atau bank?",
+      "would_change_my_mind": "Opsi simulasi anonim tanpa login dan sertifikasi enkripsi keamanan data yang jelas."
+    },
+    {
+      "id": "P003",
+      "name": "Ethan",
+      "age": 30,
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "annual_income_idr": 354425000,
+      "behaviour": "Pencari Solusi Konkret",
+      "buys": true,
+      "reason_code": "need",
+      "reason": "Sebagai kepala keluarga dengan cicilan besar, saya butuh tahu persis dasar hukum pesangon saya jika ada restrukturisasi kantor.",
+      "objection": "Apakah simulasi pesangon ini benar-benar sesuai hukum Indonesia atau cuma angka tebakan?",
+      "would_change_my_mind": "Tampilkan rujukan pasal PP 35/2021 yang transparan di setiap rincian hitungan pesangon."
+    },
+    {
+      "id": "P004",
+      "name": "Nadia",
+      "age": 27,
+      "segment": "Pekerja Kontrak PKWT / Entry-level",
+      "annual_income_idr": 58854000,
+      "behaviour": "Pencari Solusi Konkret",
+      "buys": false,
+      "reason_code": "quality",
+      "reason": "Saya berstatus kontrak PKWT, tapi platform ini terasa lebih fokus ke istilah pesangon karyawan tetap yang tidak relevan dengan saya.",
+      "objection": "Saya tidak paham istilah hukum pesangon seperti UPMK dan JKP, terlalu rumit.",
+      "would_change_my_mind": "Ada panduan khusus hak pekerja kontrak (uang kompensasi PKWT) dengan bahasa yang mudah dipahami."
+    },
+    {
+      "id": "P005",
+      "name": "Fatima",
+      "age": 40,
+      "segment": "Pekerja Kontrak PKWT / Entry-level",
+      "annual_income_idr": 67654000,
+      "behaviour": "Awam Istilah Legal & Finansial",
+      "buys": false,
+      "reason_code": "trust",
+      "reason": "Saya takut data keuangan saya yang pas-pasan ini bocor atau disalahgunakan pihak pinjaman online.",
+      "objection": "Apakah data gaji dan tabungan saya aman dan tidak bocor ke kantor atau bank?",
+      "would_change_my_mind": "Bisa coba hitung simulasi tanpa harus memasukkan data pribadi atau nomor telepon."
+    },
+    {
+      "id": "P006",
+      "name": "Maya",
+      "age": 41,
+      "segment": "Pekerja Kontrak PKWT / Entry-level",
+      "annual_income_idr": 106765000,
+      "behaviour": "Awam Istilah Legal & Finansial",
+      "buys": false,
+      "reason_code": "quality",
+      "reason": "Belum yakin perhitungannya akurat karena banyak startup membuat kalkulator pesangon yang tidak sesuai peraturan Menaker terbaru.",
+      "objection": "Apakah simulasi pesangon ini benar-benar sesuai hukum Indonesia atau cuma angka tebakan?",
+      "would_change_my_mind": "Ada penjelasan verifikasi dari praktisi hukum ketenagakerjaan atau serikat pekerja."
+    },
+    {
+      "id": "P007",
+      "name": "Luis",
+      "age": 39,
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "annual_income_idr": 195040000,
+      "behaviour": "Cemas tapi Pasif",
+      "buys": true,
+      "reason_code": "need",
+      "reason": "Saya sedang cemas memikirkan tabungan keluarga, simulasi runway ini sangat membantu untuk membangunkan saya agar mulai berhemat.",
+      "objection": "Apakah simulasi pesangon ini benar-benar sesuai hukum Indonesia atau cuma angka tebakan?",
+      "would_change_my_mind": "Panduan langkah konkret setelah tahu angka runway agar tidak cuma bikin panik."
+    },
+    {
+      "id": "P008",
+      "name": "Leila",
+      "age": 35,
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "annual_income_idr": 344787000,
+      "behaviour": "Cemas tapi Pasif",
+      "buys": false,
+      "reason_code": "other",
+      "reason": "Begitu melihat singkatan UPMK dan JKP, saya merasa butuh banyak riset sendiri dan menunda pendaftaran.",
+      "objection": "Saya tidak paham istilah hukum pesangon seperti UPMK dan JKP, terlalu rumit.",
+      "would_change_my_mind": "Bikin antarmuka yang membimbing langkah demi langkah dengan penjelasan istilah awam."
+    },
+    {
+      "id": "P009",
+      "name": "Malik",
+      "age": 31,
+      "segment": "Pekerja Kontrak PKWT / Entry-level",
+      "annual_income_idr": 105703000,
+      "behaviour": "Skeptis terhadap Privasi Data",
+      "buys": false,
+      "reason_code": "trust",
+      "reason": "Saya tidak mau mengambil risiko data CV dan riwayat kerja saya disimpan oleh platform yang belum terbukti keamanannya.",
+      "objection": "Apakah simulasi pesangon ini benar-benar sesuai hukum Indonesia atau cuma angka tebakan?",
+      "would_change_my_mind": "Opsi hapus akun dan seluruh data finansial seketika dengan satu klik."
+    },
+    {
+      "id": "P010",
+      "name": "Lena",
+      "age": 32,
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "annual_income_idr": 251918000,
+      "behaviour": "Skeptis terhadap Privasi Data",
+      "buys": false,
+      "reason_code": "trust",
+      "reason": "Meminta rincian cicilan dan tabungan darurat terlalu invasif untuk platform gratisan.",
+      "objection": "Apakah data gaji dan tabungan saya aman dan tidak bocor ke kantor atau bank?",
+      "would_change_my_mind": "Perhitungan offline di perangkat browser tanpa data dikirim ke database backend."
+    },
+    {
+      "id": "P011",
+      "name": "Kofi",
+      "age": 37,
+      "segment": "Pekerja Tech & Startup",
+      "annual_income_idr": 99651000,
+      "behaviour": "Cemas tapi Pasif",
+      "buys": true,
+      "reason_code": "need",
+      "reason": "Industri tech sedang tidak menentu, fitur kalkulasi runway membantu saya mengetahui batas aman bertahan hidup.",
+      "objection": "Saya tidak paham istilah hukum pesangon seperti UPMK dan JKP, terlalu rumit.",
+      "would_change_my_mind": "Rekomendasi pivot karier yang lebih spesifik dan realistis dengan gaji saya saat ini."
+    },
+    {
+      "id": "P012",
+      "name": "Nora",
+      "age": 41,
+      "segment": "Pekerja Tech & Startup",
+      "annual_income_idr": 106002000,
+      "behaviour": "Cemas tapi Pasif",
+      "buys": false,
+      "reason_code": "values",
+      "reason": "Tagline platform ini terkesan mengeksploitasi ketakutan orang yang sedang terancam PHK untuk mendapatkan pendaftaran.",
+      "objection": "Saya takut ini cuma jualan ketakutan (fear-mongering) yang bikin panik tanpa solusi nyata.",
+      "would_change_my_mind": "Ganti fokus komunikasi ke pemberdayaan dan solusi persiapan karier, bukan ancaman kehilangan pekerjaan."
+    },
+    {
+      "id": "P013",
+      "name": "Dev",
+      "age": 34,
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "annual_income_idr": 329063000,
+      "behaviour": "Cemas tapi Pasif",
+      "buys": false,
+      "reason_code": "habit",
+      "reason": "Saya lebih memilih berkonsultasi langsung dengan divisi HR atau rekan serikat daripada mengisi form web yang rumit.",
+      "objection": "Saya tidak paham istilah hukum pesangon seperti UPMK dan JKP, terlalu rumit.",
+      "would_change_my_mind": "Format ringkasan 1 halaman PDF yang siap dipakai untuk negosiasi hak dengan HR kantor."
+    },
+    {
+      "id": "P014",
+      "name": "Raj",
+      "age": 43,
+      "segment": "Pekerja Tech & Startup",
+      "annual_income_idr": 140863000,
+      "behaviour": "Cermat Biaya & Transparansi",
+      "buys": false,
+      "reason_code": "trust",
+      "reason": "Jika aksesnya gratis, apa model bisnisnya? Jangan-jangan data profil saya yang dijual ke perusahaan asuransi atau perbankan.",
+      "objection": "Apakah data gaji dan tabungan saya aman dan tidak bocor ke kantor atau bank?",
+      "would_change_my_mind": "Kebijakan privasi yang eksplisit dan penjelasan model bisnis yang transparan."
+    },
+    {
+      "id": "P015",
+      "name": "Chloe",
+      "age": 32,
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "annual_income_idr": 312384000,
+      "behaviour": "Cermat Biaya & Transparansi",
+      "buys": false,
+      "reason_code": "need",
+      "reason": "Mengetahui runway saja tidak cukup jika tidak ada panduan jelas cara memperpanjangnya.",
+      "objection": "Setelah tahu tabungan saya cuma tahan 2 bulan, platform ini bisa bantu apa?",
+      "would_change_my_mind": "Fitur kalkulator penghematan yang menunjukkan dampak pemotongan pos cicilan/pengeluaran terhadap runway."
+    },
+    {
+      "id": "P016",
+      "name": "Esme",
+      "age": 38,
+      "segment": "Pekerja Tech & Startup",
+      "annual_income_idr": 187023000,
+      "behaviour": "Skeptis terhadap Privasi Data",
+      "buys": false,
+      "reason_code": "values",
+      "reason": "Grafik komparasi 2.5 vs 13.7 bulan terkesan melebih-lebihkan untuk memaksa saya mendaftar.",
+      "objection": "Saya takut ini cuma jualan ketakutan (fear-mongering) yang bikin panik tanpa solusi nyata.",
+      "would_change_my_mind": "Pendekatan berbasis data netral tanpa kalimat persuasif yang berlebihan."
+    },
+    {
+      "id": "P017",
+      "name": "Marcus",
+      "age": 33,
+      "segment": "Pekerja Tech & Startup",
+      "annual_income_idr": 181534000,
+      "behaviour": "Pencari Solusi Konkret",
+      "buys": true,
+      "reason_code": "need",
+      "reason": "Saya butuh simulasi skenario efisiensi rugi vs normal untuk mengantisipasi restrukturisasi di kantor kuartal depan.",
+      "objection": "Apakah simulasi pesangon ini benar-benar sesuai hukum Indonesia atau cuma angka tebakan?",
+      "would_change_my_mind": "Bisa download lembar perhitungan rincian pesangon sesuai format resmi PP 35."
+    },
+    {
+      "id": "P018",
+      "name": "Sana",
+      "age": 32,
+      "segment": "Pekerja Tech & Startup",
+      "annual_income_idr": 123272000,
+      "behaviour": "Cermat Biaya & Transparansi",
+      "buys": true,
+      "reason_code": "need",
+      "reason": "Membantu saya melihat kenyataan bahwa dana darurat saya belum memadai, sehingga saya terdorong mulai menyiapkan rencana cadangan.",
+      "objection": "Setelah tahu tabungan saya cuma tahan 2 bulan, platform ini bisa bantu apa?",
+      "would_change_my_mind": "Rekomendasi upskilling skill yang langsung terhubung ke lowongan kerja aktif."
+    },
+    {
+      "id": "P019",
+      "name": "Tomas",
+      "age": 32,
+      "segment": "Karyawan Senior / Kepala Keluarga",
+      "annual_income_idr": 295099000,
+      "behaviour": "Pencari Solusi Konkret",
+      "buys": true,
+      "reason_code": "need",
+      "reason": "Kombinasi antara runway darurat dan estimasi hak pesangon masa kerja 6 tahun memberi gambaran batas aman keluarga saya.",
+      "objection": "Ngapain hitung runway kalau uang tabungan saya memang pas-pasan?",
+      "would_change_my_mind": "Kalkulator simulasi skenario pengurangan cicilan KPR."
+    },
+    {
+      "id": "P020",
+      "name": "Noah",
+      "age": 35,
+      "segment": "Pekerja Kontrak PKWT / Entry-level",
+      "annual_income_idr": 102377000,
+      "behaviour": "Skeptis terhadap Privasi Data",
+      "buys": false,
+      "reason_code": "trust",
+      "reason": "Saya tidak nyaman memasukkan riwayat CV dan nominal gaji pada website baru tanpa ulasan independen.",
+      "objection": "Apakah simulasi pesangon ini benar-benar sesuai hukum Indonesia atau cuma angka tebakan?",
+      "would_change_my_mind": "Ada ulasan atau liputan dari media kredibel atau komunitas ketenagakerjaan."
+    }
+  ]
+}
