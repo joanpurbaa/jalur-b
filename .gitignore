@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 
 .env
+
+# Python & Testing artifacts
+*.py
+scripts/
+tinytroupe-testing/
+.venv/
+venv/
+config.ini
