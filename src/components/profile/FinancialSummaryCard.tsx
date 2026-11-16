@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
-import { Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Lock } from "lucide-react";
 import { financialApi, parseRunwayMonths } from "../../services/financial";
 import type { FinancialProfileResponse } from "../../types/financial";
-import { getScoreStatus, statusStyles } from "../../lib/status";
-import ProgressBar from "../ui/ProgressBar";
+import { getRunwayStatus, statusStyles } from "../../lib/status";
+import { formatDecimal1, formatRupiah } from "../../lib/format";
+import MeterBar from "../ui/MeterBar";
+import StatusBadge from "../ui/StatusBadge";
 import Skeleton from "../ui/Skeleton";
 
 interface FinancialSummaryCardProps {
 	refreshKey?: number;
-}
-
-function formatRupiah(raw?: string | null): string {
-	if (!raw) return "-";
-	const n = Number(raw);
-	return Number.isFinite(n) ? `Rp ${n.toLocaleString("id-ID")}` : "-";
 }
 
 export default function FinancialSummaryCard({
@@ -49,12 +46,8 @@ export default function FinancialSummaryCard({
 	}, [refreshKey]);
 
 	const current = runway?.current ?? 0;
-	const target = runway?.target ?? 0;
-	const percentToTarget = Math.min(
-		100,
-		Math.round((current / (target || 1)) * 100),
-	);
-	const variant = getScoreStatus(percentToTarget);
+	const target = runway?.target && runway.target > 0 ? runway.target : 6;
+	const variant = getRunwayStatus(current, target);
 	const s = statusStyles[variant];
 
 	const parameters =
@@ -70,7 +63,10 @@ export default function FinancialSummaryCard({
 					},
 					{
 						label: "Jumlah Tanggungan",
-						value: profile.dependents != null ? String(profile.dependents) : "-",
+						value:
+							profile.dependents != null
+								? `${profile.dependents} orang`
+								: "0 orang",
 					},
 				]
 			: [];
@@ -78,64 +74,70 @@ export default function FinancialSummaryCard({
 	return (
 		<div>
 			{loading ? (
-				<div className="rounded-xl p-5 mb-5 bg-neutral/5 border border-neutral/10">
+				<div className="rounded-2xl p-5 mb-5 bg-slate-50 border border-slate-200">
 					<Skeleton className="h-3 w-24 mb-2" />
 					<Skeleton className="h-8 w-32 mb-3" />
 					<Skeleton className="h-3 w-full" />
-					<Skeleton className="h-3 w-full mt-2" />
 				</div>
 			) : (
-				<div className={`rounded-xl p-5 mb-5 ${s.bg} border ${s.border}`}>
-					<div className="flex items-center justify-between mb-2">
+				<div className={`rounded-2xl p-5 mb-5 ${s.bg} border ${s.border}`}>
+					<div className="flex items-start justify-between gap-2 mb-3">
 						<div>
-							<p className="text-[11px] font-medium text-neutral/50 uppercase tracking-wide">
-								Current Runway
+							<p className="text-[11px] font-bold text-neutral/55 uppercase tracking-wide">
+								Runway Saat Ini
 							</p>
-							<p className="text-2xl font-extrabold text-neutral mt-0.5">
-								{`${current.toFixed(1)} bulan`}
+							<p className="num-display text-2xl text-neutral mt-0.5">
+								{formatDecimal1(current)} bulan
 							</p>
 						</div>
 						<div className="text-right">
-							<p className="text-[11px] font-medium text-neutral/50 uppercase tracking-wide">
-								Target
-							</p>
-							<p className="text-sm font-bold text-neutral mt-0.5">
-								{`${target.toFixed(1)} bulan`}
-							</p>
+							<StatusBadge
+								variant={variant}
+								label={`Target ${formatDecimal1(target)} bln`}
+								size="sm"
+							/>
 						</div>
 					</div>
-					<ProgressBar value={percentToTarget} variant={variant} />
+					<MeterBar
+						value={current}
+						max={Math.max(target * 1.3, current * 1.1, 12)}
+						target={target}
+						status={variant}
+						height="md"
+					/>
 				</div>
 			)}
 
 			{parameters.length > 0 && (
-				<div className="divide-y divide-neutral/10 border-t border-neutral/10 mb-4">
+				<div className="divide-y divide-slate-100 border-t border-slate-100 mb-4">
 					{parameters.map((item) => (
 						<div
 							key={item.label}
 							className="flex items-center justify-between py-2.5">
-							<span className="text-sm text-neutral/60">{item.label}</span>
-							<span className="text-sm font-semibold text-neutral">{item.value}</span>
+							<span className="text-xs sm:text-sm text-neutral/65">
+								{item.label}
+							</span>
+							<span className="text-xs sm:text-sm font-extrabold text-neutral tabular">
+								{item.value}
+							</span>
 						</div>
 					))}
 				</div>
 			)}
 
-			<div className="flex items-center gap-2 mb-5">
-				<Lock size={12} className="text-neutral/40" />
-				<p className="text-xs text-neutral/50">
-					Data finansialmu bersifat privat dan hanya digunakan untuk menghitung
-					financial runway.
+			<div className="flex items-center gap-2 mb-4">
+				<Lock size={12} className="text-emerald-600 shrink-0" />
+				<p className="text-xs text-neutral/55">
+					Data finansialmu bersifat privat dan terenkripsi.
 				</p>
 			</div>
 
-			<a
-				href="/dashboard/finansial"
-				type="button"
-				// onClick={onSeeMore}
-				className="text-xs font-semibold text-primary hover:opacity-70 transition">
-				Lihat Data Finansial →
-			</a>
+			<Link
+				to="/dashboard/finansial"
+				className="inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-700 hover:text-emerald-800 transition">
+				Kelola Data Finansial
+				<ArrowRight size={13} />
+			</Link>
 		</div>
 	);
 }

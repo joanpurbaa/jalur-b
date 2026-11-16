@@ -33,20 +33,22 @@ export default function Simulasi() {
 		intro: {
 			title: "Kalau besok kamu kehilangan pekerjaan, apa yang terjadi?",
 			subtitle:
-				"Simulasikan kondisi karier dan finansialmu berdasarkan data yang sudah kamu masukkan ke Jalur B.",
+				"Simulasikan ketahanan karier dan finansialmu secara tenang berdasarkan data yang sudah kamu simpan di Jalur B.",
 		},
 		setup: {
-			title: "Siapkan simulasimu",
+			title: "Siapkan Skenario Simulasimu",
 			subtitle:
-				"Konfigurasikan skenario PHK dan estimasi waktu untuk memproyeksikan daya tahan serta transisi kariermu.",
+				"Pilih skenario PHK, atur asumsi waktu pencarian kerja, dan tentukan peran tujuan transisi.",
 		},
 		loading: {
-			title: "Menjalankan simulasi",
-			subtitle: "Mohon tunggu sebentar.",
+			title: "Menjalankan Simulasi Ketahanan",
+			subtitle:
+				"Menghitung hak normatif, napas finansial, dan rekomendasi langkah pemulihanmu.",
 		},
 		result: {
 			title: "Hasil Simulasi Risiko & Ketahanan PHK",
-			subtitle: "Berdasarkan skenario dan kondisimu saat ini, ini proyeksi yang kemungkinan terjadi.",
+			subtitle:
+				"Berdasarkan skenario dan kondisimu saat ini, ini peta proyeksi serta langkah aksi yang bisa kamu ambil.",
 		},
 	};
 
@@ -88,7 +90,12 @@ export default function Simulasi() {
 					onRetry={() => setRunKey((k) => k + 1)}
 				/>
 			)}
-			{step === "result" && result && <SimulationResult result={result} />}
+			{step === "result" && result && (
+				<SimulationResult
+					result={result}
+					onRerun={() => setStep("setup")}
+				/>
+			)}
 		</div>
 	);
 }

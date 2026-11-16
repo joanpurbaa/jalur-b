@@ -1,20 +1,37 @@
 import { useEffect, useState } from "react";
 import {
-	RefreshCw,
 	CheckCircle2,
 	Circle,
-	Hourglass,
+	Loader2,
 	Sparkles,
 	AlertTriangle,
 } from "lucide-react";
+import Card from "../../ui/Card";
+import IconTile from "../../ui/IconTile";
+import MeterBar from "../../ui/MeterBar";
 import { ApiError } from "../../../types/api";
 
 const loadingSteps = [
-	"Menganalisis kondisi karier",
-	"Menghitung financial runway",
-	"Memetakan peluang karier alternatif",
-	"Mengidentifikasi skill gap",
-	"Menyusun rencana pemulihan",
+	{
+		title: "Menganalisis kondisi karier & profil peran",
+		detail: "Membaca masa kerja, skor kesehatan, dan eksposur AI",
+	},
+	{
+		title: "Menghitung hak normatif & financial runway",
+		detail: "Mengestimasi pesangon (PP 35/2021) dan ketahanan dana likuid",
+	},
+	{
+		title: "Memetakan peluang karier alternatif",
+		detail: "Mencocokkan keahlianmu dengan opsi pivot terdekat",
+	},
+	{
+		title: "Mengidentifikasi prioritas skill & bukti kerja",
+		detail: "Menyaring celah kompetensi yang paling berdampak",
+	},
+	{
+		title: "Menyusun rencana pemulihan pasca-PHK",
+		detail: "Merangkai langkah konkret dari Hari 0 hingga kembali bekerja",
+	},
 ];
 
 interface SimulationLoadingProps {
@@ -59,114 +76,132 @@ export default function SimulationLoading({
 	}, []);
 
 	useEffect(() => {
-		if (activeIndex < steps.length) {
-			const stepTimer = setTimeout(
-				() => setActiveIndex((i) => i + 1),
-				500,
-			);
+		if (runState === "error") return;
+		// Saat API masih running, tahan di langkah terakhir sampai API selesai
+		const maxStep = runState === "done" ? steps.length : steps.length - 1;
+		if (activeIndex < maxStep) {
+			const delay = runState === "done" ? 220 : 520;
+			const stepTimer = setTimeout(() => setActiveIndex((i) => i + 1), delay);
 			return () => clearTimeout(stepTimer);
 		}
-	}, [activeIndex, steps.length]);
+	}, [activeIndex, runState, steps.length]);
 
 	useEffect(() => {
 		if (runState === "done" && activeIndex >= steps.length) {
-			const finishTimer = setTimeout(onSuccess, 400);
+			const finishTimer = setTimeout(onSuccess, 350);
 			return () => clearTimeout(finishTimer);
 		}
 	}, [runState, activeIndex, steps.length, onSuccess]);
 
+	const pct = Math.min(
+		100,
+		Math.round(((activeIndex + (runState === "done" ? 1 : 0.35)) / steps.length) * 100),
+	);
+
 	return (
-		<div className="bg-white rounded-2xl border border-neutral/5 shadow-md p-10 flex flex-col items-center text-center max-w-2xl mx-auto">
-			<div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-5 relative">
-				<RefreshCw size={22} className="text-primary animate-spin" />
-				<Sparkles size={12} className="text-primary absolute -top-1 -right-1" />
-			</div>
-			<h2 className="text-2xl font-bold text-neutral mb-2">
-				Jalur B sedang menjalankan simulasi…
+		<Card
+			padding="lg"
+			className="max-w-2xl mx-auto flex flex-col items-center text-center">
+			<IconTile icon={Sparkles} tone="simulasi" size="lg" className="mb-4" />
+
+			<h2 className="text-xl sm:text-2xl font-extrabold text-neutral">
+				{runState === "error"
+					? "Simulasi membutuhkan kelengkapan data"
+					: "Menjalankan Simulasi Ketahanan…"}
 			</h2>
-			<p className="text-sm text-neutral/60 mb-8">
-				Menghubungkan kondisi karier dan finansialmu.
+			<p className="text-sm text-neutral/65 mt-1 mb-5">
+				{runState === "error"
+					? "Periksa pesan di bawah untuk melanjutkan."
+					: "Menghubungkan kondisi karier, ketentuan kerja, dan dana cadanganmu."}
 			</p>
 
-			<div className="w-full space-y-3">
+			<div className="w-full mb-6">
+				<div className="flex items-center justify-between text-xs font-bold text-neutral/60 mb-1.5">
+					<span>Progres kalkulasi</span>
+					<span className="tabular text-fuchsia-700">{pct}%</span>
+				</div>
+				<MeterBar
+					value={pct}
+					max={100}
+					colors={["#6366f1", "#d946ef"]}
+					height="md"
+					ariaLabel={`Progres simulasi ${pct}%`}
+				/>
+			</div>
+
+			<div className="w-full space-y-2.5 text-left">
 				{steps.map((step, index) => {
 					const isDone = index < activeIndex;
-					const isActive = index === activeIndex;
+					const isActive = index === activeIndex && runState !== "error";
 					return (
 						<div
-							key={step}
-							className={`flex items-center gap-3 rounded-xl p-4 border-2 transition ${
+							key={step.title}
+							className={`flex items-start gap-3.5 rounded-2xl p-3.5 border transition ${
 								isActive
-									? "border-primary bg-primary/5"
+									? "border-indigo-400 bg-indigo-50/70 shadow-xs"
 									: isDone
-										? "border-transparent bg-neutral/5"
-										: "border-transparent bg-transparent"
+										? "border-emerald-200/80 bg-emerald-50/40"
+										: "border-slate-200/60 bg-slate-50/40 opacity-60"
 							}`}>
-							{isDone ? (
-								<CheckCircle2 size={18} className="text-primary" />
-							) : (
-								<Circle
-									size={18}
-									className={isActive ? "text-primary" : "text-neutral/20"}
-								/>
-							)}
-							<span
-								className={`text-sm font-semibold ${
-									isActive || isDone ? "text-neutral" : "text-neutral/30"
-								}`}>
-								{step}
-							</span>
+							<div className="mt-0.5 shrink-0">
+								{isDone ? (
+									<CheckCircle2 size={19} className="text-emerald-600" />
+								) : isActive ? (
+									<Loader2
+										size={19}
+										className="text-indigo-600 animate-spin"
+									/>
+								) : (
+									<Circle size={19} className="text-slate-300" />
+								)}
+							</div>
+							<div className="min-w-0 flex-1">
+								<p
+									className={`text-sm font-extrabold ${
+										isDone
+											? "text-emerald-950"
+											: isActive
+												? "text-indigo-950"
+												: "text-neutral/60"
+									}`}>
+									{step.title}
+								</p>
+								<p className="text-xs text-neutral/60 mt-0.5">{step.detail}</p>
+							</div>
 						</div>
 					);
 				})}
 			</div>
 
 			{runState === "error" && runError && (
-				<div className="w-full mt-8 px-4 py-3 rounded-2xl bg-red-50 border border-red-100 text-left">
-					<p className="text-xs font-semibold text-red-600 mb-0.5">
-						Gagal menjalankan simulasi
-					</p>
-					<p className="text-xs text-red-500 leading-relaxed">{runError}</p>
-					<div className="flex items-center gap-2 mt-4">
+				<div className="w-full mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-left">
+					<div className="flex items-start gap-2.5">
+						<AlertTriangle size={18} className="text-rose-600 shrink-0 mt-0.5" />
+						<div>
+							<p className="text-sm font-extrabold text-rose-900">
+								Gagal menjalankan simulasi
+							</p>
+							<p className="text-xs text-rose-800/85 mt-0.5 leading-relaxed">
+								{runError}
+							</p>
+						</div>
+					</div>
+					<div className="flex flex-wrap items-center gap-2.5 mt-4">
 						<button
 							type="button"
 							onClick={onBack}
-							className="px-4 py-2 text-xs font-semibold rounded-full bg-primary text-white hover:opacity-90 transition cursor-pointer">
-							Lengkapi Konfigurasi / Ketentuan Kerja
+							className="press px-4 py-2.5 text-xs font-bold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition cursor-pointer">
+							Kembali ke Konfigurasi
 						</button>
 						<button
 							type="button"
 							onClick={onRetry}
-							className="px-4 py-2 text-xs font-medium rounded-full border border-neutral/20 text-neutral hover:bg-tertiary transition cursor-pointer">
+							className="press px-4 py-2.5 text-xs font-bold rounded-xl border border-slate-300 bg-white text-neutral hover:bg-slate-50 transition cursor-pointer">
 							Coba Lagi
 						</button>
 					</div>
 				</div>
 			)}
-
-			{runState !== "error" && (
-				<div className="flex items-center gap-1.5 mt-8">
-					{runState === "done" ? (
-						<CheckCircle2 size={12} className="text-primary" />
-					) : (
-						<Hourglass size={12} className="text-neutral/40" />
-					)}
-					<p className="text-xs text-neutral/50">
-						{runState === "done"
-							? "Simulasi selesai."
-							: "Ini hanya membutuhkan beberapa detik."}
-					</p>
-				</div>
-			)}
-
-			{runState === "error" && (
-				<div className="flex items-center gap-1.5 mt-8">
-					<AlertTriangle size={12} className="text-neutral/40" />
-					<p className="text-xs text-neutral/50">
-						Kamu bisa mencoba lagi atau menyesuaikan konfigurasi.
-					</p>
-				</div>
-			)}
-		</div>
+		</Card>
 	);
 }

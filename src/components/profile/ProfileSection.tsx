@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Card from "../ui/Card";
 
 interface ProfileSectionProps {
 	title: string;
@@ -14,19 +15,19 @@ export default function ProfileSection({
 	children,
 }: ProfileSectionProps) {
 	return (
-		<div className="mb-6">
-			<div className="flex items-center justify-between mb-3">
+		<section className="mb-2">
+			<div className="flex items-center justify-between gap-2 mb-3">
 				<div>
-					<h3 className="text-sm font-bold text-neutral">{title}</h3>
+					<h3 className="text-base font-extrabold text-neutral">{title}</h3>
 					{description && (
-						<p className="text-xs text-neutral/50 mt-0.5">{description}</p>
+						<p className="text-xs sm:text-sm text-neutral/60 mt-0.5">
+							{description}
+						</p>
 					)}
 				</div>
 				{action}
 			</div>
-			<div className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-6">
-				{children}
-			</div>
-		</div>
+			<Card padding="lg">{children}</Card>
+		</section>
 	);
 }

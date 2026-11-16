@@ -1,5 +1,8 @@
-import { LayoutGrid, Info, Lock, ArrowRight } from "lucide-react";
+import { Info, Lock, ArrowRight, Sparkles } from "lucide-react";
 import { PrimaryButton } from "../../ui/PrimaryButton";
+import Card from "../../ui/Card";
+import { ScenarioBridgeSvg } from "../../ui/Illustrations";
+import { Float } from "../../ui/Motion";
 import JourneyTimeline from "./JourneyTimeline";
 
 interface SimulationIntroProps {
@@ -8,41 +11,63 @@ interface SimulationIntroProps {
 
 export default function SimulationIntro({ onStart }: SimulationIntroProps) {
 	return (
-		<div className="bg-white rounded-2xl border border-neutral/5 shadow-md p-8">
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-				<div className="flex flex-col justify-center">
-					<span className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 bg-neutral/5 text-neutral/60 text-xs font-semibold rounded-lg mb-4">
-						<LayoutGrid size={13} />
-						Modul Simulasi
+		<Card padding="lg" className="overflow-hidden">
+			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+				<div className="lg:col-span-6 flex flex-col justify-center">
+					<span className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 bg-fuchsia-50 text-fuchsia-800 border border-fuchsia-200 text-xs font-extrabold rounded-full mb-4">
+						<Sparkles size={13} />
+						Simulator Ketahanan Karier & Finansial
 					</span>
-					<h2 className="text-2xl font-bold text-neutral mb-3">
-						What If I Get Fired?
-					</h2>
-					<p className="text-sm text-neutral/60 leading-relaxed mb-6 max-w-md">
-						Cari tahu berapa lama kamu bisa bertahan, seberapa siap kamu kembali
-						bekerja, dan apa yang perlu kamu persiapkan mulai sekarang.
-					</p>
-					<PrimaryButton icon={<ArrowRight size={14} />} onClick={onStart}>
-						Jalankan Simulasi
-					</PrimaryButton>
 
-					<div className="flex items-start gap-2 mt-6">
-						<Info size={14} className="text-primary shrink-0 mt-0.5" />
-						<p className="text-xs text-neutral/50 leading-relaxed">
-							Simulasi menggunakan data karier dan finansial yang sudah kamu simpan.
-						</p>
+					<h2 className="text-2xl sm:text-3xl font-extrabold text-neutral tracking-tight">
+						What If I Get{" "}
+						<span className="accent-serif font-normal text-fuchsia-600">
+							Fired Tomorrow?
+						</span>
+					</h2>
+
+					<p className="text-sm sm:text-[15px] text-neutral/70 leading-relaxed mt-3 mb-6 max-w-lg">
+						Rasa cemas biasanya muncul karena ketidakpastian. Dengan melihat
+						angka nyata—berapa bulan napas finansialmu, estimasi hak normatif,
+						dan opsi peran berikutnya—kamu bisa memegang kendali dengan tenang.
+					</p>
+
+					<Float className="my-2 self-center sm:self-start">
+						<ScenarioBridgeSvg className="w-44 h-28" />
+					</Float>
+
+					<div className="mt-4 self-stretch sm:self-start">
+						<PrimaryButton
+							tone="simulasi"
+							size="lg"
+							icon={<ArrowRight size={16} />}
+							onClick={onStart}>
+							Mulai Konfigurasi Simulasi
+						</PrimaryButton>
 					</div>
-					<div className="flex items-start gap-2 mt-2">
-						<Lock size={14} className="text-neutral/40 shrink-0 mt-0.5" />
-						<p className="text-xs text-neutral/50 leading-relaxed">
-							Data simulasi bersifat pribadi dan tidak mengubah data karier atau
-							finansialmu.
-						</p>
+
+					<div className="mt-6 pt-5 border-t border-slate-100 space-y-2.5 text-xs text-neutral/60">
+						<div className="flex items-start gap-2.5">
+							<Info size={15} className="text-indigo-600 shrink-0 mt-0.5" />
+							<p className="leading-relaxed">
+								Simulasi menggabungkan data profil karier, tabungan likuid, dan
+								ketentuan kerja sesuai PP 35/2021.
+							</p>
+						</div>
+						<div className="flex items-start gap-2.5">
+							<Lock size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+							<p className="leading-relaxed">
+								Semua perhitungan bersifat rahasia dan tidak mengubah data profil
+								utamamu.
+							</p>
+						</div>
 					</div>
 				</div>
 
-				<JourneyTimeline />
+				<div className="lg:col-span-6">
+					<JourneyTimeline />
+				</div>
 			</div>
-		</div>
+		</Card>
 	);
 }
