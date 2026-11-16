@@ -188,7 +188,7 @@ export default function Sidebar() {
 					<nav className="space-y-5 overflow-y-auto no-scrollbar">
 						<div>
 							{!isCollapsed && (
-								<p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+								<p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
 									Pantau
 								</p>
 							)}
@@ -197,7 +197,7 @@ export default function Sidebar() {
 
 						<div>
 							{!isCollapsed && (
-								<p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+								<p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
 									Bertindak
 								</p>
 							)}

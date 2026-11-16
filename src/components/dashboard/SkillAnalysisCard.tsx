@@ -51,7 +51,7 @@ export default function SkillAnalysisCard({
 						))}
 					</div>
 				) : (
-					<p className="text-xs text-slate-400">
+					<p className="text-xs text-slate-500">
 						Belum ada daftar skill pada kategori ini.
 					</p>
 				)}

@@ -68,7 +68,7 @@ export default function RiskDimensionCard({
 									/>
 									<span
 										className={`block text-[11px] font-medium text-center ${
-											lvl === level ? "text-slate-900 font-semibold" : "text-slate-400"
+											lvl === level ? "text-slate-900 font-semibold" : "text-slate-500"
 										}`}>
 										{lvl}
 									</span>
