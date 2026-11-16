@@ -1,5 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { statusStyles, type StatusVariant } from "../../lib/status";
+import Card from "../ui/Card";
+import IconTile from "../ui/IconTile";
 
 interface MetricCardProps {
 	label: string;
@@ -11,20 +13,22 @@ interface MetricCardProps {
 export default function MetricCard({
 	label,
 	value,
-	icon: Icon,
+	icon,
 	variant,
 }: MetricCardProps) {
-	const s = statusStyles[variant];
+	const isSemantic =
+		variant === "healthy" || variant === "warning" || variant === "risk";
+	const valColor = isSemantic ? statusStyles[variant].text : "text-slate-900";
+
 	return (
-		<div className="bg-white rounded-2xl p-5 border border-neutral/5 shadow-sm flex flex-col justify-between h-32">
-			<div
-				className={`w-9 h-9 rounded-xl flex items-center justify-center ${s.iconBg}`}>
-				<Icon size={18} className={s.text} />
-			</div>
+		<Card padding="md" className="flex flex-col justify-between gap-3 h-full">
+			<IconTile icon={icon} tone="neutral" size="sm" />
 			<div>
-				<p className="text-xs text-neutral/50 font-medium">{label}</p>
-				<p className={`text-lg font-bold mt-0.5 ${s.text}`}>{value}</p>
+				<p className="text-xs font-medium text-slate-500">{label}</p>
+				<p className={`num-display text-xl sm:text-2xl mt-1 ${valColor}`}>
+					{value}
+				</p>
 			</div>
-		</div>
+		</Card>
 	);
 }

@@ -1,6 +1,4 @@
-import { Bot, Sparkles, UserCheck } from "lucide-react";
 import MeterBar from "./MeterBar";
-import IconTile from "./IconTile";
 
 interface ActivityImpactBarProps {
 	activity: string;
@@ -8,30 +6,28 @@ interface ActivityImpactBarProps {
 	score?: number;
 }
 
+/**
+ * Skema satu hue indigo dengan 3 tingkat intensitas (rendah terang, sedang,
+ * tinggi pekat) disertai label teks Bahasa Indonesia.
+ */
 const levelConfig = {
 	HIGH: {
 		width: 88,
-		colors: ["#8b5cf6", "#f43f5e"] as [string, string],
-		badge: "bg-rose-50 text-rose-700 border-rose-200",
-		label: "Tinggi · Otomasi AI",
-		tone: "danger" as const,
-		icon: Bot,
+		colors: ["#4338ca", "#4338ca"] as [string, string],
+		badge: "bg-indigo-100 text-indigo-900 border-indigo-200",
+		label: "Tinggi",
 	},
 	MEDIUM: {
 		width: 58,
-		colors: ["#f59e0b", "#fbbf24"] as [string, string],
-		badge: "bg-amber-50 text-amber-800 border-amber-200",
-		label: "Sedang · Co-Pilot AI",
-		tone: "caution" as const,
-		icon: Sparkles,
+		colors: ["#6366f1", "#6366f1"] as [string, string],
+		badge: "bg-indigo-50 text-indigo-700 border-indigo-200",
+		label: "Sedang",
 	},
 	LOW: {
 		width: 28,
-		colors: ["#059669", "#34d399"] as [string, string],
-		badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-		label: "Rendah · Human-Centric",
-		tone: "safe" as const,
-		icon: UserCheck,
+		colors: ["#a5b4fc", "#a5b4fc"] as [string, string],
+		badge: "bg-slate-100 text-slate-700 border-slate-200",
+		label: "Rendah",
 	},
 };
 
@@ -41,17 +37,15 @@ export default function ActivityImpactBar({
 	score,
 }: ActivityImpactBarProps) {
 	const cfg = levelConfig[level];
-	const pct = score != null && score > 0 ? Math.min(100, Math.round(score)) : cfg.width;
+	const pct =
+		score != null && score > 0 ? Math.min(100, Math.round(score)) : cfg.width;
 
 	return (
 		<div className="space-y-2">
-			<div className="flex flex-wrap items-center justify-between gap-2">
-				<div className="flex items-center gap-2.5 min-w-0">
-					<IconTile icon={cfg.icon} tone={cfg.tone} size="xs" />
-					<span className="text-sm font-bold text-neutral">{activity}</span>
-				</div>
+			<div className="flex items-center justify-between gap-2">
+				<span className="text-sm font-semibold text-slate-900">{activity}</span>
 				<span
-					className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${cfg.badge}`}>
+					className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border shrink-0 ${cfg.badge}`}>
 					{cfg.label}
 				</span>
 			</div>

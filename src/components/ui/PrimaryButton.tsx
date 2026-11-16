@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { toneStyles, type Tone } from "../../lib/modules";
+import type { Tone } from "../../lib/modules";
 
 interface ButtonProps {
 	children: ReactNode;
@@ -14,37 +14,31 @@ interface ButtonProps {
 }
 
 const SIZE = {
-	sm: "py-2 px-3.5 text-xs rounded-xl",
-	md: "py-2.5 px-4 text-sm rounded-xl",
-	lg: "py-3.5 px-6 text-sm sm:text-base rounded-2xl",
+	sm: "min-h-[38px] py-2 px-3.5 text-xs rounded-xl",
+	md: "min-h-[44px] py-2.5 px-4 text-sm rounded-xl",
+	lg: "min-h-[48px] py-3 px-5 text-sm sm:text-base rounded-xl",
 } as const;
 
+/** Aksi utama: indigo solid tunggal (#4F46E5), maksimal satu per area. */
 export function PrimaryButton({
 	children,
 	icon,
 	onClick,
 	fullWidth,
 	disabled,
-	tone = "beranda",
 	size = "md",
 	type = "button",
 	className = "",
 }: ButtonProps) {
-	const t = toneStyles(tone);
 	return (
 		<button
 			type={type}
 			onClick={onClick}
 			disabled={disabled}
-			style={
+			className={`press ${fullWidth ? "w-full" : ""} ${SIZE[size]} bg-indigo-600 text-white font-semibold shadow-xs flex items-center justify-center gap-2 cursor-pointer ${
 				disabled
-					? undefined
-					: {
-							boxShadow: `inset 0 1px 0 rgba(255,255,255,0.35), 0 6px 16px -4px ${t.shadow}`,
-						}
-			}
-			className={`press ${fullWidth ? "w-full" : ""} ${SIZE[size]} ${t.gradient} text-white font-semibold flex items-center justify-center gap-2 cursor-pointer ${
-				disabled ? "opacity-45 cursor-not-allowed" : "hover:brightness-105"
+					? "opacity-45 cursor-not-allowed"
+					: "hover:bg-indigo-700"
 			} ${className}`}>
 			{icon}
 			{children}
@@ -52,6 +46,7 @@ export function PrimaryButton({
 	);
 }
 
+/** Aksi sekunder: outline netral. */
 export function SecondaryButton({
 	children,
 	icon,
@@ -67,7 +62,32 @@ export function SecondaryButton({
 			type={type}
 			onClick={onClick}
 			disabled={disabled}
-			className={`press ${fullWidth ? "w-full" : ""} ${SIZE[size]} border border-slate-200/90 text-neutral bg-white/90 font-semibold hover:bg-slate-50 hover:border-indigo-200 shadow-[0_2px_6px_rgba(15,23,42,0.05)] flex items-center justify-center gap-2 cursor-pointer ${
+			className={`press ${fullWidth ? "w-full" : ""} ${SIZE[size]} border border-slate-200 text-slate-700 bg-white font-semibold hover:bg-slate-50 hover:border-slate-300 shadow-2xs flex items-center justify-center gap-2 cursor-pointer ${
+				disabled ? "opacity-45 cursor-not-allowed" : ""
+			} ${className}`}>
+			{icon}
+			{children}
+		</button>
+	);
+}
+
+/** Aksi tersier: teks / ghost button. */
+export function GhostButton({
+	children,
+	icon,
+	onClick,
+	fullWidth,
+	disabled,
+	size = "sm",
+	type = "button",
+	className = "",
+}: ButtonProps) {
+	return (
+		<button
+			type={type}
+			onClick={onClick}
+			disabled={disabled}
+			className={`press ${fullWidth ? "w-full" : ""} ${SIZE[size]} text-indigo-700 font-semibold hover:bg-indigo-50 flex items-center justify-center gap-1.5 cursor-pointer ${
 				disabled ? "opacity-45 cursor-not-allowed" : ""
 			} ${className}`}>
 			{icon}

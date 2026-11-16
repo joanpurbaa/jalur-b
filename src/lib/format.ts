@@ -1,6 +1,6 @@
 /**
  * Helper format angka & teks untuk presentasi. Tidak mengubah data —
- * hanya cara menampilkan.
+ * hanya cara menampilkan agar seragam di seluruh aplikasi.
  */
 
 const idDecimal1 = new Intl.NumberFormat("id-ID", {
@@ -14,9 +14,14 @@ export function formatDecimal1(value: number): string {
 	return idDecimal1.format(Number.isFinite(value) ? value : 0);
 }
 
-/** "9,8 bulan" */
-export function formatMonths(value: number, unit = "bulan"): string {
+/** "9,8 bln" (satuan ringkas konsisten untuk metrik/badge/label). */
+export function formatMonths(value: number, unit = "bln"): string {
 	return `${formatDecimal1(value)} ${unit}`;
+}
+
+/** "9,8 bulan" (untuk kalimat naratif). */
+export function formatMonthsLong(value: number): string {
+	return `${formatDecimal1(value)} bulan`;
 }
 
 /** "59" — bulat, pemisah ribuan id-ID. */
@@ -46,7 +51,11 @@ export function capitalizeName(name: string | null | undefined): string {
 		.map((w) =>
 			w
 				.split("-")
-				.map((p) => (p ? p[0].toLocaleUpperCase("id-ID") + p.slice(1).toLocaleLowerCase("id-ID") : p))
+				.map((p) =>
+					p
+						? p[0].toLocaleUpperCase("id-ID") + p.slice(1).toLocaleLowerCase("id-ID")
+						: p,
+				)
 				.join("-"),
 		)
 		.join(" ");

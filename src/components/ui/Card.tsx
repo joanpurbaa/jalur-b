@@ -1,46 +1,39 @@
 import type { HTMLAttributes, ReactNode } from "react";
-import { Tilt } from "./Motion";
 
 type Pad = "none" | "sm" | "md" | "lg";
 const PAD: Record<Pad, string> = {
 	none: "",
 	sm: "p-4",
 	md: "p-5 sm:p-6",
-	lg: "p-6 sm:p-8",
+	lg: "p-6 sm:p-7",
 };
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
 	children: ReactNode;
 	padding?: Pad;
-	/** Naik sedikit saat hover. */
+	variant?: "default" | "hero";
 	lift?: boolean;
-	/** Tilt 3D ringan (kartu utama saja). */
 	tilt?: boolean;
 	className?: string;
 }
 
 /**
- * Kartu dasar berlapis: shadow bertingkat, inner highlight,
- * border gradien tipis, radius besar.
+ * Kartu standar: permukaan bersih, border 1px slate-200, shadow halus.
+ * Varian "hero" memakai tint indigo-50 yang sangat samar.
  */
 export default function Card({
 	children,
 	padding = "md",
+	variant = "default",
 	lift = false,
-	tilt = false,
 	className = "",
 	...rest
 }: CardProps) {
-	const cls = `card-3d ${lift ? "card-lift" : ""} ${PAD[padding]} ${className}`;
-	if (tilt) {
-		return (
-			<Tilt className={cls} {...rest}>
-				{children}
-			</Tilt>
-		);
-	}
+	const base = variant === "hero" ? "card-hero" : "card-surface";
 	return (
-		<div className={cls} {...rest}>
+		<div
+			className={`${base} ${lift ? "card-hover" : ""} ${PAD[padding]} ${className}`}
+			{...rest}>
 			{children}
 		</div>
 	);

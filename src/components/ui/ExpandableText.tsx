@@ -86,8 +86,8 @@ export default function ExpandableText({
 				<button
 					type="button"
 					onClick={() => setExpanded((v) => !v)}
-					className={`mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:opacity-80 transition cursor-pointer ${buttonClassName}`}>
-					{expanded ? "Sembunyikan" : "Lihat selengkapnya"}
+					className={`mt-2 inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 hover:text-indigo-800 transition cursor-pointer ${buttonClassName}`}>
+					{expanded ? "Tutup" : "Baca selengkapnya"}
 					<ChevronDown
 						size={13}
 						className={`transition-transform ${expanded ? "rotate-180" : ""}`}

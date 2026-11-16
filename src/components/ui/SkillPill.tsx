@@ -1,7 +1,6 @@
 import {
 	CheckCircle2,
-	Sparkles,
-	TrendingUp,
+	CircleDot,
 	Wrench,
 	type LucideIcon,
 } from "lucide-react";
@@ -24,27 +23,26 @@ const TONE_MAP: Record<
 	{ box: string; iconColor: string; defaultIcon?: LucideIcon }
 > = {
 	neutral: {
-		box: "bg-slate-100/90 border-slate-200/90 text-slate-800",
+		box: "bg-slate-100/90 border-slate-200/90 text-slate-700",
 		iconColor: "text-slate-500",
 	},
 	insight: {
-		box: "bg-violet-50 border-violet-200 text-violet-800",
-		iconColor: "text-violet-600",
-		defaultIcon: Sparkles,
+		box: "bg-indigo-50/90 border-indigo-200/80 text-indigo-800",
+		iconColor: "text-indigo-600",
+		defaultIcon: CircleDot,
 	},
 	strong: {
-		box: "bg-emerald-50 border-emerald-200 text-emerald-900",
-		iconColor: "text-emerald-600",
+		box: "bg-slate-100/90 border-slate-200/90 text-slate-800",
+		iconColor: "text-slate-500",
 		defaultIcon: CheckCircle2,
 	},
 	rising: {
-		box: "bg-cyan-50 border-cyan-200 text-cyan-900",
-		iconColor: "text-cyan-600",
-		defaultIcon: TrendingUp,
+		box: "bg-slate-100/90 border-slate-200/90 text-slate-800",
+		iconColor: "text-slate-500",
 	},
 	improve: {
-		box: "bg-amber-50 border-amber-200 text-amber-900",
-		iconColor: "text-amber-600",
+		box: "bg-slate-100/90 border-slate-200/90 text-slate-800",
+		iconColor: "text-slate-500",
 		defaultIcon: Wrench,
 	},
 };
@@ -59,8 +57,10 @@ export default function SkillPill({
 
 	return (
 		<span
-			className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border shadow-2xs ${cfg.box}`}>
-			{Icon && <Icon size={13} strokeWidth={2.3} className={cfg.iconColor} />}
+			className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border ${cfg.box}`}>
+			{Icon && (
+				<Icon size={13} strokeWidth={1.85} className={cfg.iconColor} aria-hidden />
+			)}
 			{label}
 		</span>
 	);

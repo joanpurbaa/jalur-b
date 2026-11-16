@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import IconTile from "./IconTile";
 import StatusBadge from "./StatusBadge";
 import MeterBar from "./MeterBar";
 import Card from "./Card";
-import { toneStyles, type Tone } from "../../lib/modules";
-import type { StatusVariant } from "../../lib/status";
+import type { Tone } from "../../lib/modules";
+import { statusStyles, type StatusVariant } from "../../lib/status";
 
 interface StatCardProps {
 	label: string;
@@ -15,9 +16,9 @@ interface StatCardProps {
 	tone?: Tone;
 	status?: StatusVariant;
 	statusLabel?: string;
-	/** Nilai 0-100 untuk mini bar visual di bawah kartu. */
+	/** Bar netral indigo (0-100) atau memakai status bila eksplisit. */
 	progress?: number | null;
-	/** Level 1..3 untuk indikator 3-segmen (mis. Risiko Rendah/Sedang/Tinggi). */
+	progressUseStatusColor?: boolean;
 	segments?: { active: 1 | 2 | 3; status: StatusVariant } | null;
 	href?: string;
 	onClick?: () => void;
@@ -29,45 +30,47 @@ export default function StatCard({
 	value,
 	subtitle,
 	icon,
-	tone = "beranda",
+	tone = "neutral",
 	status,
 	statusLabel,
 	progress,
+	progressUseStatusColor = false,
 	segments,
 	href,
 	onClick,
 	className = "",
 }: StatCardProps) {
-	const t = toneStyles(tone);
+	const valueColor =
+		status && status !== "insight" && status !== "neutral"
+			? statusStyles[status].text
+			: "text-slate-900";
+
 	const body = (
 		<Card
 			lift
-			tilt
 			padding="md"
 			onClick={onClick}
-			className={`h-full flex flex-col justify-between gap-4 ${href || onClick ? "cursor-pointer" : ""} ${className}`}>
+			className={`h-full flex flex-col justify-between gap-4 ${
+				href || onClick ? "cursor-pointer" : ""
+			} ${className}`}>
 			<div className="flex items-start justify-between gap-3">
 				<IconTile icon={icon} tone={tone} size="md" />
-				{status && (
-					<StatusBadge
-						variant={status}
-						label={statusLabel}
-						size="sm"
-					/>
+				{status && statusLabel && (
+					<StatusBadge variant={status} label={statusLabel} size="sm" />
 				)}
 			</div>
 
 			<div>
-				<p className="text-xs font-semibold uppercase tracking-wider text-neutral/55">
-					{label}
-				</p>
+				<p className="text-xs font-medium text-slate-500">{label}</p>
 				<div className="mt-1 flex items-baseline gap-2">
-					<span className="num-display text-2xl sm:text-3xl text-neutral">
+					<span className={`num-display text-2xl sm:text-3xl ${valueColor}`}>
 						{value}
 					</span>
 				</div>
 				{subtitle && (
-					<p className="text-xs text-neutral/60 mt-1">{subtitle}</p>
+					<p className="text-xs text-slate-500 mt-1.5 line-clamp-2">
+						{subtitle}
+					</p>
 				)}
 			</div>
 
@@ -75,8 +78,11 @@ export default function StatCard({
 				<MeterBar
 					value={progress}
 					max={100}
-					status={status ?? "insight"}
-					colors={status ? undefined : [t.hex, t.hex]}
+					status={
+						progressUseStatusColor && status && status !== "neutral"
+							? status
+							: "insight"
+					}
 					height="sm"
 					ariaLabel={`${label} ${progress}%`}
 				/>
@@ -95,8 +101,8 @@ export default function StatCard({
 						return (
 							<span
 								key={idx}
-								className={`h-2 rounded-full transition-colors ${
-									active ? barColor : "bg-slate-900/[0.07]"
+								className={`h-1.5 rounded-full transition-colors ${
+									active ? barColor : "bg-slate-200"
 								}`}
 							/>
 						);
@@ -108,9 +114,9 @@ export default function StatCard({
 
 	if (href) {
 		return (
-			<a href={href} className="block h-full focus-visible:outline-none">
+			<Link to={href} className="block h-full">
 				{body}
-			</a>
+			</Link>
 		);
 	}
 	return body;

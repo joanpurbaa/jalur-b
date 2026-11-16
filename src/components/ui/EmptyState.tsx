@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
-import { CompassOrbSvg, EvidenceGallerySvg, ScenarioBridgeSvg, VaultShieldSvg } from "./Illustrations";
+import { CompassOrbSvg, EvidenceGallerySvg, VaultShieldSvg } from "./Illustrations";
 import IconTile from "./IconTile";
-import { Float } from "./Motion";
 import type { Tone } from "../../lib/modules";
 
-type IllustrationKind = "compass" | "vault" | "evidence" | "bridge";
+type IllustrationKind = "compass" | "vault" | "evidence";
 
 interface EmptyStateProps {
 	title: string;
@@ -17,35 +16,34 @@ interface EmptyStateProps {
 	className?: string;
 }
 
+/** Empty state tenang dan ringkas dengan satu CTA utama bila relevan. */
 export default function EmptyState({
 	title,
 	description,
 	illustration = "compass",
 	icon,
-	tone = "beranda",
+	tone = "indigo",
 	action,
 	className = "",
 }: EmptyStateProps) {
 	return (
 		<div
-			className={`card-3d p-7 sm:p-10 text-center flex flex-col items-center justify-center ${className}`}>
-			<Float className="mb-4">
+			className={`card-surface p-7 sm:p-10 text-center flex flex-col items-center justify-center ${className}`}>
+			<div className="mb-4">
 				{icon ? (
 					<IconTile icon={icon} tone={tone} size="xl" />
 				) : illustration === "vault" ? (
 					<VaultShieldSvg />
 				) : illustration === "evidence" ? (
 					<EvidenceGallerySvg />
-				) : illustration === "bridge" ? (
-					<ScenarioBridgeSvg />
 				) : (
 					<CompassOrbSvg />
 				)}
-			</Float>
-			<h3 className="text-base sm:text-lg font-bold text-neutral max-w-md">
+			</div>
+			<h3 className="text-base sm:text-lg font-bold text-slate-900 max-w-md">
 				{title}
 			</h3>
-			<p className="text-sm text-neutral/65 mt-1.5 max-w-md leading-relaxed">
+			<p className="text-sm text-slate-600 mt-1.5 max-w-md leading-relaxed">
 				{description}
 			</p>
 			{action && <div className="mt-5">{action}</div>}
