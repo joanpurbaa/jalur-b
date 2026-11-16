@@ -4,14 +4,35 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { PlusCircle } from "lucide-react";
-import { PrimaryButton } from "../ui/PrimaryButton";
+import {
+	Award,
+	BookOpen,
+	FolderKanban,
+	Medal,
+	MessageSquareQuote,
+	PlusCircle,
+	Sparkles,
+	Trophy,
+	type LucideIcon,
+} from "lucide-react";
+import { PrimaryButton, SecondaryButton } from "../ui/PrimaryButton";
+import Modal from "../ui/Modal";
 import { evidenceTypeLabels } from "../../lib/evidence";
 import { profileApi } from "../../services/profile";
 import type { EvidenceItemCreate, EvidenceType } from "../../types/evidence";
 
 const inputClass =
-	"w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-neutral placeholder:text-neutral/40";
+	"w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-neutral placeholder:text-neutral/40 transition";
+
+const TYPE_ICONS: Record<EvidenceType, LucideIcon> = {
+	project: FolderKanban,
+	achievement: Trophy,
+	feedback: MessageSquareQuote,
+	certificate: Medal,
+	award: Award,
+	training: BookOpen,
+	other: Sparkles,
+};
 
 export interface EvidenceFormHandle {
 	open: () => void;
@@ -37,7 +58,8 @@ function getOnboardingRole(): string {
 
 const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 	({ onSave }, ref) => {
-		const [evidenceType, setEvidenceType] = useState("");
+		const [isOpen, setIsOpen] = useState(false);
+		const [evidenceType, setEvidenceType] = useState<EvidenceType | "">("project");
 		const [title, setTitle] = useState("");
 		const [description, setDescription] = useState("");
 		const [impact, setImpact] = useState("");
@@ -49,18 +71,15 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 
 		useImperativeHandle(ref, () => ({
 			open: () => {
-				titleRef.current?.scrollIntoView({
-					behavior: "smooth",
-					block: "center",
-				});
-				setTimeout(() => titleRef.current?.focus(), 50);
+				setIsOpen(true);
+				setTimeout(() => titleRef.current?.focus(), 80);
 			},
 		}));
 
 		const canSave = evidenceType !== "" && title.trim().length > 0;
 
 		const reset = () => {
-			setEvidenceType("");
+			setEvidenceType("project");
 			setTitle("");
 			setDescription("");
 			setImpact("");
@@ -69,12 +88,16 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 			setSaveError("");
 		};
 
-		const handleSave = async () => {
+		const handleClose = () => {
 			if (saving) return;
+			setIsOpen(false);
+		};
+
+		const handleSave = async () => {
+			if (saving || !canSave) return;
 			setSaving(true);
 			setSaveError("");
 			try {
-				// Role/jabatan tidak diinput manual — diambil dari profile.
 				const profile = await profileApi.get().catch(() => null);
 				const userRole =
 					profile?.profile?.current_role_name?.trim() ||
@@ -88,12 +111,12 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 						description: description.trim(),
 						impact: impact.trim() || "Dampak belum disebutkan.",
 						evidence_date: date || null,
-						// Backend memaksa ai_generated=false pada saat create.
 						ai_generated: false,
 					},
 					attachmentFile,
 				);
 				reset();
+				setIsOpen(false);
 			} catch {
 				setSaveError("Gagal menyimpan bukti. Silakan coba lagi.");
 			} finally {
@@ -102,122 +125,139 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 		};
 
 		return (
-			<div className="bg-primary/5 rounded-2xl border border-primary/20 border-l-4 border-l-primary shadow-sm p-6 mb-8 relative overflow-hidden">
-				<div className="flex items-center gap-2 text-primary font-bold text-sm mb-5">
-					<PlusCircle size={16} />
-					<span>Tambah Bukti Karier</span>
-				</div>
-
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+			<Modal
+				open={isOpen}
+				onClose={handleClose}
+				variant="drawer"
+				title="Tambah Bukti Karier"
+				subtitle="Catat proyek, pencapaian, atau apresiasi selagi masih segar di ingatanmu.">
+				<div className="space-y-5">
 					<div>
-						<label className="text-xs font-semibold text-neutral/70 mb-2 block">
-							Jenis Bukti
+						<label className="text-xs font-bold uppercase tracking-wider text-neutral/60 mb-2 block">
+							Pilih Jenis Bukti
 						</label>
-						<select
-							value={evidenceType}
-							onChange={(e) => setEvidenceType(e.target.value)}
-							className={`${inputClass} text-neutral/60`}>
-							<option value="" disabled>
-								Pilih jenis bukti...
-							</option>
+						<div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
 							{(Object.keys(evidenceTypeLabels) as EvidenceType[]).map(
-								(type) => (
-									<option key={type} value={type}>
-										{evidenceTypeLabels[type]}
-									</option>
-								),
+								(type) => {
+									const Icon = TYPE_ICONS[type];
+									const selected = evidenceType === type;
+									return (
+										<button
+											key={type}
+											type="button"
+											onClick={() => setEvidenceType(type)}
+											className={`press flex items-center gap-2 p-2.5 rounded-2xl border text-left text-xs font-bold transition cursor-pointer ${
+												selected
+													? "bg-sky-50 border-sky-500 text-sky-900 ring-2 ring-sky-500/25"
+													: "bg-white border-slate-200 text-neutral/75 hover:bg-slate-50"
+											}`}>
+											<Icon
+												size={15}
+												className={
+													selected ? "text-sky-600" : "text-neutral/50"
+												}
+											/>
+											<span className="truncate">
+												{evidenceTypeLabels[type]}
+											</span>
+										</button>
+									);
+								},
 							)}
-						</select>
+						</div>
 					</div>
 
 					<div>
-						<label className="text-xs font-semibold text-neutral/70 mb-2 block">
-							Tanggal (opsional)
-						</label>
-						<input
-							type="date"
-							value={date}
-							onChange={(e) => setDate(e.target.value)}
-							className={`${inputClass} text-neutral/60`}
-						/>
-					</div>
-				</div>
-
-				<div className="grid grid-cols-1 gap-5 mt-5">
-					<div>
-						<label className="text-xs font-semibold text-neutral/70 mb-2 block">
-							Judul
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+							Judul Bukti <span className="text-rose-500">*</span>
 						</label>
 						<input
 							ref={titleRef}
 							type="text"
 							value={title}
 							onChange={(e) => setTitle(e.target.value)}
-							placeholder="Contoh: Meningkatkan efisiensi proses onboarding"
-							className={`${inputClass} bg-white`}
+							placeholder="Contoh: Memimpin migrasi sistem pembayaran tepat waktu"
+							className={inputClass}
 						/>
 					</div>
 
 					<div>
-						<label className="text-xs font-semibold text-neutral/70 mb-2 block">
-							Deskripsi
-						</label>
-						<textarea
-							rows={4}
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							placeholder="Ceritakan apa yang kamu lakukan, tantangan, dan peranmu di dalamnya."
-							className={`${inputClass} resize-none bg-white`}
-						/>
-					</div>
-
-					<div>
-						<label className="text-xs font-semibold text-neutral/70 mb-2 block">
-							Dampak
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+							Cerita Singkat & Peranmu
 						</label>
 						<textarea
 							rows={3}
-							value={impact}
-							onChange={(e) => setImpact(e.target.value)}
-							placeholder="Contoh: Campaign menghasilkan peningkatan engagement sebesar 45%."
-							className={`${inputClass} resize-none bg-white`}
+							value={description}
+							onChange={(e) => setDescription(e.target.value)}
+							placeholder="Apa tantangannya dan apa kontribusi spesifik yang kamu lakukan?"
+							className={`${inputClass} resize-none`}
 						/>
 					</div>
 
 					<div>
-						<label className="text-xs font-semibold text-neutral/70 mb-2 block">
-							Lampiran (opsional)
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+							Dampak / Hasil Terukur
 						</label>
-						<input
-							type="file"
-							accept="image/*"
-							onChange={(e) =>
-								setAttachmentFile(e.target.files?.[0] ?? null)
-							}
-							className={`${inputClass} bg-white text-xs file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-primary`}
+						<textarea
+							rows={2}
+							value={impact}
+							onChange={(e) => setImpact(e.target.value)}
+							placeholder="Contoh: Waktu proses turun 40% dan kepuasan tim meningkat."
+							className={`${inputClass} resize-none`}
 						/>
-						{attachmentFile && (
-							<p className="text-xs text-neutral/60 mt-1.5">
-								{attachmentFile.name}
-							</p>
-						)}
+					</div>
+
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div>
+							<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+								Tanggal (opsional)
+							</label>
+							<input
+								type="date"
+								value={date}
+								onChange={(e) => setDate(e.target.value)}
+								className={inputClass}
+							/>
+						</div>
+
+						<div>
+							<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+								Lampiran Gambar (opsional)
+							</label>
+							<input
+								type="file"
+								accept="image/*"
+								onChange={(e) =>
+									setAttachmentFile(e.target.files?.[0] ?? null)
+								}
+								className={`${inputClass} text-xs py-2.5 file:mr-2.5 file:cursor-pointer file:rounded-lg file:border-0 file:bg-sky-100 file:px-2.5 file:py-1 file:text-xs file:font-bold file:text-sky-800`}
+							/>
+							{attachmentFile && (
+								<p className="text-[11px] text-neutral/60 mt-1 truncate">
+									{attachmentFile.name}
+								</p>
+							)}
+						</div>
+					</div>
+
+					{saveError && (
+						<p className="text-xs text-rose-600 font-semibold">{saveError}</p>
+					)}
+
+					<div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+						<SecondaryButton onClick={handleClose} disabled={saving}>
+							Batal
+						</SecondaryButton>
+						<PrimaryButton
+							tone="bukti-karier"
+							icon={<PlusCircle size={15} />}
+							disabled={!canSave || saving}
+							onClick={() => void handleSave()}>
+							{saving ? "Menyimpan..." : "Simpan Bukti"}
+						</PrimaryButton>
 					</div>
 				</div>
-
-				<div className="flex items-center justify-end mt-5">
-					<PrimaryButton
-						icon={<PlusCircle size={14} />}
-						disabled={!canSave || saving}
-						onClick={() => void handleSave()}>
-						{saving ? "Menyimpan..." : "Simpan Bukti"}
-					</PrimaryButton>
-				</div>
-				{saveError && (
-					<p className="text-xs text-red-500 font-medium text-right mt-3">
-						{saveError}
-					</p>
-				)}
-			</div>
+			</Modal>
 		);
 	},
 );

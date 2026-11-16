@@ -5,18 +5,19 @@ import FinancialRunwayHero from "./FinancialRunwayHero";
 import FinancialProfileCard from "./FinancialProfileCard";
 import FinancialParameters from "./FinancialParameters";
 import { financialApi, parseRunwayMonths } from "../../services/financial";
+import { formatDecimal1 } from "../../lib/format";
 
 function runwayDescription(current: number, target: number): string {
 	if (current <= 0)
-		return "Lengkapi parameter finansial untuk menghitung ketahanan keuanganmu.";
+		return "Lengkapi parameter pengeluaran dan tabungan di bawah untuk melihat berapa bulan dana cadanganmu mampu menopang hidup tenang.";
 	const gap = target - current;
 	if (gap <= 0)
-		return "Ketahanan finansialmu sudah berada di atas target minimum. Pertahankan!";
-	return `Ketahanan finansialmu masih ${current.toFixed(
-		1,
-	)} bulan, butuh memperkuat posisi agar menyentuh target minimum ${target.toFixed(
-		1,
-	)} bulan.`;
+		return `Kamu masih punya waktu ${formatDecimal1(current)} bulan napas finansial — sudah berada di atas target aman ${formatDecimal1(target)} bulan. Pertahankan kebiasaan baik ini!`;
+	return `Kamu punya waktu ${formatDecimal1(
+		current,
+	)} bulan napas finansial saat ini. Mari tambah cadangan sekitar ${formatDecimal1(
+		gap,
+	)} bulan lagi agar mencapai target aman ${formatDecimal1(target)} bulan.`;
 }
 
 export default function Finansial() {
@@ -63,23 +64,21 @@ export default function Finansial() {
 		<div>
 			<PageHeader
 				title="Finansial"
-				subtitle="Pahami kesiapan finansialmu jika sewaktu-waktu kehilangan income."
+				subtitle="Ketahui berapa bulan dana daruratmu siap menopang hidup tenang jika sewaktu-waktu terjadi transisi karier."
 			/>
 
 			<FinancialRunwayHero
-				runway={
-					runway ? { ...runway, description } : null
-				}
+				runway={runway ? { ...runway, description } : null}
 				loading={loading}
 			/>
 			<FinancialProfileCard onChanged={refresh} />
 			<FinancialParameters onChanged={refresh} />
 
-			<div className="flex items-center justify-center gap-2 mt-10 pt-6 border-t border-neutral/10">
-				<Lock size={12} className="text-neutral/40" />
-				<p className="text-xs text-neutral/50">
-					Data finansialmu bersifat privat dan hanya digunakan untuk menghitung
-					financial runway.
+			<div className="flex items-center justify-center gap-2 mt-10 pt-6 border-t border-slate-200/70">
+				<Lock size={13} className="text-emerald-600" />
+				<p className="text-xs font-medium text-neutral/60">
+					Data finansialmu dienkripsi, bersifat privat, dan hanya digunakan
+					untuk menghitung ketahanan financial runway-mu.
 				</p>
 			</div>
 		</div>

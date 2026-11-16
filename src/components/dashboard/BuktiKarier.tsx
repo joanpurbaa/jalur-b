@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { PlusCircle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircle2, PlusCircle } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
 import { PrimaryButton, SecondaryButton } from "../ui/PrimaryButton";
 import EvidenceForm from "./EvidenceForm";
 import type { EvidenceFormHandle } from "./EvidenceForm";
 import FilterTabs from "../ui/FilterTabs";
 import EvidenceCard from "./EvidenceCard";
-import Skeleton from "../ui/Skeleton";
+import EmptyState from "../ui/EmptyState";
+import { SkeletonStatCard } from "../ui/Skeleton";
 import Modal from "../ui/Modal";
+import { Stagger, StaggerItem } from "../ui/Motion";
+import { celebrate } from "../../lib/motion";
 import { evidenceApi } from "../../services/evidence";
 import { evidenceTypeLabels, formatEvidenceDate } from "../../lib/evidence";
 import type {
@@ -20,15 +23,15 @@ import type {
 const filterOptions = ["Semua", ...Object.values(evidenceTypeLabels)];
 
 const inputClass =
-	"w-full text-sm text-neutral bg-neutral/5 border border-neutral/10 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30";
+	"w-full text-sm text-neutral bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500";
 
 function toDisplay(item: EvidenceItemResponse) {
 	return {
 		category: evidenceTypeLabels[item.evidence_type] ?? item.evidence_type,
 		title: item.title,
-		role: item.user_role || "—",
+		role: item.user_role || "Peran Utama",
 		description: item.description,
-		impactLabel: "Impact",
+		impactLabel: "Dampak & Hasil",
 		impactValue: item.impact || "—",
 		date: formatEvidenceDate(item.evidence_date),
 		aiGenerated: item.ai_generated,
@@ -57,6 +60,7 @@ export default function BuktiKarier() {
 	const [items, setItems] = useState<EvidenceItemResponse[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState(false);
+	const [toastMsg, setToastMsg] = useState<string | null>(null);
 	const formRef = useRef<EvidenceFormHandle>(null);
 
 	const [editing, setEditing] = useState<EvidenceItemResponse | null>(null);
@@ -65,6 +69,13 @@ export default function BuktiKarier() {
 	const [removeAttachment, setRemoveAttachment] = useState(false);
 	const [editSaving, setEditSaving] = useState(false);
 	const [editError, setEditError] = useState("");
+
+	const showToast = useCallback((msg: string) => {
+		setToastMsg(msg);
+		setTimeout(() => {
+			setToastMsg((curr) => (curr === msg ? null : curr));
+		}, 3600);
+	}, []);
 
 	useEffect(() => {
 		let active = true;
@@ -96,8 +107,10 @@ export default function BuktiKarier() {
 			}
 			setItems((prev) => [created, ...prev]);
 			setActiveFilter("Semua");
+			showToast("Bukti karier berhasil disimpan ke portofoliomu!");
+			void celebrate({ intensity: "small" });
 		},
-		[],
+		[showToast],
 	);
 
 	const openEdit = (item: EvidenceItemResponse) => {
@@ -161,6 +174,7 @@ export default function BuktiKarier() {
 				prev.map((item) => (item.id === updated.id ? updated : item)),
 			);
 			closeEdit();
+			showToast("Perubahan bukti karier disimpan.");
 		} catch {
 			setEditError("Gagal menyimpan bukti. Silakan coba lagi.");
 		} finally {
@@ -176,12 +190,22 @@ export default function BuktiKarier() {
 			await evidenceApi.remove(editing.id);
 			setItems((prev) => prev.filter((item) => item.id !== editing.id));
 			closeEdit();
+			showToast("Bukti karier dihapus.");
 		} catch {
 			setEditError("Gagal menghapus bukti. Silakan coba lagi.");
 		} finally {
 			setEditSaving(false);
 		}
 	};
+
+	const counts = useMemo(() => {
+		const map: Record<string, number> = { Semua: items.length };
+		for (const item of items) {
+			const lbl = evidenceTypeLabels[item.evidence_type] ?? item.evidence_type;
+			map[lbl] = (map[lbl] ?? 0) + 1;
+		}
+		return map;
+	}, [items]);
 
 	const filteredItems = items.filter(
 		(item) =>
@@ -194,55 +218,55 @@ export default function BuktiKarier() {
 		<div>
 			<PageHeader
 				title="Bukti Karier"
-				subtitle="Simpan pencapaianmu sekarang. Jangan tunggu sampai kamu membutuhkannya."
+				subtitle="Simpan pencapaian, proyek, dan apresiasi kerjamu selagi segar. Portofolio yang rapi membuatmu selalu siap."
+				action={
+					<PrimaryButton
+						tone="bukti-karier"
+						icon={<PlusCircle size={16} />}
+						onClick={() => formRef.current?.open()}>
+						+ Tambah Bukti
+					</PrimaryButton>
+				}
 			/>
+
+			{toastMsg && (
+				<div
+					role="status"
+					className="mb-6 rounded-2xl bg-emerald-600 text-white px-4 py-3 shadow-lg flex items-center gap-2.5 text-sm font-bold">
+					<CheckCircle2 size={18} className="shrink-0" />
+					<span>{toastMsg}</span>
+				</div>
+			)}
 
 			<EvidenceForm ref={formRef} onSave={handleCreate} />
 
 			{loading ? (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-					{Array.from({ length: 3 }).map((_, i) => (
-						<div
-							key={i}
-							className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-6">
-							<Skeleton className="h-4 w-20 rounded-lg mb-4" />
-							<Skeleton className="h-5 w-2/3 mb-2" />
-							<Skeleton className="h-3 w-28 mb-6" />
-							<Skeleton className="h-3 w-full mb-2" />
-							<Skeleton className="h-3 w-4/5 mb-6" />
-							<Skeleton className="h-12 w-full rounded-xl mb-4" />
-							<Skeleton className="h-3 w-24" />
-						</div>
+					{[0, 1, 2].map((i) => (
+						<SkeletonStatCard key={i} className="h-64" />
 					))}
 				</div>
 			) : items.length === 0 ? (
 				loadError ? (
-					<div className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-10 text-center">
-						<h3 className="text-lg font-bold text-neutral">
-							Gagal memuat bukti karier
-						</h3>
-						<p className="text-sm text-neutral/60 mt-2 max-w-md mx-auto leading-relaxed">
-							Kami tidak dapat mengambil data bukti kariermu. Periksa koneksi
-							dan coba lagi.
-						</p>
-					</div>
+					<EmptyState
+						illustration="evidence"
+						title="Gagal memuat bukti karier"
+						description="Kami belum dapat mengambil daftar bukti kariermu saat ini. Periksa koneksi internetmu lalu muat ulang halaman."
+					/>
 				) : (
-					<div className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-10 text-center">
-						<h3 className="text-lg font-bold text-neutral">
-							Belum ada bukti karier
-						</h3>
-						<p className="text-sm text-neutral/60 mt-2 max-w-md mx-auto leading-relaxed">
-							Mulai simpan project, pencapaian, atau pengalaman pentingmu
-							sekarang. Nanti kamu akan berterima kasih saat membutuhkannya.
-						</p>
-						<div className="mt-5 flex justify-center">
+					<EmptyState
+						illustration="evidence"
+						title="Galeri bukti kariermu masih kosong"
+						description="Mulai simpan 1 proyek, pencapaian, atau feedback positif dari rekan kerja. Nanti kamu akan berterima kasih pada dirimu sendiri saat memperbarui CV atau wawancara."
+						action={
 							<PrimaryButton
-								icon={<PlusCircle size={14} />}
+								tone="bukti-karier"
+								icon={<PlusCircle size={15} />}
 								onClick={() => formRef.current?.open()}>
-								Tambah Bukti
+								+ Tambah Bukti Pertama
 							</PrimaryButton>
-						</div>
-					</div>
+						}
+					/>
 				)
 			) : (
 				<>
@@ -250,23 +274,35 @@ export default function BuktiKarier() {
 						options={filterOptions}
 						active={activeFilter}
 						onChange={setActiveFilter}
+						counts={counts}
 					/>
 
 					{filteredItems.length === 0 ? (
-						<p className="text-sm text-neutral/50">
-							Tidak ada bukti pada kategori ini.
-						</p>
+						<EmptyState
+							illustration="evidence"
+							title={`Belum ada bukti di kategori "${activeFilter}"`}
+							description="Tambahkan bukti baru pada kategori ini atau pilih kategori lain di atas."
+							action={
+								<PrimaryButton
+									tone="bukti-karier"
+									icon={<PlusCircle size={15} />}
+									onClick={() => formRef.current?.open()}>
+									+ Tambah Bukti
+								</PrimaryButton>
+							}
+						/>
 					) : (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+						<Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 							{filteredItems.map((item) => (
-								<EvidenceCard
-									key={item.id}
-									{...toDisplay(item)}
-									onEdit={() => openEdit(item)}
-									onDelete={() => openEdit(item)}
-								/>
+								<StaggerItem key={item.id}>
+									<EvidenceCard
+										{...toDisplay(item)}
+										onEdit={() => openEdit(item)}
+										onDelete={() => openEdit(item)}
+									/>
+								</StaggerItem>
 							))}
-						</div>
+						</Stagger>
 					)}
 				</>
 			)}
@@ -274,10 +310,11 @@ export default function BuktiKarier() {
 			<Modal
 				open={editing !== null}
 				onClose={closeEdit}
-				title="Edit Bukti Karier">
+				title="Edit Bukti Karier"
+				subtitle="Perbarui rincian atau lampiran bukti kerjamu.">
 				<div className="space-y-4">
 					<div>
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
 							Jenis Bukti
 						</label>
 						<select
@@ -299,7 +336,7 @@ export default function BuktiKarier() {
 						</select>
 					</div>
 					<div>
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
 							Judul
 						</label>
 						<input
@@ -310,7 +347,7 @@ export default function BuktiKarier() {
 						/>
 					</div>
 					<div>
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
 							Deskripsi
 						</label>
 						<textarea
@@ -321,7 +358,7 @@ export default function BuktiKarier() {
 						/>
 					</div>
 					<div>
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
 							Dampak
 						</label>
 						<textarea
@@ -332,7 +369,7 @@ export default function BuktiKarier() {
 						/>
 					</div>
 					<div>
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
 							Tanggal
 						</label>
 						<input
@@ -345,15 +382,15 @@ export default function BuktiKarier() {
 						/>
 					</div>
 					<div>
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
 							Lampiran
 						</label>
 						{editing?.attachment_url && !removeAttachment ? (
-							<div className="flex items-center gap-3 rounded-xl border border-neutral/10 bg-neutral/5 p-2.5 mb-2">
+							<div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-2.5 mb-2">
 								<img
 									src={editing.attachment_url}
 									alt="Lampiran bukti"
-									className="h-12 w-12 rounded-lg object-cover border border-neutral/10"
+									className="h-12 w-12 rounded-lg object-cover border border-slate-200"
 								/>
 								<div className="flex-1 min-w-0">
 									<p className="text-xs text-neutral/60 truncate">
@@ -362,19 +399,19 @@ export default function BuktiKarier() {
 									<button
 										type="button"
 										onClick={() => setRemoveAttachment(true)}
-										className="text-xs font-medium text-red-500 hover:text-red-600 transition cursor-pointer mt-1">
+										className="text-xs font-bold text-rose-600 hover:text-rose-700 transition cursor-pointer mt-1">
 										Hapus Lampiran
 									</button>
 								</div>
 							</div>
 						) : null}
 						{removeAttachment && (
-							<p className="text-xs text-neutral/50 mb-2">
+							<p className="text-xs text-neutral/60 mb-2">
 								Lampiran saat ini akan dihapus.{" "}
 								<button
 									type="button"
 									onClick={() => setRemoveAttachment(false)}
-									className="text-primary font-semibold cursor-pointer">
+									className="text-sky-600 font-bold cursor-pointer">
 									Batalkan
 								</button>
 							</p>
@@ -386,29 +423,28 @@ export default function BuktiKarier() {
 								setEditFile(e.target.files?.[0] ?? null);
 								if (e.target.files?.[0]) setRemoveAttachment(false);
 							}}
-							className={`${inputClass} file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-primary`}
+							className={`${inputClass} file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-sky-100 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-sky-800`}
 						/>
 						{editFile && (
-							<p className="text-xs text-neutral/50 mt-1.5">
-								{editFile.name}
-							</p>
+							<p className="text-xs text-neutral/60 mt-1.5">{editFile.name}</p>
 						)}
 					</div>
 					{editError && (
-						<p className="text-xs text-red-500 font-medium">{editError}</p>
+						<p className="text-xs text-rose-600 font-semibold">{editError}</p>
 					)}
 				</div>
-				<div className="flex justify-between gap-2.5 mt-2">
+				<div className="flex items-center justify-between gap-2.5 mt-6 pt-4 border-t border-slate-100">
 					<button
 						type="button"
 						onClick={() => void handleDelete()}
 						disabled={editSaving}
-						className="text-xs font-medium text-red-500 hover:text-red-600 transition cursor-pointer disabled:opacity-50">
+						className="text-xs font-bold text-rose-600 hover:text-rose-700 transition cursor-pointer disabled:opacity-50">
 						Hapus Bukti
 					</button>
 					<div className="flex items-center gap-2.5">
 						<SecondaryButton onClick={closeEdit}>Batal</SecondaryButton>
 						<PrimaryButton
+							tone="bukti-karier"
 							onClick={() => void handleEditSave()}
 							disabled={editSaving}>
 							{editSaving ? "Menyimpan..." : "Simpan Perubahan"}

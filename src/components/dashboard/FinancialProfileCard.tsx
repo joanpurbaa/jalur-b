@@ -1,45 +1,46 @@
 import { useEffect, useState } from "react";
-import { Wallet, CreditCard, Users, Coins } from "lucide-react";
+import { Wallet, CreditCard, Users, Coins, Pencil } from "lucide-react";
 import ParameterCard from "../ui/ParameterCard";
-import Skeleton from "../ui/Skeleton";
+import { SkeletonStatCard } from "../ui/Skeleton";
 import { SecondaryButton } from "../ui/PrimaryButton";
+import { Stagger, StaggerItem } from "../ui/Motion";
 import { financialApi } from "../../services/financial";
+import { formatRupiah } from "../../lib/format";
 import type { FinancialProfileResponse } from "../../types/financial";
 import type { FinanceTone } from "../../lib/status";
 import { EditFinancialModal } from "../profile/EditFinancialModal";
 
-function formatRupiah(raw?: string | null): string {
-	if (!raw) return "-";
-	const n = Number(raw);
-	return Number.isFinite(n) ? `Rp ${n.toLocaleString("id-ID")}` : "-";
-}
-
 const cardConfig: {
 	label: string;
+	sublabel: string;
 	icon: typeof Wallet;
 	tone: FinanceTone;
 	value: (p: FinancialProfileResponse) => string;
 }[] = [
 	{
 		label: "Pengeluaran Esensial / Bulan",
+		sublabel: "Kebutuhan pokok bulanan",
 		icon: Wallet,
 		tone: "amber",
 		value: (p) => formatRupiah(p.monthly_essential_expenses),
 	},
 	{
 		label: "Cicilan Utang / Bulan",
+		sublabel: "Kewajiban rutin bulanan",
 		icon: CreditCard,
 		tone: "rose",
 		value: (p) => formatRupiah(p.monthly_debt_payment),
 	},
 	{
 		label: "Jumlah Tanggungan",
+		sublabel: "Anggota keluarga yang ditanggung",
 		icon: Users,
 		tone: "violet",
-		value: (p) => (p.dependents != null ? String(p.dependents) : "-"),
+		value: (p) => (p.dependents != null ? `${p.dependents} orang` : "0 orang"),
 	},
 	{
 		label: "Mata Uang",
+		sublabel: "Satuan perhitungan runway",
 		icon: Coins,
 		tone: "slate",
 		value: (p) => p.currency || "IDR",
@@ -90,58 +91,54 @@ export default function FinancialProfileCard({
 	};
 
 	return (
-		<div className="mb-8">
-			<div className="flex items-start justify-between gap-4 mb-3">
+		<section className="mb-8" aria-label="Profil Finansial">
+			<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
 				<div>
-					<h3 className="text-sm font-bold text-neutral">
-						Pengeluaran &amp; Tanggungan
+					<h3 className="text-base sm:text-lg font-extrabold text-neutral">
+						Beban & Profil Finansial Bulanan
 					</h3>
-					<p className="text-xs text-neutral/50 mt-0.5">
-						Data ini memengaruhi perhitungan financial runway.
+					<p className="text-xs sm:text-sm text-neutral/60">
+						Komponen pengeluaran yang menentukan kecepatan konsumsi dana darurat
 					</p>
 				</div>
-				<SecondaryButton onClick={() => setEditOpen(true)}>
-					Edit Data Finansial
+				<SecondaryButton
+					size="sm"
+					icon={<Pencil size={14} />}
+					onClick={() => setEditOpen(true)}>
+					Ubah Profil Finansial
 				</SecondaryButton>
 			</div>
 
 			{loading ? (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-					{Array.from({ length: 4 }).map((_, i) => (
-						<div
-							key={i}
-							className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-5">
-							<div className="flex items-start justify-between mb-4">
-								<Skeleton className="w-9 h-9 rounded-xl" />
-								<Skeleton className="w-4 h-4 rounded" />
-							</div>
-							<Skeleton className="h-3 w-24 mb-2" />
-							<Skeleton className="h-5 w-32" />
-						</div>
+					{[0, 1, 2, 3].map((i) => (
+						<SkeletonStatCard key={i} />
 					))}
 				</div>
 			) : (
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-					{profile
-						? cardConfig.map(({ label, icon, tone, value }) => (
-								<ParameterCard
-									key={label}
-									label={label}
-									value={value(profile)}
-									icon={icon}
-									tone={tone}
-									onEdit={() => setEditOpen(true)}
-								/>
-							))
-						: null}
-				</div>
+				<Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+					{cardConfig.map((c) => (
+						<StaggerItem key={c.label}>
+							<ParameterCard
+								label={c.label}
+								sublabel={c.sublabel}
+								value={profile ? c.value(profile) : "—"}
+								icon={c.icon}
+								tone={c.tone}
+								onEdit={() => setEditOpen(true)}
+							/>
+						</StaggerItem>
+					))}
+				</Stagger>
 			)}
 
-			<EditFinancialModal
-				open={editOpen}
-				onClose={() => setEditOpen(false)}
-				onSaved={() => void handleSaved()}
-			/>
-		</div>
+			{editOpen && (
+				<EditFinancialModal
+					open={editOpen}
+					onClose={() => setEditOpen(false)}
+					onSaved={handleSaved}
+				/>
+			)}
+		</section>
 	);
 }

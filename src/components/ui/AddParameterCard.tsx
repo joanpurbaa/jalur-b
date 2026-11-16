@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import IconTile from "./IconTile";
 
 interface AddParameterCardProps {
 	onClick?: () => void;
@@ -9,14 +10,16 @@ export default function AddParameterCard({ onClick }: AddParameterCardProps) {
 		<button
 			type="button"
 			onClick={onClick}
-			className="rounded-2xl border border-dashed border-neutral/20 p-5 flex flex-col items-center justify-center text-center gap-2 hover:border-primary/40 hover:bg-primary/5 transition h-full min-h-[140px]">
-			<div className="w-9 h-9 rounded-full bg-neutral/5 flex items-center justify-center">
-				<Plus size={16} className="text-neutral/50" />
+			className="press rounded-3xl border-2 border-dashed border-emerald-300/90 bg-emerald-50/40 hover:bg-emerald-50/80 hover:border-emerald-500 p-6 flex flex-col items-center justify-center text-center gap-2.5 transition h-full min-h-[156px] cursor-pointer">
+			<IconTile icon={Plus} tone="finansial" size="md" />
+			<div>
+				<p className="text-sm font-extrabold text-emerald-950">
+					+ Tambah Aset / Tabungan
+				</p>
+				<p className="text-xs text-neutral/60 mt-0.5">
+					Tabungan utama, dana darurat, deposito, atau investasi
+				</p>
 			</div>
-			<p className="text-sm font-semibold text-neutral">Tambah Parameter</p>
-			<p className="text-xs text-neutral/50">
-				Misal: Asuransi, Investasi Jangka Panjang
-			</p>
 		</button>
 	);
 }

@@ -5,6 +5,8 @@ import {
 	Wallet,
 	TrendingUp,
 	Coins,
+	PlusCircle,
+	PieChart,
 } from "lucide-react";
 import { financialApi } from "../../services/financial";
 import type {
@@ -14,6 +16,8 @@ import type {
 } from "../../types/financial";
 import ParameterCard from "../ui/ParameterCard";
 import AddParameterCard from "../ui/AddParameterCard";
+import Card from "../ui/Card";
+import IconTile from "../ui/IconTile";
 import Skeleton from "../ui/Skeleton";
 import { PrimaryButton } from "../ui/PrimaryButton";
 import type { FinanceTone } from "../../lib/status";
@@ -235,9 +239,136 @@ export default function FinancialParameters({
 		}
 	};
 
+	const totalAssetsAmount = assets.reduce(
+		(acc, item) => acc + (Number.isFinite(Number(item.amount)) ? Number(item.amount) : 0),
+		0,
+	);
+
+	const donutColors: Record<FinancialAssetType, string> = {
+		main_savings: "#6366f1",
+		emergency_fund: "#10b981",
+		long_term_savings: "#8b5cf6",
+		investment: "#f59e0b",
+		other: "#0ea5e9",
+	};
+
+	const groupedByType = savingsTypes
+		.map((st) => {
+			const sum = assets
+				.filter((a) => a.asset_type === st.value)
+				.reduce((acc, a) => acc + (Number(a.amount) || 0), 0);
+			return {
+				type: st.value,
+				label: st.label,
+				amount: sum,
+				color: donutColors[st.value],
+			};
+		})
+		.filter((g) => g.amount > 0);
+
 	return (
 		<div>
-			<h3 className="text-sm font-bold text-neutral mb-3">Parameter Finansial</h3>
+			<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+				<div>
+					<h3 className="text-base sm:text-lg font-extrabold text-neutral">
+						Aset & Parameter Tabungan
+					</h3>
+					<p className="text-xs sm:text-sm text-neutral/60">
+						Daftar dana cadangan dan tingkat likuiditasnya
+					</p>
+				</div>
+				<PrimaryButton
+					tone="finansial"
+					size="sm"
+					icon={<PlusCircle size={15} />}
+					onClick={() => setIsModalOpen(true)}>
+					+ Tambah Aset
+				</PrimaryButton>
+			</div>
+
+			{!loading && groupedByType.length > 0 && totalAssetsAmount > 0 && (
+				<Card
+					padding="md"
+					className="mb-5 bg-gradient-to-r from-emerald-50/50 via-white to-teal-50/40">
+					<div className="flex flex-col sm:flex-row items-center gap-6">
+						<div className="relative shrink-0 w-36 h-36 flex items-center justify-center">
+							<svg
+								width={144}
+								height={144}
+								viewBox="0 0 144 144"
+								className="-rotate-90"
+								role="img"
+								aria-label="Grafik komposisi dana berdasarkan jenis aset">
+								{(() => {
+									const r = 54;
+									const c = 2 * Math.PI * r;
+									let offset = 0;
+									return groupedByType.map((g) => {
+										const len = (g.amount / totalAssetsAmount) * c;
+										const el = (
+											<circle
+												key={g.type}
+												cx={72}
+												cy={72}
+												r={r}
+												fill="none"
+												stroke={g.color}
+												strokeWidth={18}
+												strokeDasharray={`${len} ${c - len}`}
+												strokeDashoffset={-offset}
+											/>
+										);
+										offset += len;
+										return el;
+									});
+								})()}
+							</svg>
+							<div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+								<span className="text-[10px] font-bold uppercase text-neutral/50">
+									Total Aset
+								</span>
+								<span className="text-xs font-extrabold text-neutral tabular">
+									{assets.length} pos
+								</span>
+							</div>
+						</div>
+
+						<div className="flex-1 w-full">
+							<div className="flex items-center gap-2 mb-2">
+								<IconTile icon={PieChart} tone="finansial" size="xs" />
+								<span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800">
+									Komposisi Dana Tersimpan
+								</span>
+							</div>
+							<p className="num-display text-2xl text-neutral mb-3">
+								{formatRupiah(totalAssetsAmount)}
+							</p>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+								{groupedByType.map((g) => {
+									const pct = Math.round((g.amount / totalAssetsAmount) * 100);
+									return (
+										<div
+											key={g.type}
+											className="flex items-center justify-between gap-2 rounded-xl bg-white/85 border border-slate-200/80 px-3 py-2 text-xs">
+											<span className="flex items-center gap-2 font-semibold text-neutral truncate">
+												<span
+													className="w-2.5 h-2.5 rounded-full shrink-0"
+													style={{ backgroundColor: g.color }}
+												/>
+												<span className="truncate">{g.label}</span>
+											</span>
+											<span className="font-extrabold text-neutral/80 tabular shrink-0">
+												{pct}% · {formatRupiah(g.amount)}
+											</span>
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					</div>
+				</Card>
+			)}
+
 			{loading ? (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					{Array.from({ length: 3 }).map((_, i) => (
