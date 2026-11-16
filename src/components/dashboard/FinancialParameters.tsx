@@ -546,19 +546,14 @@ export default function FinancialParameters({
 								/>
 							</div>
 							{errors.api && (
-								<p className="text-xs text-rose-600 font-medium">
+								<p className="text-xs text-rose-700 font-medium">
 									Gagal menyimpan tabungan. Silakan coba lagi.
 								</p>
 							)}
 						</div>
 
-						<div className="mt-8 pt-6 border-t border-neutral/10 flex items-center justify-end gap-3">
-							<button
-								type="button"
-								onClick={closeModal}
-								className="px-5 py-2.5 text-sm font-medium rounded-full border border-neutral/20 text-neutral hover:bg-tertiary transition cursor-pointer">
-								Batalkan
-							</button>
+						<div className="mt-8 pt-5 border-t border-slate-200 flex items-center justify-end gap-3">
+							<SecondaryButton onClick={closeModal}>Batalkan</SecondaryButton>
 							<PrimaryButton onClick={handleSave} disabled={saving}>
 								{saving ? "Menyimpan..." : "Simpan Tabungan"}
 							</PrimaryButton>
@@ -569,17 +564,17 @@ export default function FinancialParameters({
 
 			{editing && (
 				<div
-					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral/40 backdrop-blur-sm"
+					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-[2px]"
 					onClick={closeEdit}>
 					<div
-						className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-neutral/5"
+						className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200"
 						onClick={(e) => e.stopPropagation()}>
 						<div className="flex items-start justify-between mb-6">
 							<div>
-								<h2 className="text-xl sm:text-2xl font-bold text-neutral">
+								<h2 className="text-xl sm:text-2xl font-bold text-slate-900">
 									Edit Aset
 								</h2>
-								<p className="text-sm text-neutral/60 mt-1">
+								<p className="text-sm text-slate-500 mt-1">
 									Perbarui data aset finansialmu.
 								</p>
 							</div>
@@ -711,27 +706,22 @@ export default function FinancialParameters({
 								/>
 							</div>
 							{editErrors.api && (
-								<p className="text-xs text-rose-600 font-medium">
+								<p className="text-xs text-rose-700 font-medium">
 									Gagal menyimpan. Silakan coba lagi.
 								</p>
 							)}
 						</div>
 
-						<div className="mt-8 pt-6 border-t border-neutral/10 flex items-center justify-between gap-3">
+						<div className="mt-8 pt-5 border-t border-slate-200 flex items-center justify-between gap-3">
 							<button
 								type="button"
 								onClick={handleDelete}
 								disabled={saving}
-								className="px-4 py-2.5 text-sm font-medium rounded-full border border-red-200 text-rose-600 hover:bg-red-50 transition cursor-pointer">
+								className="min-h-[44px] px-4 py-2.5 text-sm font-medium rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 transition cursor-pointer">
 								Hapus Aset
 							</button>
 							<div className="flex items-center gap-3">
-								<button
-									type="button"
-									onClick={closeEdit}
-									className="px-5 py-2.5 text-sm font-medium rounded-full border border-neutral/20 text-neutral hover:bg-tertiary transition cursor-pointer">
-									Batalkan
-								</button>
+								<SecondaryButton onClick={closeEdit}>Batalkan</SecondaryButton>
 								<PrimaryButton onClick={handleEditSave} disabled={saving}>
 									{saving ? "Menyimpan..." : "Simpan Perubahan"}
 								</PrimaryButton>

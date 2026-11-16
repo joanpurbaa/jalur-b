@@ -1,11 +1,11 @@
 import {
+	Cpu,
 	FolderCheck,
 	GitFork,
 	HeartPulse,
 	Home,
 	PlaySquare,
 	ShieldAlert,
-	Sparkles,
 	User,
 	Wallet,
 	type LucideIcon,
@@ -78,7 +78,7 @@ export const MODULES: Record<ModuleId, ModuleTheme> = {
 		id: "skill",
 		label: "Skill & AI",
 		shortLabel: "Skill",
-		icon: Sparkles,
+		icon: Cpu,
 		...BRAND_THEME,
 	},
 	"jalur-karier": {
@@ -124,13 +124,7 @@ export type ExtraTone =
 	| "caution"
 	| "danger"
 	| "neutral"
-	| "indigo"
-	| "violet"
-	| "cyan"
-	| "pink"
-	| "teal"
-	| "orange"
-	| "blue";
+	| "indigo";
 
 const INDIGO_TILE = {
 	gradient: "bg-indigo-50 text-indigo-600 border border-indigo-100",
@@ -175,12 +169,6 @@ export const EXTRA_TONES: Record<
 	},
 	neutral: SLATE_TILE,
 	indigo: INDIGO_TILE,
-	violet: INDIGO_TILE,
-	cyan: INDIGO_TILE,
-	pink: INDIGO_TILE,
-	teal: INDIGO_TILE,
-	orange: INDIGO_TILE,
-	blue: INDIGO_TILE,
 };
 
 export type Tone = ModuleId | ExtraTone;

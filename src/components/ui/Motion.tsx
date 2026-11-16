@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { motion, type Variants } from "motion/react";
 import { DUR, EASE_OUT, fadeUp, staggerParent, useCountUp } from "../../lib/motion";
 
@@ -82,24 +82,7 @@ export function PageTransition({
 	);
 }
 
-/** Wrapper hover halus tanpa tilt 3D. */
-export function Tilt({
-	children,
-	className = "",
-	...rest
-}: {
-	children: ReactNode;
-	className?: string;
-	max?: number;
-} & HTMLAttributes<HTMLDivElement>) {
-	return (
-		<div className={className} {...rest}>
-			{children}
-		</div>
-	);
-}
-
-/** Count-up angka saat masuk viewport (sekali). */
+/** Count-up angka saat elemen masuk viewport (sekali). */
 export function CountUp({
 	value,
 	decimals = 0,
@@ -124,16 +107,4 @@ export function CountUp({
 					})}
 		</span>
 	);
-}
-
-/** Container statis (animasi float dekoratif dihapus). */
-export function Float({
-	children,
-	className = "",
-}: {
-	children: ReactNode;
-	className?: string;
-	delay?: number;
-}) {
-	return <div className={className}>{children}</div>;
 }

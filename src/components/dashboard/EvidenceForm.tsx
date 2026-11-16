@@ -7,11 +7,11 @@ import {
 import {
 	Award,
 	BookOpen,
+	FileText,
 	FolderKanban,
 	Medal,
 	MessageSquareQuote,
 	Plus,
-	Sparkles,
 	Trophy,
 	type LucideIcon,
 } from "lucide-react";
@@ -31,7 +31,7 @@ const TYPE_ICONS: Record<EvidenceType, LucideIcon> = {
 	certificate: Medal,
 	award: Award,
 	training: BookOpen,
-	other: Sparkles,
+	other: FileText,
 };
 
 export interface EvidenceFormHandle {

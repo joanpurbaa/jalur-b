@@ -9,7 +9,6 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 import type { ExitType } from "../../../types/layoffSimulation";
-import type { Tone } from "../../../lib/modules";
 import IconTile from "../../ui/IconTile";
 
 export interface ExitTypeOption {
@@ -59,13 +58,13 @@ export const exitTypeOptions: ExitTypeOption[] = [
 	},
 ];
 
-const EXIT_VISUAL: Record<ExitType, { icon: LucideIcon; tone: Tone }> = {
-	efficiency_due_to_loss: { icon: TrendingDown, tone: "danger" },
-	efficiency_prevent_loss: { icon: ShieldAlert, tone: "caution" },
-	closure_not_loss: { icon: Building2, tone: "indigo" },
-	bankruptcy: { icon: Scale, tone: "violet" },
-	pkwt_ends_on_schedule: { icon: CalendarCheck2, tone: "teal" },
-	resign: { icon: DoorOpen, tone: "simulasi" },
+const EXIT_ICON: Record<ExitType, LucideIcon> = {
+	efficiency_due_to_loss: TrendingDown,
+	efficiency_prevent_loss: ShieldAlert,
+	closure_not_loss: Building2,
+	bankruptcy: Scale,
+	pkwt_ends_on_schedule: CalendarCheck2,
+	resign: DoorOpen,
 };
 
 interface ExitTypePickerProps {
@@ -86,7 +85,7 @@ export default function ExitTypePicker({
 			className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
 			{options.map((option) => {
 				const active = option.id === selected;
-				const vis = EXIT_VISUAL[option.id] ?? EXIT_VISUAL.efficiency_due_to_loss;
+				const Icon = EXIT_ICON[option.id] ?? TrendingDown;
 				return (
 					<button
 						key={option.id}
@@ -94,15 +93,15 @@ export default function ExitTypePicker({
 						role="radio"
 						aria-checked={active}
 						onClick={() => onSelect(option.id)}
-						className={`press rounded-2xl p-4 text-left transition border-2 cursor-pointer flex items-start gap-3.5 ${
+						className={`rounded-xl p-4 text-left transition border cursor-pointer flex items-start gap-3.5 ${
 							active
-								? "border-indigo-600 bg-indigo-50/60 shadow-[0_12px_26px_-12px_rgba(79,70,229,0.35)] ring-2 ring-indigo-500/20"
-								: "border-slate-200/85 bg-white/90 hover:bg-white hover:border-indigo-200"
+								? "border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-500/25"
+								: "border-slate-200 bg-white hover:border-indigo-200"
 						}`}>
-						<IconTile icon={vis.icon} tone={vis.tone} size="sm" />
+						<IconTile icon={Icon} tone="indigo" size="sm" />
 						<div className="flex-1 min-w-0">
 							<div className="flex items-center justify-between gap-2">
-								<p className="text-sm font-extrabold text-neutral">
+								<p className="text-sm font-bold text-slate-900">
 									{option.label}
 								</p>
 								{active && (
@@ -113,11 +112,11 @@ export default function ExitTypePicker({
 								)}
 							</div>
 							{option.badge && (
-								<span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-700">
+								<span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-slate-100 text-xs font-medium text-slate-700">
 									{option.badge}
 								</span>
 							)}
-							<p className="text-xs text-neutral/65 mt-1.5 leading-relaxed">
+							<p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
 								{option.description}
 							</p>
 						</div>

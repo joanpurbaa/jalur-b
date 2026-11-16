@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { Layers } from "lucide-react";
 import ActivityImpactBar from "../ui/ActivityImpactBar";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
@@ -37,7 +37,7 @@ export default function ActivityImpactPanel({
 		<Card padding="lg" className="mb-8">
 			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
 				<div className="flex items-start gap-3">
-					<IconTile icon={Sparkles} tone="indigo" size="md" />
+					<IconTile icon={Layers} tone="indigo" size="md" />
 					<div className="min-w-0">
 						<h3 className="text-base font-bold text-slate-900">{title}</h3>
 						<ExpandableText

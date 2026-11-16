@@ -1,41 +1,51 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-	Sparkles,
-	TrendingDown,
-	HeartPulse,
-	Zap,
-	Compass,
-	Wallet as WalletIcon,
-	CheckSquare,
-	RotateCcw,
-	FolderCheck,
+	Activity,
 	ArrowRight,
+	CheckSquare,
+	Compass,
+	FolderCheck,
+	HeartPulse,
+	RotateCcw,
 	Target,
+	TrendingDown,
+	Wallet as WalletIcon,
+	Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { getRunwayStatus, getScoreStatus } from "../../../lib/status";
-import { formatDateID, formatDecimal1 } from "../../../lib/format";
-import { celebrate } from "../../../lib/motion";
+import {
+	getHealthStatus,
+	getRunwayStatus,
+	getScoreStatus,
+	statusStyles,
+} from "../../../lib/status";
+import {
+	formatDateID,
+	formatDecimal1,
+	formatMonths,
+} from "../../../lib/format";
 import ScoreRing from "../../ui/ScoreRing";
 import MeterBar from "../../ui/MeterBar";
 import StatusBadge from "../../ui/StatusBadge";
 import Card from "../../ui/Card";
 import IconTile from "../../ui/IconTile";
-import { PrimaryButton } from "../../ui/PrimaryButton";
+import {
+	PrimaryButton,
+	SecondaryButton,
+} from "../../ui/PrimaryButton";
 import { CountUp, Stagger, StaggerItem } from "../../ui/Motion";
 import ResultTimeline from "./ResultTimeline";
 import { careerPivotApi } from "../../../services/careerPivot";
 import { aiExposureApi } from "../../../services/aiExposure";
 import { parseDecimal } from "../../../lib/parseNumeric";
 import type { LayoffSimulationResult } from "../../../types/layoffSimulation";
-import type { Tone } from "../../../lib/modules";
 
 interface ReadinessItem {
 	label: string;
 	value: number;
 	icon: LucideIcon;
-	tone: Tone;
+	hasStatus: boolean;
 }
 
 const scenarioLabels: Record<string, string> = {
@@ -72,19 +82,22 @@ export default function SimulationResult({
 	const runway = parseDecimal(result.financial_runway_months);
 	const target = parseDecimal(result.target_runway_months) || 6;
 	const overallScore = clampScore(result.overall_resilience_score);
+	const overallVariant = getHealthStatus(
+		overallScore >= 75
+			? "Sehat"
+			: overallScore >= 60
+				? "Perlu Perhatian"
+				: "Kritis",
+		overallScore,
+	);
 	const runwayVariant = getRunwayStatus(runway, target);
+	const runwaySt = statusStyles[runwayVariant];
 	const diff = runway - target;
 	const isSurplus = diff >= 0;
 	const maxScale = Math.max(target * 1.4, runway * 1.15, 12);
 	const simulatedDate = result.simulated_at
 		? formatDateID(result.simulated_at)
 		: "";
-
-	useEffect(() => {
-		if (runway >= target || overallScore >= 70) {
-			void celebrate({ intensity: "small" });
-		}
-	}, [runway, target, overallScore]);
 
 	useEffect(() => {
 		let active = true;
@@ -117,60 +130,60 @@ export default function SimulationResult({
 			label: "Financial Readiness",
 			value: clampScore(result.financial_readiness_score),
 			icon: WalletIcon,
-			tone: "finansial",
+			hasStatus: true,
 		},
 		{
 			label: "Career Readiness",
 			value: clampScore(result.career_readiness_score),
 			icon: HeartPulse,
-			tone: "kesehatan-karier",
+			hasStatus: true,
 		},
 		{
 			label: "Skill Relevance",
 			value: clampScore(result.skill_relevance_score),
 			icon: Zap,
-			tone: "skill",
+			hasStatus: false,
 		},
 		{
 			label: "Job Mobility",
 			value: clampScore(result.job_mobility_score),
 			icon: Compass,
-			tone: "jalur-karier",
+			hasStatus: false,
 		},
 		{
 			label: "Overall Resilience",
 			value: overallScore,
-			icon: Sparkles,
-			tone: "simulasi",
+			icon: Activity,
+			hasStatus: true,
 		},
 	];
 
 	return (
 		<div className="space-y-6">
-			{/* Ringkasan & CTA Jalankan Ulang */}
 			<Card
+				variant="hero"
 				padding="lg"
-				className="bg-gradient-to-r from-indigo-50/80 via-white to-fuchsia-50/70 flex flex-col md:flex-row md:items-center justify-between gap-5">
+				className="flex flex-col md:flex-row md:items-center justify-between gap-5">
 				<div className="flex items-start gap-4">
-					<IconTile icon={Sparkles} tone="simulasi" size="md" />
+					<IconTile icon={Activity} tone="indigo" size="md" />
 					<div>
-						<div className="flex flex-wrap items-center gap-2 mb-1">
-							<span className="text-xs font-extrabold uppercase tracking-wider text-fuchsia-700">
+						<div className="flex flex-wrap items-center gap-2 mb-1.5">
+							<span className="text-xs font-semibold text-indigo-700">
 								Ringkasan Proyeksi Simulasi
 							</span>
 							<StatusBadge
-								variant={getScoreStatus(overallScore)}
+								variant={overallVariant}
 								label={`Resilience ${overallScore}/100`}
 								size="sm"
 							/>
 						</div>
-						<p className="text-sm sm:text-[15px] text-neutral/85 leading-relaxed max-w-3xl">
+						<p className="text-sm sm:text-[15px] text-slate-800 leading-relaxed max-w-3xl">
 							{result.summary ||
 								"Simulasi selesai dihitung berdasarkan kondisi karier, tabungan likuid, dan ketentuan kerjamu."}
 						</p>
-						<p className="text-xs font-medium text-neutral/55 mt-2">
+						<p className="text-xs font-medium text-slate-500 mt-2">
 							Skenario:{" "}
-							<strong className="text-neutral">
+							<strong className="text-slate-900">
 								{result.exit_type
 									? (exitTypeLabels[result.exit_type] ?? result.exit_type)
 									: (scenarioLabels[result.scenario] ?? result.scenario)}
@@ -188,30 +201,28 @@ export default function SimulationResult({
 
 				{onRerun && (
 					<div className="shrink-0">
-						<PrimaryButton
-							tone="simulasi"
+						<SecondaryButton
 							icon={<RotateCcw size={15} />}
 							onClick={onRerun}>
 							Jalankan Ulang
-						</PrimaryButton>
+						</SecondaryButton>
 					</div>
 				)}
 			</Card>
 
 			<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 				<div className="lg:col-span-8 space-y-6">
-					{/* Runway Reveal Card dengan warna semantik yang diperbaiki */}
 					<Card
 						padding="lg"
-						className={
+						className={`border-l-4 ${
 							runwayVariant === "healthy"
-								? "bg-gradient-to-br from-white via-emerald-50/45 to-teal-50/35"
+								? "border-l-emerald-500"
 								: runwayVariant === "warning"
-									? "bg-gradient-to-br from-white via-amber-50/45 to-orange-50/35"
-									: "bg-gradient-to-br from-white via-rose-50/45 to-orange-50/35"
-						}>
+									? "border-l-amber-500"
+									: "border-l-rose-500"
+						}`}>
 						<div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-							<span className="text-xs font-extrabold uppercase tracking-wider text-neutral/60">
+							<span className="text-xs font-semibold text-slate-600">
 								Proyeksi Financial Runway Pasca-PHK
 							</span>
 							<StatusBadge
@@ -228,55 +239,41 @@ export default function SimulationResult({
 
 						<div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
 							<div>
-								<h3 className="text-lg sm:text-xl font-extrabold text-neutral max-w-lg leading-snug">
+								<h3 className="text-lg sm:text-xl font-bold text-slate-900 max-w-lg leading-snug">
 									Kamu masih punya waktu sekitar{" "}
-									<span
-										className={
-											runwayVariant === "healthy"
-												? "text-emerald-700"
-												: runwayVariant === "warning"
-													? "text-amber-700"
-													: "text-rose-600"
-										}>
-										{formatDecimal1(runway)} bulan
+									<span className={runwaySt.text}>
+										{formatMonths(runway, "bulan")}
 									</span>{" "}
 									napas finansial untuk bertransisi dengan tenang.
 								</h3>
-								<p className="text-xs sm:text-sm text-neutral/65 mt-1">
+								<p className="text-xs sm:text-sm text-slate-600 mt-1">
 									{isSurplus
-										? `Surplus +${formatDecimal1(Math.abs(diff))} bulan di atas target aman ${formatDecimal1(target)} bulan.`
-										: `Masih butuh sekitar ${formatDecimal1(Math.abs(diff))} bulan lagi untuk menyentuh target aman ${formatDecimal1(target)} bulan.`}
+										? `Surplus +${formatMonths(Math.abs(diff), "bulan")} di atas target aman ${formatMonths(target, "bulan")}.`
+										: `Masih butuh sekitar ${formatMonths(Math.abs(diff), "bulan")} lagi untuk menyentuh target aman ${formatMonths(target, "bulan")}.`}
 								</p>
 							</div>
 
 							<div className="text-left sm:text-right shrink-0">
-								<span
-									className={`num-display text-5xl ${
-										runwayVariant === "healthy"
-											? "text-emerald-600"
-											: runwayVariant === "warning"
-												? "text-amber-600"
-												: "text-rose-600"
-									}`}>
+								<span className={`num-display text-5xl ${runwaySt.text}`}>
 									<CountUp
 										value={runway}
 										decimals={1}
 										format={(n) => formatDecimal1(n)}
 									/>
 								</span>
-								<p className="text-xs font-bold text-neutral/50 mt-0.5">
+								<p className="text-xs font-semibold text-slate-500 mt-0.5">
 									bulan runway
 								</p>
 							</div>
 						</div>
 
-						<div className="flex items-center justify-between text-xs font-bold text-neutral/60 mb-2">
+						<div className="flex items-center justify-between text-xs font-semibold text-slate-600 mb-2">
 							<span>0 bln</span>
-							<span className="inline-flex items-center gap-1 text-neutral">
+							<span className="inline-flex items-center gap-1 text-slate-900">
 								<Target size={12} />
-								Target: {formatDecimal1(target)} bln
+								Target: {formatMonths(target)}
 							</span>
-							<span>{formatDecimal1(maxScale)} bln</span>
+							<span>{formatMonths(maxScale)}</span>
 						</div>
 						<MeterBar
 							value={runway}
@@ -288,23 +285,24 @@ export default function SimulationResult({
 						/>
 					</Card>
 
-					{/* Lima Skor sebagai Ring Mini */}
 					<Card padding="lg">
 						<div className="mb-4">
-							<h3 className="text-base sm:text-lg font-extrabold text-neutral">
+							<h3 className="text-base sm:text-lg font-bold text-slate-900">
 								5 Indikator Kesiapan Transisi
 							</h3>
-							<p className="text-xs sm:text-sm text-neutral/60">
+							<p className="text-xs sm:text-sm text-slate-600 mt-0.5">
 								Skor 0–100 pada tiap aspek ketahanan finansial dan karier
 							</p>
 						</div>
 						<Stagger className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3.5">
 							{readiness.map((item) => {
-								const st = getScoreStatus(item.value);
+								const st = item.hasStatus
+									? getScoreStatus(item.value)
+									: undefined;
 								return (
 									<StaggerItem
 										key={item.label}
-										className="rounded-2xl border border-slate-200/80 bg-white/90 p-3.5 flex flex-col items-center text-center">
+										className="rounded-xl border border-slate-200 bg-white p-3.5 flex flex-col items-center text-center">
 										<ScoreRing
 											value={item.value}
 											max={100}
@@ -314,7 +312,7 @@ export default function SimulationResult({
 											suffix="/100"
 											label={item.label}
 										/>
-										<p className="text-xs font-extrabold text-neutral mt-2.5 leading-snug">
+										<p className="text-xs font-semibold text-slate-900 mt-2.5 leading-snug">
 											{item.label}
 										</p>
 									</StaggerItem>
@@ -326,27 +324,28 @@ export default function SimulationResult({
 					<ResultTimeline runwayMonths={runway} targetMonths={target} />
 				</div>
 
-				{/* Kolom Kanan: Transisi, Pivot, Skill, Bukti */}
 				<div className="lg:col-span-4 space-y-5">
 					{result.transition_role_name && (
 						<Card padding="md">
 							<div className="flex items-center gap-2.5 mb-2">
-								<IconTile icon={Compass} tone="jalur-karier" size="sm" />
+								<IconTile icon={Compass} tone="indigo" size="sm" />
 								<div>
-									<span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+									<span className="text-xs font-semibold text-indigo-700">
 										Target Transisi Karier
 									</span>
-									<p className="text-base font-extrabold text-neutral">
+									<p className="text-base font-bold text-slate-900">
 										{result.transition_role_name}
 									</p>
 								</div>
 							</div>
 							{result.transition_gap_months != null && (
-								<p className="text-xs text-neutral/65 mt-1">
+								<p className="text-xs text-slate-600 mt-1">
 									Estimasi gap persiapan:{" "}
-									<strong className="text-neutral">
-										{formatDecimal1(parseDecimal(result.transition_gap_months))}{" "}
-										bulan
+									<strong className="text-slate-900">
+										{formatMonths(
+											parseDecimal(result.transition_gap_months),
+											"bulan",
+										)}
 									</strong>
 									{result.transition_gap_status
 										? ` (${result.transition_gap_status})`
@@ -356,16 +355,14 @@ export default function SimulationResult({
 						</Card>
 					)}
 
-					<Card
-						padding="md"
-						className="bg-gradient-to-br from-indigo-50/70 via-white to-violet-50/50">
+					<Card padding="md">
 						<div className="flex items-center gap-2.5 mb-3">
-							<IconTile icon={Sparkles} tone="beranda" size="sm" />
+							<IconTile icon={Compass} tone="indigo" size="sm" />
 							<div>
-								<h4 className="text-sm font-extrabold text-neutral">
+								<h4 className="text-sm font-bold text-slate-900">
 									Opsi Pivot Terdekat
 								</h4>
-								<p className="text-xs text-neutral/55">
+								<p className="text-xs text-slate-500">
 									Peran dengan kecocokan tertinggi
 								</p>
 							</div>
@@ -375,17 +372,17 @@ export default function SimulationResult({
 								pivotRoles.map((option) => (
 									<div
 										key={option.role}
-										className="bg-white rounded-xl p-3 border border-slate-200/80 flex items-center justify-between gap-2">
-										<span className="text-xs sm:text-sm font-bold text-neutral truncate">
+										className="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-between gap-2">
+										<span className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
 											{option.role}
 										</span>
-										<span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full shrink-0">
+										<span className="text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full shrink-0 tabular">
 											{option.match}% cocok
 										</span>
 									</div>
 								))
 							) : (
-								<p className="text-xs text-neutral/55">
+								<p className="text-xs text-slate-500">
 									Lengkapi penilaian karier untuk melihat rekomendasi pivot.
 								</p>
 							)}
@@ -393,7 +390,7 @@ export default function SimulationResult({
 					</Card>
 
 					<Card padding="md">
-						<h4 className="text-sm font-extrabold text-neutral mb-3">
+						<h4 className="text-sm font-bold text-slate-900 mb-3">
 							Skill yang Perlu Diperkuat
 						</h4>
 						<div className="space-y-2.5">
@@ -401,23 +398,23 @@ export default function SimulationResult({
 								weaknesses.map((skill) => (
 									<div
 										key={skill}
-										className="flex items-center justify-between gap-2 rounded-xl bg-amber-50/70 border border-amber-200/80 px-3 py-2">
+										className="flex items-center justify-between gap-2 rounded-xl bg-amber-50/70 border border-amber-200 px-3 py-2.5">
 										<div className="flex items-center gap-2 min-w-0">
 											<TrendingDown
 												size={14}
-												className="text-amber-600 shrink-0"
+												className="text-amber-700 shrink-0"
 											/>
-											<span className="text-xs font-bold text-neutral truncate">
+											<span className="text-xs font-semibold text-slate-900 truncate">
 												{skill}
 											</span>
 										</div>
-										<span className="text-[10px] font-extrabold text-amber-800 uppercase">
+										<span className="text-xs font-semibold text-amber-800 shrink-0">
 											Prioritas
 										</span>
 									</div>
 								))
 							) : (
-								<p className="text-xs text-neutral/55">
+								<p className="text-xs text-slate-500">
 									Belum ada rekomendasi skill spesifik.
 								</p>
 							)}
@@ -426,14 +423,14 @@ export default function SimulationResult({
 
 					<Card padding="md">
 						<div className="flex items-center gap-3 mb-2">
-							<IconTile icon={FolderCheck} tone="bukti-karier" size="sm" />
+							<IconTile icon={FolderCheck} tone="indigo" size="sm" />
 							<div>
-								<h4 className="text-sm font-extrabold text-neutral">
+								<h4 className="text-sm font-bold text-slate-900">
 									Portofolio Bukti Karier
 								</h4>
-								<p className="text-xs text-neutral/60">
+								<p className="text-xs text-slate-600">
 									Kamu memiliki{" "}
-									<strong className="text-sky-700">
+									<strong className="text-indigo-700">
 										{result.evidence_count} bukti tersimpan
 									</strong>
 								</p>
@@ -441,7 +438,7 @@ export default function SimulationResult({
 						</div>
 						<Link
 							to="/dashboard/bukti-karier"
-							className="press mt-2 inline-flex items-center justify-between w-full px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100/80 border border-sky-200 text-xs font-bold text-sky-900">
+							className="mt-2 inline-flex items-center justify-between w-full min-h-[40px] px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-semibold text-indigo-700 transition">
 							<span>Tambah bukti pencapaian</span>
 							<ArrowRight size={13} />
 						</Link>
@@ -449,16 +446,15 @@ export default function SimulationResult({
 				</div>
 			</div>
 
-			{/* Action Items sebagai Kartu Bernomor Berikon dan Berprioritas */}
 			{result.action_items && result.action_items.length > 0 && (
 				<Card padding="lg">
 					<div className="flex items-center gap-3 mb-5">
-						<IconTile icon={CheckSquare} tone="simulasi" size="md" />
+						<IconTile icon={CheckSquare} tone="indigo" size="md" />
 						<div>
-							<h4 className="text-base sm:text-lg font-extrabold text-neutral">
+							<h4 className="text-base sm:text-lg font-bold text-slate-900">
 								Rencana Langkah Aksi Prioritas
 							</h4>
-							<p className="text-xs sm:text-sm text-neutral/60">
+							<p className="text-xs sm:text-sm text-slate-600 mt-0.5">
 								Langkah konkret yang bisa kamu cicil mulai minggu ini
 							</p>
 						</div>
@@ -483,26 +479,26 @@ export default function SimulationResult({
 							return (
 								<StaggerItem
 									key={idx}
-									className="rounded-2xl border border-slate-200/90 bg-white/90 p-4 flex flex-col justify-between gap-3 shadow-2xs">
+									className="rounded-xl border border-slate-200 bg-white p-4 flex flex-col justify-between gap-3">
 									<div>
 										<div className="flex items-center justify-between gap-2 mb-2.5">
-											<span className="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white text-xs font-extrabold shadow-xs">
-												0{idx + 1}
+											<span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold tabular">
+												{String(idx + 1).padStart(2, "0")}
 											</span>
 											<span
-												className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${
+												className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
 													isHigh
 														? "bg-amber-50 text-amber-800 border-amber-200"
-														: "bg-indigo-50 text-indigo-700 border-indigo-200"
+														: "bg-slate-50 text-slate-700 border-slate-200"
 												}`}>
 												{isHigh ? "Prioritas Utama" : `Tahap ${idx + 1}`}
 											</span>
 										</div>
-										<p className="text-sm font-extrabold text-neutral leading-snug">
+										<p className="text-sm font-bold text-slate-900 leading-snug">
 											{title}
 										</p>
 										{desc && (
-											<p className="text-xs text-neutral/70 mt-1.5 leading-relaxed">
+											<p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
 												{desc}
 											</p>
 										)}
@@ -516,23 +512,21 @@ export default function SimulationResult({
 
 			<Card
 				padding="lg"
-				className="text-center bg-gradient-to-r from-indigo-600 via-violet-700 to-fuchsia-700 text-white">
-				<h3 className="text-lg sm:text-xl font-extrabold mb-1">
+				className="text-center bg-indigo-950 border-indigo-900 text-white">
+				<h3 className="text-lg sm:text-xl font-bold mb-1.5">
 					PHK mungkin tidak selalu bisa kamu prediksi.
 				</h3>
-				<p className="text-sm text-indigo-100 max-w-xl mx-auto">
+				<p className="text-sm text-indigo-100/85 max-w-xl mx-auto leading-relaxed">
 					Namun dengan mengetahui angka runway dan langkah transisimu hari ini,
 					kamu memegang kendali penuh atas apa yang terjadi setelahnya.
 				</p>
 				{onRerun && (
-					<div className="mt-4 flex justify-center">
-						<button
-							type="button"
-							onClick={onRerun}
-							className="press inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-indigo-800 text-xs sm:text-sm font-bold shadow-md cursor-pointer">
-							<RotateCcw size={14} />
+					<div className="mt-5 flex justify-center">
+						<PrimaryButton
+							icon={<RotateCcw size={14} />}
+							onClick={onRerun}>
 							Uji Skenario Lain
-						</button>
+						</PrimaryButton>
 					</div>
 				)}
 			</Card>

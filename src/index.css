@@ -84,17 +84,8 @@ html {
 		background-color: #f8fafc;
 	}
 
-	/* Alias kompatibilitas untuk kelas latar lama */
-	.bg-mesh {
-		background-color: #f8fafc;
-	}
-	.bg-noise {
-		position: relative;
-	}
-
 	/* Kartu bersih bergaya produk finansial/produktivitas: border 1px + shadow lembut */
-	.card-surface,
-	.card-3d {
+	.card-surface {
 		background-color: #ffffff;
 		border: 1px solid rgba(226, 232, 240, 0.9);
 		border-radius: 1rem;
@@ -156,11 +147,6 @@ html {
 	}
 	.tabular {
 		font-variant-numeric: tabular-nums;
-	}
-	.accent-serif {
-		font-family: var(--font-accent);
-		font-style: italic;
-		font-weight: 400;
 	}
 
 	.no-scrollbar {

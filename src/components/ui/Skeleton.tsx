@@ -31,13 +31,13 @@ export function SkeletonButton({ className = "" }: SkeletonProps) {
 /** Skeleton kartu statistik: tile + label + angka. */
 export function SkeletonStatCard({ className = "" }: SkeletonProps) {
 	return (
-		<div className={`card-3d p-5 ${className}`} aria-busy="true" aria-label="Memuat">
+		<div className={`card-surface p-5 ${className}`} aria-busy="true" aria-label="Memuat">
 			<div className="flex items-center gap-3">
-				<Skeleton className="h-11 w-11 rounded-[14px]" />
+				<Skeleton className="h-10 w-10 rounded-lg" />
 				<Skeleton className="h-3.5 w-24" />
 			</div>
 			<Skeleton className="mt-5 h-8 w-28" />
-			<Skeleton className="mt-3 h-2.5 w-full rounded-full" />
+			<Skeleton className="mt-3 h-2 w-full rounded-full" />
 		</div>
 	);
 }
@@ -46,7 +46,7 @@ export function SkeletonStatCard({ className = "" }: SkeletonProps) {
 export function SkeletonHero({ className = "" }: SkeletonProps) {
 	return (
 		<div
-			className={`card-3d p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 ${className}`}
+			className={`card-surface p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 ${className}`}
 			aria-busy="true"
 			aria-label="Memuat">
 			<Skeleton className="h-40 w-40 rounded-full" />

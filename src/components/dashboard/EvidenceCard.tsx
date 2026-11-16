@@ -2,11 +2,12 @@ import {
 	Award,
 	BookOpen,
 	Calendar,
+	Cpu,
+	FileText,
 	FolderKanban,
 	Medal,
 	MessageSquareQuote,
 	Pencil,
-	Sparkles,
 	Trash2,
 	Trophy,
 	type LucideIcon,
@@ -34,7 +35,7 @@ const CATEGORY_ICON: Record<string, LucideIcon> = {
 	Certificate: Medal,
 	Award: Award,
 	Training: BookOpen,
-	Other: Sparkles,
+	Other: FileText,
 };
 
 export default function EvidenceCard({
@@ -73,8 +74,11 @@ export default function EvidenceCard({
 						{category}
 					</span>
 					{aiGenerated && (
-						<span title="Dibantu AI" className="text-indigo-600">
-							<Sparkles size={14} />
+						<span
+							title="Dibantu AI"
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-medium">
+							<Cpu size={12} />
+							AI
 						</span>
 					)}
 				</div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Calendar, Sparkles } from "lucide-react";
+import { ArrowRight, Calendar, Cpu } from "lucide-react";
 import Skeleton from "../ui/Skeleton";
 import { evidenceApi } from "../../services/evidence";
 import { evidenceTypeLabels, formatEvidenceDate } from "../../lib/evidence";
@@ -87,7 +87,7 @@ export default function EvidenceSummaryCard({
 								{evidenceTypeLabels[item.evidence_type]}
 							</span>
 							{item.ai_generated && (
-								<Sparkles size={12} className="text-indigo-600" />
+								<Cpu size={12} className="text-indigo-600" />
 							)}
 						</div>
 						<p className="text-sm font-semibold text-slate-900">{item.title}</p>

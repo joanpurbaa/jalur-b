@@ -1,4 +1,4 @@
-import { Sparkles, Info } from "lucide-react";
+import { Cpu, Info } from "lucide-react";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
 import MeterBar from "../ui/MeterBar";
@@ -16,7 +16,7 @@ export default function AIAnalysisPanel({
 	return (
 		<Card padding="lg">
 			<div className="flex items-center gap-3 mb-4">
-				<IconTile icon={Sparkles} tone="indigo" size="sm" />
+				<IconTile icon={Cpu} tone="indigo" size="sm" />
 				<div>
 					<span className="text-xs font-medium text-indigo-700">
 						Analisis AI

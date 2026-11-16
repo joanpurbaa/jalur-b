@@ -4,8 +4,6 @@
  */
 interface IllustrationProps {
 	className?: string;
-	primary?: string;
-	secondary?: string;
 }
 
 export function CompassOrbSvg({ className = "w-20 h-20" }: IllustrationProps) {
@@ -61,7 +59,3 @@ export function EvidenceGallerySvg({ className = "w-20 h-20" }: IllustrationProp
 		</svg>
 	);
 }
-
-/** @deprecated Alias sementara hingga Fase 3 memperbarui SimulationIntro. */
-export const ScenarioBridgeSvg = CompassOrbSvg;
-

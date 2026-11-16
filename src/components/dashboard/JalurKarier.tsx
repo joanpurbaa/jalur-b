@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GitFork, Sparkles } from "lucide-react";
+import { Compass, GitFork } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
 import CareerPathMap from "./CareerPathMap";
 import RoleDetailPanel from "./RoleDetailPanel";
@@ -64,7 +64,7 @@ export default function JalurKarier() {
 					padding="md"
 					className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 					<div className="flex items-start gap-3.5 min-w-0">
-						<IconTile icon={Sparkles} tone="indigo" size="sm" />
+						<IconTile icon={Compass} tone="indigo" size="sm" />
 						<div className="min-w-0">
 							<p className="text-xs font-semibold text-indigo-700 mb-0.5">
 								Ringkasan Rekomendasi AI

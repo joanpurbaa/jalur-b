@@ -228,7 +228,7 @@ export default function Sidebar() {
 								stroke={4}
 								colors={["#4f46e5", "#6366f1"]}
 								ariaLabel={`Kelengkapan profil ${completeness}%`}>
-								<span className="text-[10px] font-bold text-indigo-700 tabular">
+								<span className="text-[11px] font-bold text-indigo-700 tabular">
 									{completeness}%
 								</span>
 							</ScoreRing>
@@ -287,7 +287,7 @@ export default function Sidebar() {
 										: "text-slate-500 hover:text-slate-900"
 								}`}>
 								<Icon size={18} strokeWidth={isActive ? 2.1 : 1.75} />
-								<span className="text-[10px] font-semibold mt-1 truncate max-w-full">
+								<span className="text-[11px] font-semibold mt-1 truncate max-w-full">
 									{mod.shortLabel}
 								</span>
 							</button>
@@ -303,7 +303,7 @@ export default function Sidebar() {
 								: "text-slate-500 hover:text-slate-900"
 						}`}>
 						<MoreHorizontal size={18} strokeWidth={1.75} />
-						<span className="text-[10px] font-semibold mt-1">Lainnya</span>
+						<span className="text-[11px] font-semibold mt-1">Lainnya</span>
 					</button>
 				</div>
 			</nav>
@@ -352,7 +352,7 @@ export default function Sidebar() {
 									size={40}
 									stroke={4}
 									colors={["#4f46e5", "#6366f1"]}>
-									<span className="text-[10px] font-bold text-indigo-700">
+									<span className="text-[11px] font-bold text-indigo-700 tabular">
 										{completeness}%
 									</span>
 								</ScoreRing>

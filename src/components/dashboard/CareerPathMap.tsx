@@ -5,7 +5,7 @@ import {
 	Compass,
 	Layers,
 	Cpu,
-	Sparkles,
+	Target,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import CareerPathNode from "./CareerPathNode";
@@ -17,7 +17,7 @@ const roleIcons: LucideIcon[] = [
 	Compass,
 	Layers,
 	Cpu,
-	Sparkles,
+	Target,
 ];
 
 /**

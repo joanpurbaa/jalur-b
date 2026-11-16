@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, ArrowRight, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Lightbulb } from "lucide-react";
 import Skeleton from "../ui/Skeleton";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
@@ -52,7 +52,7 @@ export default function InsightCard() {
 				<div>
 					<div className="flex items-center justify-between gap-3 mb-4">
 						<div className="flex items-center gap-3">
-							<IconTile icon={Sparkles} tone="indigo" size="sm" />
+							<IconTile icon={Lightbulb} tone="indigo" size="sm" />
 							<div>
 								<h3 className="text-sm font-bold text-slate-900">
 									Insight Risiko AI
