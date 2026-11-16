@@ -6,6 +6,7 @@ export interface ExitTypeOption {
 	description: string;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const exitTypeOptions: ExitTypeOption[] = [
 	{
 		id: "efficiency_due_to_loss",

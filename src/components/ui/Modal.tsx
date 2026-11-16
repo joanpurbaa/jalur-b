@@ -1,30 +1,97 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 interface ModalProps {
 	open: boolean;
 	onClose: () => void;
 	title: string;
+	subtitle?: string;
 	children: ReactNode;
+	variant?: "modal" | "drawer";
+	maxWidth?: string;
 }
 
-export default function Modal({ open, onClose, title, children }: ModalProps) {
+export default function Modal({
+	open,
+	onClose,
+	title,
+	subtitle,
+	children,
+	variant = "modal",
+	maxWidth = "max-w-lg",
+}: ModalProps) {
+	useEffect(() => {
+		if (!open) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") onClose();
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [open, onClose]);
+
 	if (!open) return null;
 
+	if (variant === "drawer") {
+		return (
+			<div
+				role="dialog"
+				aria-modal="true"
+				aria-label={title}
+				className="fixed inset-0 z-50 flex justify-end">
+				<div
+					className="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
+					onClick={onClose}
+				/>
+				<div className="relative z-10 w-full max-w-lg bg-white h-full shadow-2xl border-l border-slate-200/70 flex flex-col overflow-hidden">
+					<div className="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-100 shrink-0">
+						<div>
+							<h3 className="text-lg font-bold text-neutral">{title}</h3>
+							{subtitle && (
+								<p className="text-sm text-neutral/60 mt-0.5">{subtitle}</p>
+							)}
+						</div>
+						<button
+							type="button"
+							onClick={onClose}
+							aria-label="Tutup dialog"
+							className="p-2 rounded-xl text-neutral/50 hover:text-neutral hover:bg-slate-100 transition cursor-pointer">
+							<X size={18} />
+						</button>
+					</div>
+					<div className="flex-1 overflow-y-auto p-6">{children}</div>
+				</div>
+			</div>
+		);
+	}
+
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-			<div className="absolute inset-0 bg-neutral/40" onClick={onClose} />
-			<div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-				<div className="flex items-center justify-between mb-5">
-					<h3 className="text-base font-bold text-neutral">{title}</h3>
+		<div
+			role="dialog"
+			aria-modal="true"
+			aria-label={title}
+			className="fixed inset-0 z-50 flex items-center justify-center p-4">
+			<div
+				className="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
+				onClick={onClose}
+			/>
+			<div
+				className={`relative bg-white rounded-3xl shadow-2xl border border-white/80 w-full ${maxWidth} max-h-[90vh] flex flex-col overflow-hidden`}>
+				<div className="flex items-start justify-between gap-3 px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
+					<div>
+						<h3 className="text-lg font-bold text-neutral">{title}</h3>
+						{subtitle && (
+							<p className="text-sm text-neutral/60 mt-0.5">{subtitle}</p>
+						)}
+					</div>
 					<button
 						type="button"
 						onClick={onClose}
-						className="text-neutral/40 hover:text-neutral transition">
+						aria-label="Tutup dialog"
+						className="p-2 rounded-xl text-neutral/50 hover:text-neutral hover:bg-slate-100 transition cursor-pointer">
 						<X size={18} />
 					</button>
 				</div>
-				{children}
+				<div className="overflow-y-auto p-6">{children}</div>
 			</div>
 		</div>
 	);

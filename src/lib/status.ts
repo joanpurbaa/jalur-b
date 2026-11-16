@@ -71,6 +71,50 @@ export function getLevelStatus(level: RiskLevel): StatusVariant {
 
 export type FinanceTone = "indigo" | "violet" | "rose" | "amber" | "slate";
 
+/* ------------------------------------------------------------------ */
+/* Meta status untuk presentasi: label + hex. Status tidak boleh hanya */
+/* mengandalkan warna — komponen StatusBadge/ikon memakai meta ini.    */
+/* ------------------------------------------------------------------ */
+export const statusMeta: Record<
+	StatusVariant,
+	{ label: string; hex: string; hex2: string; soft: string }
+> = {
+	healthy: { label: "Aman", hex: "#10b981", hex2: "#34d399", soft: "#d1fae5" },
+	warning: {
+		label: "Perlu perhatian",
+		hex: "#f59e0b",
+		hex2: "#fbbf24",
+		soft: "#fef3c7",
+	},
+	risk: { label: "Perlu ditingkatkan", hex: "#f43f5e", hex2: "#fb7185", soft: "#ffe4e6" },
+	insight: { label: "Insight", hex: "#6366f1", hex2: "#818cf8", soft: "#e0e7ff" },
+	neutral: { label: "Belum ada data", hex: "#94a3b8", hex2: "#cbd5e1", soft: "#f1f5f9" },
+};
+
+/**
+ * Status runway relatif terhadap target (presentasi). Di atas/sama dengan
+ * target = aman; ≥ 60% target = perhatian; di bawahnya = prioritas.
+ */
+export function getRunwayStatus(current: number, target: number): StatusVariant {
+	if (!Number.isFinite(current)) return "neutral";
+	if (!target || target <= 0) {
+		if (current >= 6) return "healthy";
+		if (current >= 3) return "warning";
+		return "risk";
+	}
+	if (current >= target) return "healthy";
+	if (current >= target * 0.6) return "warning";
+	return "risk";
+}
+
+/** Untuk skor di mana makin TINGGI makin berisiko (risiko, AI exposure). */
+export function getInverseScoreStatus(score: number): StatusVariant {
+	if (score >= 67) return "risk";
+	if (score >= 34) return "warning";
+	return "healthy";
+}
+
+
 export const financeToneStyles: Record<
 	FinanceTone,
 	{ iconBg: string; iconText: string }

@@ -33,4 +33,6 @@ founder/
 .venv/
 venv/
 config.ini
+graphify-out/
+
 
