@@ -5,14 +5,12 @@ import {
 	ChevronRight,
 	LogOut,
 	MoreHorizontal,
-	Sparkles,
 	User,
 	X,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
 import { MODULES, moduleFromPath, type ModuleId } from "../../lib/modules";
-import IconTile from "../ui/IconTile";
 import ScoreRing from "../ui/ScoreRing";
 import { dashboardApi } from "../../services/dashboard";
 import { careerHealthApi } from "../../services/careerHealth";
@@ -44,9 +42,9 @@ export default function Sidebar() {
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 	const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
-	const [completeness, setCompleteness] = useState<number>(75);
+	const [completeness, setCompleteness] = useState<number>(100);
 	const [missingLabel, setMissingLabel] = useState<string>(
-		"Penilaian karier belum lengkap",
+		"Semua modul profil sudah terisi",
 	);
 
 	const location = useLocation();
@@ -124,21 +122,26 @@ export default function Sidebar() {
 				key={id}
 				type="button"
 				onClick={() => handleNavigation(id)}
+				aria-current={isActive ? "page" : undefined}
 				title={isCollapsed ? mod.label : undefined}
-				className={`press group w-full flex items-center gap-3 px-2.5 py-2 rounded-2xl text-sm font-semibold transition cursor-pointer ${
+				className={`relative w-full min-h-[42px] flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
 					isCollapsed ? "justify-center" : ""
 				} ${
 					isActive
-						? `${mod.activePill} shadow-md`
-						: "text-neutral/75 hover:bg-slate-900/[0.04] hover:text-neutral"
+						? "bg-indigo-50 text-indigo-700 font-semibold"
+						: "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
 				}`}>
-				{isActive ? (
-					<span className="inline-flex w-7 h-7 items-center justify-center rounded-[9px] bg-white/20 text-white shrink-0">
-						<Icon size={16} strokeWidth={2.4} />
-					</span>
-				) : (
-					<IconTile icon={Icon} tone={id} size="xs" />
+				{isActive && !isCollapsed && (
+					<span
+						aria-hidden
+						className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-indigo-600"
+					/>
 				)}
+				<Icon
+					size={18}
+					strokeWidth={isActive ? 2.1 : 1.75}
+					className={isActive ? "text-indigo-600 shrink-0" : "text-slate-500 shrink-0"}
+				/>
 				{!isCollapsed && <span className="truncate">{mod.label}</span>}
 			</button>
 		);
@@ -149,14 +152,14 @@ export default function Sidebar() {
 			{/* Desktop Sidebar */}
 			<aside
 				aria-label="Navigasi utama"
-				className={`hidden lg:flex sticky top-0 h-screen bg-white/80 backdrop-blur-xl border-r border-white/80 shadow-[4px_0_24px_-12px_rgba(30,27,75,0.1)] flex-col justify-between transition-all duration-300 p-4 shrink-0 z-30 ${
-					isCollapsed ? "w-20" : "w-68"
+				className={`hidden lg:flex sticky top-0 h-screen bg-white border-r border-slate-200/80 flex-col justify-between transition-all duration-200 p-4 shrink-0 z-30 ${
+					isCollapsed ? "w-20" : "w-64"
 				}`}>
 				<button
 					type="button"
 					onClick={() => setIsCollapsed(!isCollapsed)}
 					aria-label={isCollapsed ? "Perluas sidebar" : "Ciutkan sidebar"}
-					className="absolute -right-3 top-7 bg-white border border-slate-200 rounded-full p-1.5 text-neutral/60 hover:text-primary shadow-sm transition z-40 cursor-pointer">
+					className="absolute -right-3 top-7 bg-white border border-slate-200 rounded-full p-1 text-slate-500 hover:text-indigo-600 hover:border-slate-300 shadow-2xs transition z-40 cursor-pointer">
 					{isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
 				</button>
 
@@ -164,30 +167,28 @@ export default function Sidebar() {
 					<button
 						type="button"
 						onClick={() => handleNavigation("beranda")}
-						className={`flex items-center gap-3 px-2 py-2.5 mb-5 shrink-0 text-left cursor-pointer ${
+						className={`flex items-center gap-3 px-2 py-2 mb-6 shrink-0 text-left cursor-pointer rounded-xl ${
 							isCollapsed ? "justify-center" : ""
 						}`}>
 						<img
 							src="/icon.png"
-							className="w-10 h-10 rounded-2xl shadow-sm shrink-0"
+							className="w-8 h-8 rounded-xl shrink-0 object-contain"
 							alt="Logo Jalur B"
 						/>
 						{!isCollapsed && (
 							<div>
-								<h2 className="font-extrabold text-neutral text-base leading-tight tracking-tight">
+								<h2 className="font-bold text-slate-900 text-base leading-tight tracking-tight">
 									Jalur B
 								</h2>
-								<p className="text-xs text-neutral/55 font-medium">
-									Career Resilience
-								</p>
+								<p className="text-xs text-slate-500">Career Resilience</p>
 							</div>
 						)}
 					</button>
 
-					<nav className="space-y-5 overflow-y-auto no-scrollbar pr-0.5">
+					<nav className="space-y-5 overflow-y-auto no-scrollbar">
 						<div>
 							{!isCollapsed && (
-								<p className="px-2.5 mb-2 text-[11px] font-bold uppercase tracking-wider text-neutral/45">
+								<p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
 									Pantau
 								</p>
 							)}
@@ -196,7 +197,7 @@ export default function Sidebar() {
 
 						<div>
 							{!isCollapsed && (
-								<p className="px-2.5 mb-2 text-[11px] font-bold uppercase tracking-wider text-neutral/45">
+								<p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
 									Bertindak
 								</p>
 							)}
@@ -207,36 +208,36 @@ export default function Sidebar() {
 					</nav>
 				</div>
 
-				<div className="space-y-3 pt-4 border-t border-slate-200/70 shrink-0">
+				<div className="space-y-3 pt-4 border-t border-slate-200/80 shrink-0">
 					{completeness < 100 && (
 						<button
 							type="button"
 							onClick={openCareerAssessment}
 							title={
 								isCollapsed
-									? `Kelengkapan data ${completeness}% — klik untuk melengkapi`
+									? `Kelengkapan profil ${completeness}% — klik untuk melengkapi`
 									: undefined
 							}
-							className={`press w-full rounded-2xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50/90 via-white to-violet-50/90 p-2.5 text-left shadow-xs hover:border-indigo-300 transition cursor-pointer flex items-center gap-3 ${
+							className={`press w-full rounded-xl border border-slate-200 bg-slate-50/80 hover:border-indigo-200 hover:bg-indigo-50/40 p-2.5 text-left transition cursor-pointer flex items-center gap-2.5 ${
 								isCollapsed ? "justify-center" : ""
 							}`}>
 							<ScoreRing
 								value={completeness}
 								max={100}
-								size={42}
-								stroke={5}
-								colors={["#6366f1", "#a855f7"]}>
-								<span className="text-[11px] font-extrabold text-indigo-700 tabular">
+								size={36}
+								stroke={4}
+								colors={["#4f46e5", "#6366f1"]}
+								ariaLabel={`Kelengkapan profil ${completeness}%`}>
+								<span className="text-[10px] font-bold text-indigo-700 tabular">
 									{completeness}%
 								</span>
 							</ScoreRing>
 							{!isCollapsed && (
 								<div className="min-w-0 flex-1">
-									<div className="flex items-center gap-1 text-xs font-bold text-indigo-950">
-										<Sparkles size={12} className="text-indigo-600 shrink-0" />
-										<span className="truncate">Kelengkapan Data</span>
-									</div>
-									<p className="text-[11px] text-neutral/60 truncate mt-0.5">
+									<span className="text-xs font-semibold text-slate-800 block truncate">
+										Kelengkapan profil
+									</span>
+									<p className="text-[11px] text-slate-500 truncate mt-0.5">
 										{missingLabel}
 									</p>
 								</div>
@@ -245,35 +246,20 @@ export default function Sidebar() {
 					)}
 
 					<div className="space-y-1">
-						<button
-							type="button"
-							onClick={() => handleNavigation("profil")}
-							title={isCollapsed ? "Profil" : undefined}
-							className={`press w-full flex items-center gap-3 px-2.5 py-2 rounded-2xl text-sm font-semibold transition cursor-pointer ${
-								isCollapsed ? "justify-center" : ""
-							} ${
-								currentPath === "profil"
-									? `${MODULES.profil.activePill} shadow-md`
-									: "text-neutral/75 hover:bg-slate-900/[0.04] hover:text-neutral"
-							}`}>
-							{currentPath === "profil" ? (
-								<span className="inline-flex w-7 h-7 items-center justify-center rounded-[9px] bg-white/20 text-white shrink-0">
-									<User size={16} strokeWidth={2.4} />
-								</span>
-							) : (
-								<IconTile icon={User} tone="profil" size="xs" />
-							)}
-							{!isCollapsed && <span>Profil</span>}
-						</button>
+						{renderNavButton("profil")}
 
 						<button
 							type="button"
 							onClick={() => handleNavigation("keluar")}
 							title={isCollapsed ? "Keluar" : undefined}
-							className={`press w-full flex items-center gap-3 px-2.5 py-2 rounded-2xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition cursor-pointer ${
+							className={`w-full min-h-[42px] flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition cursor-pointer ${
 								isCollapsed ? "justify-center" : ""
 							}`}>
-							<IconTile icon={LogOut} tone="danger" size="xs" />
+							<LogOut
+								size={18}
+								strokeWidth={1.75}
+								className="text-slate-500 shrink-0"
+							/>
 							{!isCollapsed && <span>Keluar</span>}
 						</button>
 					</div>
@@ -283,7 +269,7 @@ export default function Sidebar() {
 			{/* Mobile Bottom Navigation (5 item + Lainnya) */}
 			<nav
 				aria-label="Navigasi bawah"
-				className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-xl border-t border-slate-200/80 shadow-[0_-8px_24px_-12px_rgba(15,23,42,0.16)] px-1.5 py-1.5">
+				className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-1 py-1">
 				<div className="grid grid-cols-6 gap-0.5 max-w-md mx-auto">
 					{MOBILE_PRIMARY_ITEMS.map((id) => {
 						const mod = MODULES[id];
@@ -294,16 +280,14 @@ export default function Sidebar() {
 								key={id}
 								type="button"
 								onClick={() => handleNavigation(id)}
-								className={`press flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition cursor-pointer ${
-									isActive ? mod.text : "text-neutral/55"
+								aria-current={isActive ? "page" : undefined}
+								className={`min-h-[48px] flex flex-col items-center justify-center py-1 px-1 rounded-xl transition cursor-pointer ${
+									isActive
+										? "text-indigo-700 bg-indigo-50/90"
+										: "text-slate-500 hover:text-slate-900"
 								}`}>
-								<span
-									className={`inline-flex items-center justify-center w-8 h-8 rounded-xl transition ${
-										isActive ? `${mod.gradient} text-white shadow-sm` : ""
-									}`}>
-									<Icon size={17} strokeWidth={2.3} />
-								</span>
-								<span className="text-[10px] font-bold mt-0.5 truncate max-w-full">
+								<Icon size={18} strokeWidth={isActive ? 2.1 : 1.75} />
+								<span className="text-[10px] font-semibold mt-1 truncate max-w-full">
 									{mod.shortLabel}
 								</span>
 							</button>
@@ -313,16 +297,13 @@ export default function Sidebar() {
 					<button
 						type="button"
 						onClick={() => setIsMobileMoreOpen(true)}
-						className={`press flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition cursor-pointer ${
-							isMobileMoreOpen ? "text-indigo-600" : "text-neutral/55"
+						className={`min-h-[48px] flex flex-col items-center justify-center py-1 px-1 rounded-xl transition cursor-pointer ${
+							isMobileMoreOpen
+								? "text-indigo-700 bg-indigo-50/90"
+								: "text-slate-500 hover:text-slate-900"
 						}`}>
-						<span
-							className={`inline-flex items-center justify-center w-8 h-8 rounded-xl ${
-								isMobileMoreOpen ? "bg-indigo-600 text-white" : ""
-							}`}>
-							<MoreHorizontal size={18} strokeWidth={2.3} />
-						</span>
-						<span className="text-[10px] font-bold mt-0.5">Lainnya</span>
+						<MoreHorizontal size={18} strokeWidth={1.75} />
+						<span className="text-[10px] font-semibold mt-1">Lainnya</span>
 					</button>
 				</div>
 			</nav>
@@ -335,19 +316,17 @@ export default function Sidebar() {
 					aria-label="Menu lainnya"
 					className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
 					<div
-						className="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
+						className="absolute inset-0 bg-slate-950/40"
 						onClick={() => setIsMobileMoreOpen(false)}
 					/>
-					<div className="relative z-10 bg-white rounded-t-3xl p-5 shadow-2xl border-t border-slate-100 max-h-[85vh] overflow-y-auto">
+					<div className="relative z-10 bg-white rounded-t-3xl p-5 shadow-2xl border-t border-slate-200 max-h-[85vh] overflow-y-auto">
 						<div className="flex items-center justify-between mb-4">
 							<div className="flex items-center gap-2.5">
 								<img src="/icon.png" className="w-8 h-8 rounded-xl" alt="" />
 								<div>
-									<p className="font-extrabold text-sm text-neutral">
-										Menu Jalur B
-									</p>
-									<p className="text-xs text-neutral/55">
-										Pilih modul yang ingin kamu buka
+									<p className="font-bold text-sm text-slate-900">Menu Jalur B</p>
+									<p className="text-xs text-slate-500">
+										Pilih halaman yang ingin dibuka
 									</p>
 								</div>
 							</div>
@@ -355,7 +334,7 @@ export default function Sidebar() {
 								type="button"
 								onClick={() => setIsMobileMoreOpen(false)}
 								aria-label="Tutup menu"
-								className="p-2 rounded-xl text-neutral/50 hover:text-neutral hover:bg-slate-100">
+								className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100">
 								<X size={18} />
 							</button>
 						</div>
@@ -367,45 +346,49 @@ export default function Sidebar() {
 									setIsMobileMoreOpen(false);
 									openCareerAssessment();
 								}}
-								className="w-full mb-4 rounded-2xl border border-indigo-200 bg-indigo-50/70 p-3 flex items-center gap-3 text-left">
+								className="w-full mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3 flex items-center gap-3 text-left">
 								<ScoreRing
 									value={completeness}
-									size={44}
-									stroke={5}
-									colors={["#6366f1", "#a855f7"]}>
-									<span className="text-[11px] font-extrabold text-indigo-700">
+									size={40}
+									stroke={4}
+									colors={["#4f46e5", "#6366f1"]}>
+									<span className="text-[10px] font-bold text-indigo-700">
 										{completeness}%
 									</span>
 								</ScoreRing>
 								<div className="min-w-0 flex-1">
-									<p className="text-xs font-bold text-indigo-950">
-										Kelengkapan Data Karier
+									<p className="text-xs font-semibold text-slate-900">
+										Kelengkapan profil
 									</p>
-									<p className="text-xs text-neutral/65 truncate">
-										{missingLabel} — ketuk untuk melengkapi
+									<p className="text-xs text-slate-500 truncate">
+										{missingLabel}
 									</p>
 								</div>
 							</button>
 						)}
 
-						<p className="text-[11px] font-bold uppercase tracking-wider text-neutral/45 mb-2">
-							Pantau & Bertindak
-						</p>
 						<div className="grid grid-cols-2 gap-2 mb-4">
 							{[...PANTAU_ITEMS, ...BERTINDAK_ITEMS].map((id) => {
 								const mod = MODULES[id];
+								const Icon = mod.icon;
 								const isActive = currentPath === id;
 								return (
 									<button
 										key={id}
 										type="button"
 										onClick={() => handleNavigation(id)}
-										className={`press flex items-center gap-2.5 p-2.5 rounded-2xl border text-left text-xs font-bold ${
+										className={`min-h-[44px] flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left text-xs font-semibold ${
 											isActive
-												? `${mod.tint} ${mod.border} ${mod.text}`
-												: "border-slate-200/80 text-neutral hover:bg-slate-50"
+												? "bg-indigo-50 border-indigo-200 text-indigo-700"
+												: "border-slate-200 text-slate-700 hover:bg-slate-50"
 										}`}>
-										<IconTile icon={mod.icon} tone={id} size="xs" />
+										<Icon
+											size={16}
+											strokeWidth={1.85}
+											className={
+												isActive ? "text-indigo-600" : "text-slate-500"
+											}
+										/>
 										<span className="truncate">{mod.label}</span>
 									</button>
 								);
@@ -416,14 +399,14 @@ export default function Sidebar() {
 							<button
 								type="button"
 								onClick={() => handleNavigation("profil")}
-								className="press flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl border border-slate-200 text-xs font-bold text-neutral">
+								className="press min-h-[44px] flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700">
 								<User size={15} />
-								Profil Saya
+								Profil
 							</button>
 							<button
 								type="button"
 								onClick={() => handleNavigation("keluar")}
-								className="press flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold">
+								className="press min-h-[44px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold">
 								<LogOut size={15} />
 								Keluar
 							</button>
@@ -437,27 +420,25 @@ export default function Sidebar() {
 					role="dialog"
 					aria-modal="true"
 					aria-label="Konfirmasi keluar"
-					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/45 backdrop-blur-xs"
+					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40"
 					onClick={() => setIsLogoutModalOpen(false)}>
 					<div
-						className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/80"
+						className="w-full max-w-md bg-white rounded-2xl p-6 shadow-xl border border-slate-200"
 						onClick={(e) => e.stopPropagation()}>
 						<div className="flex items-start justify-between mb-4">
-							<div className="flex items-center gap-3">
-								<IconTile icon={LogOut} tone="danger" size="md" />
-								<div>
-									<h2 className="text-lg font-bold text-neutral">
-										Keluar dari Jalur B?
-									</h2>
-									<p className="text-sm text-neutral/60 mt-0.5">
-										Kamu akan diarahkan ke halaman login.
-									</p>
-								</div>
+							<div>
+								<h2 className="text-lg font-bold text-slate-900">
+									Keluar dari Jalur B?
+								</h2>
+								<p className="text-sm text-slate-600 mt-1">
+									Kamu akan diarahkan kembali ke halaman login.
+								</p>
 							</div>
 							<button
 								type="button"
 								onClick={() => setIsLogoutModalOpen(false)}
-								className="text-neutral/40 hover:text-neutral transition cursor-pointer">
+								aria-label="Tutup dialog"
+								className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 transition cursor-pointer">
 								<X size={18} />
 							</button>
 						</div>
@@ -466,14 +447,14 @@ export default function Sidebar() {
 							<button
 								type="button"
 								onClick={() => setIsLogoutModalOpen(false)}
-								className="press px-5 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 text-neutral hover:bg-slate-50 transition cursor-pointer">
+								className="press min-h-[42px] px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition cursor-pointer">
 								Batal
 							</button>
 							<button
 								type="button"
 								onClick={handleLogout}
-								className="press px-5 py-2.5 bg-rose-600 text-white text-sm font-semibold rounded-xl hover:bg-rose-700 transition shadow-sm cursor-pointer">
-								Ya, Keluar
+								className="press min-h-[42px] px-4 py-2 bg-rose-600 text-white text-sm font-semibold rounded-xl hover:bg-rose-700 transition cursor-pointer">
+								Keluar
 							</button>
 						</div>
 					</div>

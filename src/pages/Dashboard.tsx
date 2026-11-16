@@ -1,25 +1,39 @@
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../components/layouts/Sidebar";
 import { CareerAssessmentProvider } from "../context/CareerAssessmentContext";
-import { moduleFromPath } from "../lib/modules";
 import { PageTransition } from "../components/ui/Motion";
+import { SkeletonHero, SkeletonStatCard } from "../components/ui/Skeleton";
+
+function DashboardOutletFallback() {
+	return (
+		<div className="space-y-6">
+			<SkeletonHero />
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+				<SkeletonStatCard />
+				<SkeletonStatCard />
+				<SkeletonStatCard />
+				<SkeletonStatCard />
+			</div>
+		</div>
+	);
+}
 
 export default function Dashboard() {
 	const location = useLocation();
-	const currentModule = moduleFromPath(location.pathname);
 
 	return (
 		<CareerAssessmentProvider>
-			<div
-				data-module={currentModule}
-				className="min-h-screen bg-mesh bg-noise flex flex-col lg:flex-row font-sans text-neutral">
+			<div className="min-h-screen bg-app flex flex-col lg:flex-row font-sans text-slate-900">
 				<Sidebar />
 
-				<main className="flex-1 min-w-0 px-4 pt-5 pb-28 sm:px-8 sm:pt-8 lg:px-10 lg:py-9 overflow-x-hidden">
+				<main className="flex-1 min-w-0 px-4 pt-5 pb-28 sm:px-8 sm:pt-7 lg:px-10 lg:py-8 overflow-x-hidden">
 					<div className="mx-auto max-w-6xl">
-						<PageTransition routeKey={location.pathname}>
-							<Outlet />
-						</PageTransition>
+						<Suspense fallback={<DashboardOutletFallback />}>
+							<PageTransition routeKey={location.pathname}>
+								<Outlet />
+							</PageTransition>
+						</Suspense>
 					</div>
 				</main>
 			</div>
