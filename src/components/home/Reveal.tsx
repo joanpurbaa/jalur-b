@@ -19,6 +19,12 @@ export default function Reveal({ children, delay = 0, className = "" }: RevealPr
 			return () => cancelAnimationFrame(frameId);
 		}
 
+		const rect = node.getBoundingClientRect();
+		if (rect.top < window.innerHeight) {
+			const frameId = requestAnimationFrame(() => setVisible(true));
+			return () => cancelAnimationFrame(frameId);
+		}
+
 		const observer = new IntersectionObserver(
 			([entry]) => {
 				if (entry.isIntersecting) {
@@ -26,7 +32,7 @@ export default function Reveal({ children, delay = 0, className = "" }: RevealPr
 					observer.disconnect();
 				}
 			},
-			{ threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
+			{ threshold: 0.05 },
 		);
 
 		observer.observe(node);

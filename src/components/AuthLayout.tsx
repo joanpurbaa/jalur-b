@@ -100,18 +100,18 @@ export default function AuthLayout({
 				</div>
 			</div>
 
-			<div className="lg:col-span-6 xl:col-span-5 flex flex-col justify-center items-center px-5 py-10 sm:px-10">
-				<div className="w-full max-w-md">
+			<div className="lg:col-span-6 xl:col-span-5 min-w-0 w-full flex flex-col justify-center items-center px-4 py-8 sm:px-10 sm:py-10">
+				<div className="w-full max-w-md min-w-0">
 					<Link
 						to="/"
-						className="inline-flex lg:hidden items-center gap-2 mb-7">
+						className="inline-flex lg:hidden items-center gap-2 mb-6">
 						<span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
 							<ShieldCheck size={16} strokeWidth={2} />
 						</span>
 						<span className="font-bold text-lg text-slate-900">Jalur B</span>
 					</Link>
 
-					<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+					<div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-8">
 						<h1 className="text-2xl sm:text-[26px] font-bold tracking-tight text-slate-900">
 							{title}
 						</h1>
