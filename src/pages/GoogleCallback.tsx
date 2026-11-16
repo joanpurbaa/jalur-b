@@ -47,10 +47,13 @@ export default function GoogleCallback() {
 	}, [navigate, completeGoogle]);
 
 	return (
-		<div className="min-h-screen bg-[#F9F9FB] text-neutral flex flex-col items-center justify-center p-4 font-sans">
-			<p className="text-sm font-medium text-neutral/70">
-				Menghubungkan akun Google...
-			</p>
+		<div className="min-h-screen bg-app text-slate-900 flex flex-col items-center justify-center p-4 font-sans">
+			<div className="bg-white border border-slate-200 rounded-2xl px-6 py-5 shadow-sm flex items-center gap-3">
+				<span className="w-4 h-4 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
+				<p className="text-sm font-medium text-slate-600">
+					Menghubungkan akun Google...
+				</p>
+			</div>
 		</div>
 	);
 }

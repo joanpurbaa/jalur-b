@@ -7,42 +7,36 @@ import { Stagger, StaggerItem } from "../ui/Motion";
 import { financialApi } from "../../services/financial";
 import { formatRupiah } from "../../lib/format";
 import type { FinancialProfileResponse } from "../../types/financial";
-import type { FinanceTone } from "../../lib/status";
 import { EditFinancialModal } from "../profile/EditFinancialModal";
 
 const cardConfig: {
 	label: string;
 	sublabel: string;
 	icon: typeof Wallet;
-	tone: FinanceTone;
 	value: (p: FinancialProfileResponse) => string;
 }[] = [
 	{
-		label: "Pengeluaran Esensial / Bulan",
+		label: "Pengeluaran Esensial / Bln",
 		sublabel: "Kebutuhan pokok bulanan",
 		icon: Wallet,
-		tone: "amber",
 		value: (p) => formatRupiah(p.monthly_essential_expenses),
 	},
 	{
-		label: "Cicilan Utang / Bulan",
+		label: "Cicilan Utang / Bln",
 		sublabel: "Kewajiban rutin bulanan",
 		icon: CreditCard,
-		tone: "rose",
 		value: (p) => formatRupiah(p.monthly_debt_payment),
 	},
 	{
 		label: "Jumlah Tanggungan",
 		sublabel: "Anggota keluarga yang ditanggung",
 		icon: Users,
-		tone: "violet",
 		value: (p) => (p.dependents != null ? `${p.dependents} orang` : "0 orang"),
 	},
 	{
 		label: "Mata Uang",
 		sublabel: "Satuan perhitungan runway",
 		icon: Coins,
-		tone: "slate",
 		value: (p) => p.currency || "IDR",
 	},
 ];
@@ -94,11 +88,12 @@ export default function FinancialProfileCard({
 		<section className="mb-8" aria-label="Profil Finansial">
 			<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
 				<div>
-					<h3 className="text-base sm:text-lg font-extrabold text-neutral">
+					<h3 className="text-base font-bold text-slate-900">
 						Beban & Profil Finansial Bulanan
 					</h3>
-					<p className="text-xs sm:text-sm text-neutral/60">
-						Komponen pengeluaran yang menentukan kecepatan konsumsi dana darurat
+					<p className="text-xs sm:text-sm text-slate-500">
+						Komponen pengeluaran yang menentukan kecepatan pemakaian dana
+						cadangan
 					</p>
 				</div>
 				<SecondaryButton
@@ -124,7 +119,6 @@ export default function FinancialProfileCard({
 								sublabel={c.sublabel}
 								value={profile ? c.value(profile) : "—"}
 								icon={c.icon}
-								tone={c.tone}
 								onEdit={() => setEditOpen(true)}
 							/>
 						</StaggerItem>

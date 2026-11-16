@@ -45,7 +45,7 @@ export default function Register() {
 			subtitle="Mulai siapkan langkah karier terbaikmu.">
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<div>
-					<label className="block text-sm font-medium mb-1 text-neutral">
+					<label className="block text-sm font-medium mb-1.5 text-slate-700">
 						Username
 					</label>
 					<input
@@ -53,13 +53,13 @@ export default function Register() {
 						value={username}
 						onChange={(e) => setUsername(e.target.value)}
 						placeholder="johndoe"
-						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
+						className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/25 transition"
 						required
 					/>
 				</div>
 
 				<div>
-					<label className="block text-sm font-medium mb-1 text-neutral">
+					<label className="block text-sm font-medium mb-1.5 text-slate-700">
 						Email
 					</label>
 					<input
@@ -67,13 +67,13 @@ export default function Register() {
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						placeholder="nama@email.com"
-						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
+						className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/25 transition"
 						required
 					/>
 				</div>
 
 				<div>
-					<label className="block text-sm font-medium mb-1 text-neutral">
+					<label className="block text-sm font-medium mb-1.5 text-slate-700">
 						Password
 					</label>
 					<input
@@ -81,27 +81,27 @@ export default function Register() {
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						placeholder="Minimal 8 karakter"
-						className="w-full px-4 py-2.5 rounded-lg border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition"
+						className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/25 transition"
 						required
 						minLength={8}
 					/>
 				</div>
 
-				{error && <p className="text-xs text-red-500 font-medium">{error}</p>}
+				{error && <p className="text-xs text-rose-700 font-medium">{error}</p>}
 
 				<button
 					type="submit"
 					disabled={loading}
-					className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:opacity-90 transition shadow-sm mt-2 disabled:opacity-60 disabled:cursor-not-allowed">
+					className="w-full min-h-[44px] py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition shadow-xs mt-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
 					{loading ? "Mendaftarkan..." : "Daftar Sekarang"}
 				</button>
 			</form>
 
 			<div className="relative my-6 text-center">
 				<div className="absolute inset-0 flex items-center">
-					<div className="w-full border-t border-neutral/10" />
+					<div className="w-full border-t border-slate-200" />
 				</div>
-				<span className="relative bg-white px-3 text-xs text-neutral/50 font-medium">
+				<span className="relative bg-white px-3 text-xs text-slate-500 font-medium">
 					atau
 				</span>
 			</div>
@@ -109,7 +109,7 @@ export default function Register() {
 			<button
 				type="button"
 				onClick={handleGoogle}
-				className="w-full py-2.5 border border-neutral/20 rounded-lg flex items-center justify-center gap-2 font-medium text-sm hover:bg-tertiary transition">
+				className="w-full min-h-[44px] py-2.5 border border-slate-200 bg-white text-slate-700 rounded-xl flex items-center justify-center gap-2 font-medium text-sm hover:bg-slate-50 transition cursor-pointer">
 				<svg className="w-4 h-4" viewBox="0 0 24 24">
 					<path
 						fill="#4285F4"
@@ -131,9 +131,11 @@ export default function Register() {
 				Daftar dengan Google
 			</button>
 
-			<p className="text-center text-sm text-neutral/70 mt-6">
+			<p className="text-center text-sm text-slate-600 mt-6">
 				Sudah punya akun?{" "}
-				<Link to="/login" className="font-semibold text-primary hover:underline">
+				<Link
+					to="/login"
+					className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline">
 					Masuk
 				</Link>
 			</p>

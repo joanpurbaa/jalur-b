@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useInView, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
+import { CountUp } from "../ui/Motion";
 
 // TODO: Isi detail persona dari paper (profesi, gaji, tabungan, pesangon, dll)
 // dan nama tiap cara keluar. Angka months (2,5 dan 13,7) sudah sesuai paper.
@@ -13,15 +15,15 @@ const PERSONA = {
 			label: "Cara keluar A",
 			detail: "",
 			months: 2.5,
-			barClass: "bg-red-500",
-			numberClass: "text-red-500",
+			barClass: "bg-rose-500",
+			numberClass: "text-rose-600",
 		},
 		{
 			label: "Cara keluar B",
 			detail: "",
 			months: 13.7,
-			barClass: "bg-primary",
-			numberClass: "text-primary",
+			barClass: "bg-indigo-600",
+			numberClass: "text-indigo-600",
 		},
 	],
 };
@@ -37,12 +39,10 @@ const formatMonths = (value: number) =>
 
 export default function Hero() {
 	const navigate = useNavigate();
-	const [animated, setAnimated] = useState(false);
-
-	useEffect(() => {
-		const id = requestAnimationFrame(() => setAnimated(true));
-		return () => cancelAnimationFrame(id);
-	}, []);
+	const cardRef = useRef<HTMLDivElement>(null);
+	const inView = useInView(cardRef, { once: true, margin: "-40px" });
+	const reduce = useReducedMotion();
+	const animated = inView || Boolean(reduce);
 
 	return (
 		<section
@@ -71,7 +71,7 @@ export default function Hero() {
 							<button
 								type="button"
 								onClick={() => navigate("/login")}
-								className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
+								className="press rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 cursor-pointer">
 								Hitung runway-ku
 							</button>
 							<a
@@ -83,7 +83,9 @@ export default function Hero() {
 					</div>
 
 					{/* Kanan: kartu persona */}
-					<div className="w-full rounded-2xl border border-neutral/10 bg-white p-6 shadow-sm sm:p-8 lg:ml-auto lg:max-w-md">
+					<div
+						ref={cardRef}
+						className="w-full card-surface p-6 sm:p-8 lg:ml-auto lg:max-w-md">
 						<p className="text-xs font-semibold uppercase tracking-widest text-neutral/40">
 							{PERSONA.caption}
 						</p>
@@ -91,7 +93,10 @@ export default function Hero() {
 
 						<ul className="mt-6 space-y-7">
 							{PERSONA.scenarios.map((scenario) => {
-								const width = Math.min((scenario.months / MAX_MONTHS) * 100, 100);
+								const width = Math.min(
+									(scenario.months / MAX_MONTHS) * 100,
+									100,
+								);
 								return (
 									<li key={scenario.label}>
 										<div className="flex items-end justify-between gap-4">
@@ -100,20 +105,28 @@ export default function Hero() {
 													{scenario.label}
 												</p>
 												{scenario.detail ? (
-													<p className="mt-0.5 text-xs text-neutral/50">{scenario.detail}</p>
+													<p className="mt-0.5 text-xs text-neutral/50">
+														{scenario.detail}
+													</p>
 												) : null}
 											</div>
 											<p className="shrink-0 tabular-nums">
 												<span
 													className={`text-4xl font-extrabold tracking-tight sm:text-5xl ${scenario.numberClass}`}>
-													{formatMonths(scenario.months)}
+													<CountUp
+														value={scenario.months}
+														decimals={1}
+														format={formatMonths}
+													/>
 												</span>
-												<span className="ml-1.5 text-base text-neutral/50">bulan</span>
+												<span className="ml-1.5 text-base text-neutral/50">
+													bulan
+												</span>
 											</p>
 										</div>
 
 										<div
-											className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-neutral/10"
+											className="mt-3 h-3 w-full overflow-hidden rounded-full bg-neutral/10"
 											role="img"
 											aria-label={`${scenario.label}: uang cukup ${formatMonths(scenario.months)} bulan`}>
 											<div
@@ -127,8 +140,8 @@ export default function Hero() {
 						</ul>
 
 						<p className="mt-7 border-t border-neutral/10 pt-4 text-xs text-neutral/45">
-							Runway = berapa bulan uangmu cukup menutup pengeluaran saat tidak ada
-							penghasilan.
+							Runway = berapa bulan uangmu cukup menutup pengeluaran saat tidak
+							ada penghasilan.
 						</p>
 					</div>
 				</div>

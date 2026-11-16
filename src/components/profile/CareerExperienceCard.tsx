@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, CheckCircle2, FileText, Sparkles, Upload } from "lucide-react";
-import SkillPill, { type SkillPillTone } from "../ui/SkillPill";
+import { Briefcase, CheckCircle2, FileText, Upload } from "lucide-react";
+import SkillPill from "../ui/SkillPill";
 import IconTile from "../ui/IconTile";
 import Skeleton from "../ui/Skeleton";
-import { SecondaryButton } from "../ui/PrimaryButton";
+import { PrimaryButton, SecondaryButton } from "../ui/PrimaryButton";
 import { initials as getInitials } from "../../lib/format";
 import { ApiError } from "../../types/api";
 import { cvApi } from "../../services/cv";
@@ -14,16 +14,6 @@ interface CareerExperienceCardProps {
 	skills?: OnboardingSkill[];
 	loading?: boolean;
 }
-
-const AVATAR_GRADIENTS = [
-	"from-indigo-500 to-violet-600",
-	"from-emerald-500 to-teal-600",
-	"from-sky-500 to-blue-600",
-	"from-amber-500 to-orange-600",
-	"from-rose-500 to-pink-600",
-];
-
-const SKILL_TONES: SkillPillTone[] = ["strong", "rising", "insight", "neutral"];
 
 export default function CareerExperienceCard({
 	skills,
@@ -120,7 +110,7 @@ export default function CareerExperienceCard({
 					<Skeleton className="h-16 w-full rounded-xl" />
 					<Skeleton className="h-16 w-full rounded-xl" />
 				</div>
-				<div className="flex flex-wrap gap-2 mb-6">
+				<div className="flex flex-wrap gap-2">
 					<Skeleton className="h-8 w-24 rounded-lg" />
 					<Skeleton className="h-8 w-20 rounded-lg" />
 					<Skeleton className="h-8 w-28 rounded-lg" />
@@ -133,44 +123,42 @@ export default function CareerExperienceCard({
 		<div className="space-y-6">
 			<div>
 				<div className="flex items-center gap-2.5 mb-4">
-					<IconTile icon={Briefcase} tone="beranda" size="xs" />
-					<h4 className="text-sm font-extrabold text-neutral">
+					<IconTile icon={Briefcase} tone="neutral" size="xs" />
+					<h4 className="text-sm font-bold text-slate-900">
 						Timeline Pengalaman Karier
 					</h4>
 				</div>
 
 				{hasCv && !showPreview && cvData ? (
 					cvData.experiences.length > 0 ? (
-						<div className="relative pl-5 space-y-4 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:to-teal-400">
+						<div className="relative pl-5 space-y-3.5 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-slate-200">
 							{cvData.experiences.map((exp, i) => {
 								const compInit = getInitials(exp.company) || "CO";
-								const grad = AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length];
 								return (
 									<div
 										key={`cv-exp-${i}`}
-										className="relative rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 flex items-start gap-3.5">
+										className="relative rounded-xl border border-slate-200/90 bg-slate-50/50 p-4 flex items-start gap-3.5">
 										<span
 											aria-hidden
-											className="absolute -left-[19px] top-6 w-3 h-3 rounded-full bg-indigo-600 ring-4 ring-white"
+											className="absolute -left-[19px] top-6 w-2.5 h-2.5 rounded-full bg-indigo-600 ring-4 ring-white"
 										/>
-										<span
-											className={`inline-flex w-10 h-10 rounded-2xl bg-gradient-to-br ${grad} text-white text-xs font-extrabold items-center justify-center shrink-0 shadow-xs`}>
+										<span className="inline-flex w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold items-center justify-center shrink-0">
 											{compInit}
 										</span>
 										<div className="flex-1 min-w-0">
 											<div className="flex items-center justify-between flex-wrap gap-1">
-												<p className="text-sm font-extrabold text-neutral">
+												<p className="text-sm font-bold text-slate-900">
 													{exp.role}
 												</p>
-												<span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white border border-slate-200 text-neutral/65">
+												<span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-white border border-slate-200 text-slate-600">
 													{exp.start_date} — {exp.end_date}
 												</span>
 											</div>
-											<p className="text-xs font-bold text-indigo-700 mt-0.5">
+											<p className="text-xs font-semibold text-indigo-700 mt-0.5">
 												{exp.company}
 											</p>
 											{exp.description && (
-												<p className="text-xs text-neutral/70 mt-1.5 leading-relaxed">
+												<p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
 													{exp.description}
 												</p>
 											)}
@@ -180,19 +168,19 @@ export default function CareerExperienceCard({
 							})}
 						</div>
 					) : (
-						<p className="text-xs text-neutral/55">
+						<p className="text-xs text-slate-500">
 							Tidak ada riwayat pengalaman yang terdeteksi dari CV.
 						</p>
 					)
 				) : showPreview && cvPreview ? (
-					<div className="rounded-2xl border-2 border-indigo-200 bg-indigo-50/50 p-4 space-y-4">
+					<div className="rounded-xl border border-indigo-200 bg-indigo-50/40 p-4 space-y-4">
 						<div className="flex items-center gap-3">
 							<IconTile icon={CheckCircle2} tone="safe" size="sm" />
 							<div>
-								<p className="text-sm font-extrabold text-neutral">
+								<p className="text-sm font-bold text-slate-900">
 									Pratinjau Ekstraksi CV
 								</p>
-								<p className="text-xs text-neutral/60">{cvPreview.file_name}</p>
+								<p className="text-xs text-slate-500">{cvPreview.file_name}</p>
 							</div>
 						</div>
 
@@ -202,13 +190,13 @@ export default function CareerExperienceCard({
 									<div
 										key={`preview-exp-${i}`}
 										className="rounded-xl bg-white p-3.5 border border-slate-200">
-										<p className="text-sm font-extrabold text-neutral">
+										<p className="text-sm font-bold text-slate-900">
 											{exp.role}
 										</p>
-										<p className="text-xs font-bold text-indigo-700">
+										<p className="text-xs font-semibold text-indigo-700">
 											{exp.company} · {exp.start_date} — {exp.end_date}
 										</p>
-										<p className="text-xs text-neutral/70 mt-1 leading-relaxed">
+										<p className="text-xs text-slate-600 mt-1 leading-relaxed">
 											{exp.description}
 										</p>
 									</div>
@@ -218,39 +206,29 @@ export default function CareerExperienceCard({
 
 						{cvPreview.skills.length > 0 && (
 							<div className="flex flex-wrap gap-1.5">
-								{cvPreview.skills.map((skill, idx) => (
-									<SkillPill
-										key={skill}
-										label={skill}
-										tone={SKILL_TONES[idx % SKILL_TONES.length]}
-									/>
+								{cvPreview.skills.map((skill) => (
+									<SkillPill key={skill} label={skill} tone="neutral" />
 								))}
 							</div>
 						)}
 
 						<div className="flex gap-2.5">
-							<button
-								type="button"
+							<PrimaryButton
+								size="sm"
 								onClick={handleConfirm}
-								disabled={cvUploading}
-								className={`press px-4 py-2 text-xs font-bold rounded-xl transition ${
-									cvUploading
-										? "bg-indigo-400 text-white cursor-not-allowed"
-										: "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
-								}`}>
+								disabled={cvUploading}>
 								{cvUploading ? "Menyimpan…" : "Gunakan Data Ini"}
-							</button>
-							<button
-								type="button"
+							</PrimaryButton>
+							<SecondaryButton
+								size="sm"
 								onClick={handleReset}
-								disabled={cvUploading}
-								className="press px-4 py-2 text-xs font-bold text-neutral/70 border border-slate-300 bg-white rounded-xl hover:bg-slate-50 transition cursor-pointer">
+								disabled={cvUploading}>
 								Batal
-							</button>
+							</SecondaryButton>
 						</div>
 					</div>
 				) : (
-					<div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-4 text-xs text-neutral/60">
+					<div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-4 text-xs sm:text-sm text-slate-600">
 						Belum ada timeline pengalaman karier. Unggah CV di bawah untuk
 						mengekstrak riwayat kerja secara otomatis.
 					</div>
@@ -258,39 +236,34 @@ export default function CareerExperienceCard({
 			</div>
 
 			<div>
-				<div className="flex items-center gap-2.5 mb-3">
-					<IconTile icon={Sparkles} tone="skill" size="xs" />
-					<h4 className="text-sm font-extrabold text-neutral">
-						Koleksi Skill ({skills?.length ?? 0})
-					</h4>
-				</div>
+				<h4 className="text-sm font-bold text-slate-900 mb-3">
+					Koleksi Skill ({skills?.length ?? 0})
+				</h4>
 
 				{skills && skills.length > 0 ? (
 					<div className="flex flex-wrap gap-2">
-						{skills.map((skill, idx) => (
-							<SkillPill
-								key={skill.id}
-								label={skill.name}
-								tone={SKILL_TONES[idx % SKILL_TONES.length]}
-							/>
+						{skills.map((skill) => (
+							<SkillPill key={skill.id} label={skill.name} tone="neutral" />
 						))}
 					</div>
 				) : (
-					<p className="text-xs text-neutral/55">Belum ada skill yang dicatat.</p>
+					<p className="text-xs text-slate-500">
+						Belum ada skill yang dicatat.
+					</p>
 				)}
 			</div>
 
 			<div className="pt-4 border-t border-slate-100">
 				<div className="flex items-center justify-between flex-wrap gap-3">
 					<div className="flex items-center gap-3 min-w-0 flex-1">
-						<IconTile icon={FileText} tone="bukti-karier" size="sm" />
+						<IconTile icon={FileText} tone="neutral" size="sm" />
 						<div className="min-w-0">
 							{hasCv && !showPreview ? (
 								<>
-									<p className="text-xs font-extrabold text-neutral">
+									<p className="text-xs font-bold text-slate-900">
 										Berkas CV Terlampir
 									</p>
-									<p className="text-xs text-neutral/55">
+									<p className="text-xs text-slate-500">
 										Diunggah{" "}
 										{new Date(cvData!.uploaded_at).toLocaleDateString("id-ID", {
 											day: "numeric",
@@ -302,10 +275,8 @@ export default function CareerExperienceCard({
 								</>
 							) : (
 								<>
-									<p className="text-xs font-extrabold text-neutral">
-										Dokumen CV
-									</p>
-									<p className="text-xs text-neutral/55">
+									<p className="text-xs font-bold text-slate-900">Dokumen CV</p>
+									<p className="text-xs text-slate-500">
 										Unggah PDF/DOCX untuk melengkapi pengalaman otomatis
 									</p>
 								</>
@@ -317,7 +288,7 @@ export default function CareerExperienceCard({
 						<>
 							<SecondaryButton
 								size="sm"
-								icon={<Upload size={14} className="text-indigo-600" />}
+								icon={<Upload size={14} />}
 								onClick={() => fileInputRef.current?.click()}>
 								{cvUploading
 									? "Memproses..."
@@ -342,7 +313,7 @@ export default function CareerExperienceCard({
 				</div>
 
 				{cvError && (
-					<p className="text-xs text-rose-600 font-semibold mt-2">{cvError}</p>
+					<p className="text-xs text-rose-700 font-semibold mt-2">{cvError}</p>
 				)}
 			</div>
 		</div>

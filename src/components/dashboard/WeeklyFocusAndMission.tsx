@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Circle, Trophy } from "lucide-react";
+import { CheckCircle2, Circle, ListChecks } from "lucide-react";
 import InsightCard from "./InsightCard";
 import NextActionCard from "./NextActionCard";
 import Card from "../ui/Card";
@@ -41,7 +41,8 @@ export default function WeeklyFocusAndMission() {
 			const hasProfile = Boolean(
 				dash?.onboarding_completed || dash?.profile?.full_name,
 			);
-			const hasHealth = healthRes.status === "fulfilled" && Boolean(healthRes.value);
+			const hasHealth =
+				healthRes.status === "fulfilled" && Boolean(healthRes.value);
 			const hasEvidence = Boolean(dash && dash.evidence.total > 0);
 			const hasFinancial = Boolean(
 				(finRes.status === "fulfilled" &&
@@ -64,7 +65,7 @@ export default function WeeklyFocusAndMission() {
 					id: "health",
 					label: "Penilaian kesehatan karier",
 					detail: hasHealth
-						? "Skor & analisis faktor sudah aktif"
+						? "Skor & analisis faktor tersedia"
 						: "Ukur kondisi karier saat ini",
 					done: hasHealth,
 					onClick: openCareerAssessment,
@@ -74,7 +75,7 @@ export default function WeeklyFocusAndMission() {
 					label: "Simpan minimal 1 bukti karier",
 					detail:
 						dash && dash.evidence.total > 0
-							? `${dash.evidence.total} bukti tersimpan di portofolio`
+							? `${dash.evidence.total} bukti tersimpan`
 							: "Dokumentasikan pencapaian terbaikmu",
 					done: hasEvidence,
 					href: "/dashboard/bukti-karier",
@@ -90,10 +91,10 @@ export default function WeeklyFocusAndMission() {
 				},
 				{
 					id: "simulation",
-					label: "Jalankan simulasi 'What If'",
+					label: "Jalankan simulasi ketahanan",
 					detail: hasSim
-						? "Skenario ketahanan sudah disimulasikan"
-						: "Uji ketahanan finansial bila terjadi PHK",
+						? "Skenario ketahanan tersedia"
+						: "Proyeksikan ketahanan finansial bila terjadi PHK",
 					done: hasSim,
 					href: "/dashboard/simulasi",
 				},
@@ -110,7 +111,7 @@ export default function WeeklyFocusAndMission() {
 	const pct = Math.round((doneCount / totalCount) * 100);
 
 	return (
-		<div className="space-y-7">
+		<div className="space-y-6">
 			<NextActionCard />
 
 			<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -123,17 +124,17 @@ export default function WeeklyFocusAndMission() {
 						<div>
 							<div className="flex items-center justify-between gap-3 mb-3">
 								<div className="flex items-center gap-3">
-									<IconTile icon={Trophy} tone="jalur-karier" size="sm" />
+									<IconTile icon={ListChecks} tone="indigo" size="sm" />
 									<div>
-										<h3 className="text-base font-extrabold text-neutral">
-											Misi Kesiapan Jalur B
+										<h3 className="text-sm font-bold text-slate-900">
+											Kesiapan Fondasi
 										</h3>
-										<p className="text-xs text-neutral/55">
-											{doneCount} dari {totalCount} fondasi selesai
+										<p className="text-xs text-slate-500">
+											{doneCount} dari {totalCount} bagian selesai
 										</p>
 									</div>
 								</div>
-								<span className="num-display text-xl text-emerald-600">
+								<span className="num-display text-lg text-indigo-700">
 									{pct}%
 								</span>
 							</div>
@@ -141,10 +142,10 @@ export default function WeeklyFocusAndMission() {
 							<MeterBar
 								value={pct}
 								max={100}
-								status={pct >= 80 ? "healthy" : pct >= 40 ? "warning" : "insight"}
+								status="insight"
 								height="sm"
 								className="mb-4"
-								ariaLabel={`Progres kesiapan ${pct}%`}
+								ariaLabel={`Progres kesiapan fondasi ${pct}%`}
 							/>
 
 							<ul className="space-y-2">
@@ -153,28 +154,25 @@ export default function WeeklyFocusAndMission() {
 										<div
 											className={`flex items-start gap-2.5 p-2.5 rounded-xl border transition ${
 												item.done
-													? "bg-emerald-50/50 border-emerald-200/70 text-neutral"
-													: "bg-white/70 border-slate-200/80 hover:border-indigo-300 text-neutral"
+													? "bg-slate-50/70 border-slate-200/70 text-slate-800"
+													: "bg-white border-slate-200 hover:border-indigo-200 text-slate-900"
 											}`}>
 											{item.done ? (
 												<CheckCircle2
-													size={17}
+													size={16}
 													className="text-emerald-600 shrink-0 mt-0.5"
 												/>
 											) : (
 												<Circle
-													size={17}
-													className="text-slate-400 shrink-0 mt-0.5"
+													size={16}
+													className="text-slate-300 shrink-0 mt-0.5"
 												/>
 											)}
 											<div className="min-w-0 flex-1">
-												<p
-													className={`text-xs font-bold ${
-														item.done ? "text-emerald-950" : "text-neutral"
-													}`}>
+												<p className="text-xs font-semibold text-slate-900">
 													{item.label}
 												</p>
-												<p className="text-[11px] text-neutral/60 truncate">
+												<p className="text-xs text-slate-500 truncate">
 													{item.detail}
 												</p>
 											</div>

@@ -10,7 +10,7 @@ import {
 	FolderKanban,
 	Medal,
 	MessageSquareQuote,
-	PlusCircle,
+	Plus,
 	Sparkles,
 	Trophy,
 	type LucideIcon,
@@ -22,7 +22,7 @@ import { profileApi } from "../../services/profile";
 import type { EvidenceItemCreate, EvidenceType } from "../../types/evidence";
 
 const inputClass =
-	"w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-neutral placeholder:text-neutral/40 transition";
+	"w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/15 text-sm text-slate-900 placeholder:text-slate-400 transition";
 
 const TYPE_ICONS: Record<EvidenceType, LucideIcon> = {
 	project: FolderKanban,
@@ -133,7 +133,7 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 				subtitle="Catat proyek, pencapaian, atau apresiasi selagi masih segar di ingatanmu.">
 				<div className="space-y-5">
 					<div>
-						<label className="text-xs font-bold uppercase tracking-wider text-neutral/60 mb-2 block">
+						<label className="text-xs font-semibold text-slate-700 mb-2 block">
 							Pilih Jenis Bukti
 						</label>
 						<div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -146,15 +146,15 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 											key={type}
 											type="button"
 											onClick={() => setEvidenceType(type)}
-											className={`press flex items-center gap-2 p-2.5 rounded-2xl border text-left text-xs font-bold transition cursor-pointer ${
+											className={`press min-h-[42px] flex items-center gap-2 p-2.5 rounded-xl border text-left text-xs font-semibold transition cursor-pointer ${
 												selected
-													? "bg-sky-50 border-sky-500 text-sky-900 ring-2 ring-sky-500/25"
-													: "bg-white border-slate-200 text-neutral/75 hover:bg-slate-50"
+													? "bg-indigo-50 border-indigo-600 text-indigo-800"
+													: "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
 											}`}>
 											<Icon
 												size={15}
 												className={
-													selected ? "text-sky-600" : "text-neutral/50"
+													selected ? "text-indigo-600" : "text-slate-500"
 												}
 											/>
 											<span className="truncate">
@@ -168,8 +168,8 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 					</div>
 
 					<div>
-						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
-							Judul Bukti <span className="text-rose-500">*</span>
+						<label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+							Judul Bukti <span className="text-rose-600">*</span>
 						</label>
 						<input
 							ref={titleRef}
@@ -182,20 +182,20 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 					</div>
 
 					<div>
-						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+						<label className="text-xs font-semibold text-slate-700 mb-1.5 block">
 							Cerita Singkat & Peranmu
 						</label>
 						<textarea
 							rows={3}
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
-							placeholder="Apa tantangannya dan apa kontribusi spesifik yang kamu lakukan?"
+							placeholder="Apa tantangannya dan kontribusi spesifik yang kamu lakukan?"
 							className={`${inputClass} resize-none`}
 						/>
 					</div>
 
 					<div>
-						<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+						<label className="text-xs font-semibold text-slate-700 mb-1.5 block">
 							Dampak / Hasil Terukur
 						</label>
 						<textarea
@@ -209,7 +209,7 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<div>
-							<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+							<label className="text-xs font-semibold text-slate-700 mb-1.5 block">
 								Tanggal (opsional)
 							</label>
 							<input
@@ -221,7 +221,7 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 						</div>
 
 						<div>
-							<label className="text-xs font-bold text-neutral/70 mb-1.5 block">
+							<label className="text-xs font-semibold text-slate-700 mb-1.5 block">
 								Lampiran Gambar (opsional)
 							</label>
 							<input
@@ -230,10 +230,10 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 								onChange={(e) =>
 									setAttachmentFile(e.target.files?.[0] ?? null)
 								}
-								className={`${inputClass} text-xs py-2.5 file:mr-2.5 file:cursor-pointer file:rounded-lg file:border-0 file:bg-sky-100 file:px-2.5 file:py-1 file:text-xs file:font-bold file:text-sky-800`}
+								className={`${inputClass} text-xs py-2 file:mr-2.5 file:cursor-pointer file:rounded-lg file:border-0 file:bg-indigo-50 file:px-2.5 file:py-1 file:text-xs file:font-semibold file:text-indigo-700`}
 							/>
 							{attachmentFile && (
-								<p className="text-[11px] text-neutral/60 mt-1 truncate">
+								<p className="text-xs text-slate-500 mt-1 truncate">
 									{attachmentFile.name}
 								</p>
 							)}
@@ -241,7 +241,7 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 					</div>
 
 					{saveError && (
-						<p className="text-xs text-rose-600 font-semibold">{saveError}</p>
+						<p className="text-xs text-rose-700 font-semibold">{saveError}</p>
 					)}
 
 					<div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -249,8 +249,7 @@ const EvidenceForm = forwardRef<EvidenceFormHandle, EvidenceFormProps>(
 							Batal
 						</SecondaryButton>
 						<PrimaryButton
-							tone="bukti-karier"
-							icon={<PlusCircle size={15} />}
+							icon={<Plus size={15} />}
 							disabled={!canSave || saving}
 							onClick={() => void handleSave()}>
 							{saving ? "Menyimpan..." : "Simpan Bukti"}

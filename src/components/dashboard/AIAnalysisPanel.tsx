@@ -2,6 +2,7 @@ import { Sparkles, Info } from "lucide-react";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
 import MeterBar from "../ui/MeterBar";
+import ExpandableText from "../ui/ExpandableText";
 
 interface AIAnalysisPanelProps {
 	description?: string;
@@ -13,51 +14,49 @@ export default function AIAnalysisPanel({
 	confidence,
 }: AIAnalysisPanelProps) {
 	return (
-		<Card
-			padding="lg"
-			className="bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/40">
+		<Card padding="lg">
 			<div className="flex items-center gap-3 mb-4">
-				<span className="motion-safe:animate-spark inline-flex">
-					<IconTile icon={Sparkles} tone="beranda" size="sm" />
-				</span>
+				<IconTile icon={Sparkles} tone="indigo" size="sm" />
 				<div>
-					<span className="text-xs font-extrabold uppercase tracking-wider text-indigo-700">
-						AI Analysis
+					<span className="text-xs font-medium text-indigo-700">
+						Analisis AI
 					</span>
-					<h4 className="text-base font-extrabold text-neutral">
+					<h4 className="text-base font-bold text-slate-900">
 						Memahami Estimasi Risiko
 					</h4>
 				</div>
 			</div>
 
-			<p className="text-sm text-neutral/80 leading-relaxed">
-				{description ||
-					"Lengkapi data karier untuk mendapatkan analisis AI yang mendalam mengenai posisi dan lanskap industrimu."}
-			</p>
+			{description ? (
+				<ExpandableText
+					text={description}
+					maxLines={4}
+					className="text-sm text-slate-700 leading-relaxed"
+				/>
+			) : (
+				<p className="text-sm text-slate-600 leading-relaxed">
+					Lengkapi data karier untuk mendapatkan penjelasan AI mengenai posisi
+					dan lanskap industrimu.
+				</p>
+			)}
 
 			{confidence != null && confidence > 0 && (
-				<div className="mt-5 pt-4 border-t border-indigo-100/80">
-					<div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-						<span className="text-neutral/60">Kelengkapan data analisis</span>
-						<span className="text-indigo-700 font-bold tabular">
+				<div className="mt-5 pt-4 border-t border-slate-100">
+					<div className="flex items-center justify-between text-xs font-medium mb-1.5">
+						<span className="text-slate-600">Cakupan data analisis</span>
+						<span className="text-indigo-700 font-semibold tabular">
 							{confidence}%
 						</span>
 					</div>
-					<MeterBar
-						value={confidence}
-						max={100}
-						colors={["#6366f1", "#8b5cf6"]}
-						height="sm"
-					/>
+					<MeterBar value={confidence} max={100} status="insight" height="sm" />
 				</div>
 			)}
 
-			<div className="flex items-start gap-2.5 mt-4 pt-4 border-t border-indigo-100/80">
-				<Info size={15} className="text-indigo-500 shrink-0 mt-0.5" />
-				<p className="text-xs text-neutral/60 leading-relaxed">
-					Jalur B menganalisis peran, performa, industri, dan tren pasar terkini.
-					Estimasi ini bersifat panduan untuk membantumu bersiap lebih tenang,
-					bukan vonis tetap.
+			<div className="flex items-start gap-2.5 mt-4 pt-4 border-t border-slate-100">
+				<Info size={15} className="text-slate-400 shrink-0 mt-0.5" />
+				<p className="text-xs text-slate-500 leading-relaxed">
+					Estimasi ini menganalisis peran, performa, dan tren pasar terkini
+					sebagai panduan untuk membantumu bersiap, bukan kepastian tetap.
 				</p>
 			</div>
 		</Card>

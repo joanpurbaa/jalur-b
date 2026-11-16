@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { RefreshCw } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
+import { SecondaryButton } from "../ui/PrimaryButton";
 import ProfileHeaderCard from "../profile/ProfileHeaderCard";
 import CareerSummaryCard from "../profile/CareerSummaryCard";
 import ProfileSection from "../profile/ProfileSection";
@@ -15,13 +17,14 @@ import CareerExperienceCard from "../profile/CareerExperienceCard";
 import { EditProfileModal } from "../profile/EditProfileModal";
 import { EditCareerModal } from "../profile/EditCareerModal";
 import { profileApi } from "../../services/profile";
-import type { OnboardingProfile } from "../../types/onboarding";
-import type { OnboardingSkill } from "../../types/onboarding";
+import type { OnboardingProfile, OnboardingSkill } from "../../types/onboarding";
 import { useAuth } from "../../context/AuthContext";
+import { useCareerAssessment } from "../../context/CareerAssessmentContext";
 
 export default function Profil() {
 	const navigate = useNavigate();
 	const { user } = useAuth();
+	const { openCareerAssessment } = useCareerAssessment();
 	const [profile, setProfile] = useState<OnboardingProfile | null>(null);
 	const [skills, setSkills] = useState<OnboardingSkill[]>([]);
 	const [profileLoading, setProfileLoading] = useState(true);
@@ -56,7 +59,14 @@ export default function Profil() {
 		<div>
 			<PageHeader
 				title="Profil"
-				subtitle="Kelola informasi diri dan data yang digunakan Jalur B untuk memahami kondisi kariermu."
+				subtitle="Kelola informasi diri, pengalaman, dan data analisis yang digunakan Jalur B."
+				action={
+					<SecondaryButton
+						icon={<RefreshCw size={15} />}
+						onClick={openCareerAssessment}>
+						Perbarui Data Karier
+					</SecondaryButton>
+				}
 			/>
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 items-stretch">
@@ -83,30 +93,13 @@ export default function Profil() {
 				</ProfileSection>
 
 				<ProfileSection title="Profil Risiko Karier">
-					<RiskSummaryCard onSeeMore={() => navigate("/dashboard/risiko-karier")} />
+					<RiskSummaryCard
+						onSeeMore={() => navigate("/dashboard/risiko-karier")}
+					/>
 				</ProfileSection>
 
 				<ProfileSection title="Skill & AI">
 					<SkillSummaryCard onSeeMore={() => navigate("/dashboard/skill")} />
-				</ProfileSection>
-
-				<div className="lg:col-span-2">
-					<ProfileSection
-						title="Pengalaman Karier & Skill"
-						description="Riwayat pekerjaan, skill, dan berkas CV yang melengkapi profil kariermu.">
-						<CareerExperienceCard
-							skills={skills}
-							loading={profileLoading}
-						/>
-					</ProfileSection>
-				</div>
-
-				<ProfileSection title="Jalur Karier">
-					<CareerPathSummaryCard onSeeMore={() => navigate("/dashboard/jalur-karier")} />
-				</ProfileSection>
-
-				<ProfileSection title="Bukti Karier">
-					<EvidenceSummaryCard onSeeMore={() => navigate("/dashboard/bukti-karier")} />
 				</ProfileSection>
 
 				<ProfileSection title="Informasi Finansial">
@@ -114,7 +107,27 @@ export default function Profil() {
 				</ProfileSection>
 
 				<div className="lg:col-span-2">
-					<ProfileSection title="Data Simulasi">
+					<ProfileSection
+						title="Pengalaman Karier & Skill"
+						description="Riwayat pekerjaan, keahlian utama, dan berkas CV yang melengkapi profilmu.">
+						<CareerExperienceCard skills={skills} loading={profileLoading} />
+					</ProfileSection>
+				</div>
+
+				<ProfileSection title="Jalur Karier">
+					<CareerPathSummaryCard
+						onSeeMore={() => navigate("/dashboard/jalur-karier")}
+					/>
+				</ProfileSection>
+
+				<ProfileSection title="Bukti Karier">
+					<EvidenceSummaryCard
+						onSeeMore={() => navigate("/dashboard/bukti-karier")}
+					/>
+				</ProfileSection>
+
+				<div className="lg:col-span-2">
+					<ProfileSection title="Ringkasan Simulasi Terakhir">
 						<SimulationSummaryCard
 							onSeeMore={() => navigate("/dashboard/simulasi")}
 						/>

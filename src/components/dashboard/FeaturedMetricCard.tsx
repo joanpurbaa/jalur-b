@@ -1,9 +1,6 @@
 import type { LucideIcon } from "lucide-react";
-import { type StatusVariant } from "../../lib/status";
-import type { Tone } from "../../lib/modules";
 import ScoreRing from "../ui/ScoreRing";
 import IconTile from "../ui/IconTile";
-import StatusBadge from "../ui/StatusBadge";
 import Card from "../ui/Card";
 
 interface FeaturedMetricCardProps {
@@ -11,48 +8,48 @@ interface FeaturedMetricCardProps {
 	value: number;
 	description: string;
 	icon: LucideIcon;
-	variant: StatusVariant;
-	tone?: Tone;
-	ringColors?: [string, string];
 	badgeLabel?: string;
 }
 
+/**
+ * Metrik utama di halaman Skill & AI memakai skala netral indigo
+ * (bukan status merah/hijau) karena exposure/relevance bersifat deskriptif.
+ */
 export default function FeaturedMetricCard({
 	title,
 	value,
 	description,
 	icon: Icon,
-	variant,
-	tone = "skill",
-	ringColors,
 	badgeLabel,
 }: FeaturedMetricCardProps) {
 	return (
 		<Card
 			lift
-			tilt
 			padding="lg"
 			className="flex flex-col sm:flex-row items-center gap-6">
 			<ScoreRing
 				value={value}
 				max={100}
-				size={136}
-				stroke={13}
-				status={variant}
-				colors={ringColors}
+				size={132}
+				stroke={12}
+				status="insight"
 				suffix="%"
 				label={title}
 			/>
 
 			<div className="flex-1 min-w-0 text-center sm:text-left">
 				<div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mb-2">
-					<IconTile icon={Icon} tone={tone} size="sm" />
-					<h3 className="text-lg font-extrabold text-neutral">{title}</h3>
+					<IconTile icon={Icon} tone="indigo" size="sm" />
+					<h3 className="text-base font-bold text-slate-900">{title}</h3>
 					{badgeLabel && (
-						<StatusBadge label={badgeLabel} variant={variant} size="sm" />
+						<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+							{badgeLabel}
+						</span>
 					)}
 				</div>
-				<p className="text-sm text-neutral/70 leading-relaxed">{description}</p>
+				<p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
+					{description}
+				</p>
 			</div>
 		</Card>
 	);

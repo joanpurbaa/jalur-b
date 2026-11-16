@@ -2,6 +2,7 @@ import { Sparkles } from "lucide-react";
 import ActivityImpactBar from "../ui/ActivityImpactBar";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
+import ExpandableText from "../ui/ExpandableText";
 import { parseDecimal } from "../../lib/parseNumeric";
 
 interface ActivityItem {
@@ -28,39 +29,40 @@ function normalizeImpactLevel(
 }
 
 export default function ActivityImpactPanel({
-	title = "Peta Aktivitas & AI Impact",
+	title = "Peta Aktivitas & Dampak AI",
 	description,
 	activities = [],
 }: ActivityImpactPanelProps) {
 	return (
-		<Card
-			padding="lg"
-			className="mb-8 bg-gradient-to-br from-white via-violet-50/35 to-cyan-50/30">
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
-				<div className="flex items-center gap-3">
-					<IconTile icon={Sparkles} tone="skill" size="md" />
-					<div>
-						<h3 className="text-base sm:text-lg font-extrabold text-neutral">
-							{title}
-						</h3>
-						<p className="text-xs sm:text-sm text-neutral/65 mt-0.5">
-							{description ||
-								"Intensitas dampak AI pada rutinitas kerjamu saat ini."}
-						</p>
+		<Card padding="lg" className="mb-8">
+			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+				<div className="flex items-start gap-3">
+					<IconTile icon={Sparkles} tone="indigo" size="md" />
+					<div className="min-w-0">
+						<h3 className="text-base font-bold text-slate-900">{title}</h3>
+						<ExpandableText
+							text={
+								description ||
+								"Intensitas dampak AI pada rutinitas kerjamu saat ini."
+							}
+							maxLines={3}
+							className="text-sm text-slate-600 mt-1 leading-relaxed"
+						/>
 					</div>
 				</div>
 
-				<div className="flex flex-wrap items-center gap-2 text-[11px] font-bold">
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-						<span className="w-2 h-2 rounded-full bg-emerald-500" />
+				{/* Legenda 1 hue indigo dengan 3 tingkat intensitas */}
+				<div className="flex flex-wrap items-center gap-2 text-xs font-medium shrink-0">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+						<span className="w-2 h-2 rounded-full bg-indigo-300" />
 						Rendah
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-						<span className="w-2 h-2 rounded-full bg-amber-500" />
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+						<span className="w-2 h-2 rounded-full bg-indigo-500" />
 						Sedang
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-						<span className="w-2 h-2 rounded-full bg-rose-500" />
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900 border border-indigo-200">
+						<span className="w-2 h-2 rounded-full bg-indigo-700" />
 						Tinggi
 					</span>
 				</div>
@@ -73,14 +75,14 @@ export default function ActivityImpactPanel({
 					return (
 						<div
 							key={item.key || item.title}
-							className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 space-y-2 shadow-2xs">
+							className="rounded-xl border border-slate-200/90 bg-slate-50/50 p-4 space-y-2">
 							<ActivityImpactBar
 								activity={item.title}
 								level={lvl}
 								score={numScore}
 							/>
 							{item.explanation && (
-								<p className="text-xs text-neutral/65 leading-relaxed pt-1">
+								<p className="text-xs sm:text-sm text-slate-600 leading-relaxed pt-1 line-clamp-2">
 									{item.explanation}
 								</p>
 							)}

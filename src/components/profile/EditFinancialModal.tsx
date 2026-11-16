@@ -10,7 +10,7 @@ interface EditFinancialModalProps {
 }
 
 const inputClass =
-	"w-full text-sm text-neutral bg-neutral/5 border border-neutral/10 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30";
+	"w-full text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/30 focus-visible:border-indigo-500 disabled:text-slate-400 disabled:cursor-not-allowed transition";
 
 function formatNumber(raw: string): string {
 	if (!raw) return "";
@@ -78,7 +78,7 @@ export function EditFinancialModal({
 		<Modal open={open} onClose={onClose} title="Edit Data Finansial">
 			<div>
 				<div className="mb-4">
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-semibold text-slate-600 mb-1.5 block">
 							Pengeluaran Esensial Bulanan (Rp)
 						</label>
 						<input
@@ -92,7 +92,7 @@ export function EditFinancialModal({
 						/>
 					</div>
 					<div className="mb-4">
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-semibold text-slate-600 mb-1.5 block">
 							Cicilan Utang Bulanan (Rp)
 						</label>
 						<input
@@ -104,7 +104,7 @@ export function EditFinancialModal({
 						/>
 					</div>
 					<div className="mb-4">
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-semibold text-slate-600 mb-1.5 block">
 							Jumlah Tanggungan
 						</label>
 						<input
@@ -118,13 +118,13 @@ export function EditFinancialModal({
 						/>
 					</div>
 					<div className="mb-4">
-						<label className="text-xs font-semibold text-neutral/60 mb-1.5 block">
+						<label className="text-xs font-semibold text-slate-600 mb-1.5 block">
 							Mata Uang
 						</label>
 						<input type="text" value="IDR" disabled className={inputClass} />
 					</div>
 					{error && (
-						<p className="text-xs text-red-500 font-medium mb-2">
+						<p className="text-xs text-rose-700 font-medium mb-2">
 							Gagal menyimpan data. Silakan coba lagi.
 						</p>
 					)}

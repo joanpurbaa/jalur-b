@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { ShieldAlert, Sparkles, HeartPulse } from "lucide-react";
+import { ShieldAlert, Cpu, HeartPulse } from "lucide-react";
 import {
-	getScoreStatus,
+	getHealthStatus,
 	getLevelStatus,
+	localizeLevelLabel,
 	normalizeRiskLevel,
 } from "../../lib/status";
 import { formatDateID } from "../../lib/format";
@@ -10,6 +11,7 @@ import StatusBadge from "../ui/StatusBadge";
 import ScoreRing from "../ui/ScoreRing";
 import StatCard from "../ui/StatCard";
 import Skeleton from "../ui/Skeleton";
+import { PrimaryButton } from "../ui/PrimaryButton";
 import { careerHealthApi } from "../../services/careerHealth";
 import { careerRiskApi } from "../../services/careerRisk";
 import { aiExposureApi } from "../../services/aiExposure";
@@ -50,10 +52,10 @@ export default function CareerSummaryCard() {
 	if (loading) {
 		return (
 			<div className="space-y-4">
-				<Skeleton className="h-32 w-full rounded-2xl" />
+				<Skeleton className="h-32 w-full rounded-xl" />
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<Skeleton className="h-32 rounded-2xl" />
-					<Skeleton className="h-32 rounded-2xl" />
+					<Skeleton className="h-32 rounded-xl" />
+					<Skeleton className="h-32 rounded-xl" />
 				</div>
 			</div>
 		);
@@ -61,27 +63,26 @@ export default function CareerSummaryCard() {
 
 	if (!health && !risk && !exposure) {
 		return (
-			<div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center">
-				<HeartPulse size={28} className="text-rose-500 mx-auto mb-2" />
-				<p className="text-sm font-bold text-neutral">
+			<div className="rounded-xl border border-dashed border-slate-200 p-8 text-center">
+				<HeartPulse size={26} className="text-indigo-600 mx-auto mb-2" />
+				<p className="text-sm font-semibold text-slate-900">
 					Belum ada ringkasan penilaian karier
 				</p>
-				<p className="text-xs text-neutral/60 mt-1 mb-4">
-					Lengkapi penilaian karier singkat untuk melihat skor kesehatan, risiko,
-					dan relevansi skill-mu di sini.
+				<p className="text-xs text-slate-500 mt-1 mb-4">
+					Lengkapi penilaian karier untuk melihat skor kesehatan, risiko, dan
+					relevansi skill di sini.
 				</p>
-				<button
-					type="button"
-					onClick={openCareerAssessment}
-					className="press px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold cursor-pointer">
+				<PrimaryButton size="sm" onClick={openCareerAssessment}>
 					Isi Penilaian Karier
-				</button>
+				</PrimaryButton>
 			</div>
 		);
 	}
 
 	const score = health ? Math.round(parseDecimal(health.score)) : null;
-	const status = score != null ? getScoreStatus(score) : "neutral";
+	const status = health
+		? getHealthStatus(health.status || health.level, score ?? undefined)
+		: "neutral";
 	const assessedDate = health ? formatDateID(health.assessed_at) : "";
 	const riskLevel = risk ? normalizeRiskLevel(risk.level) : null;
 	const relevance = exposure
@@ -90,41 +91,39 @@ export default function CareerSummaryCard() {
 
 	return (
 		<div className="space-y-4">
-			<div className="rounded-2xl bg-gradient-to-r from-rose-50/80 via-white to-indigo-50/70 border border-rose-100 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-				<div className="flex items-center gap-4">
-					<ScoreRing
-						value={score}
-						max={100}
-						size={92}
-						stroke={9}
-						status={status}
-						suffix="/100"
-						label="Career Health Score"
-					/>
-					<div>
-						<span className="text-xs font-extrabold uppercase tracking-wider text-rose-700">
-							Career Health Score
+			<div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-5 flex flex-col sm:flex-row items-center gap-5">
+				<ScoreRing
+					value={score}
+					max={100}
+					size={88}
+					stroke={9}
+					status={status}
+					suffix="/100"
+					label="Skor Kesehatan Karier"
+				/>
+				<div className="text-center sm:text-left min-w-0 flex-1">
+					<div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+						<span className="text-xs font-semibold text-slate-700">
+							Kesehatan Karier
 						</span>
-						<div className="flex flex-wrap items-center gap-2 mt-1">
-							{health && (
-								<StatusBadge
-									label={health.status ?? (health.level || "Dipantau")}
-									variant={status}
-									size="sm"
-								/>
-							)}
-							{assessedDate && (
-								<span className="text-xs text-neutral/50 font-medium">
-									Dinilai {assessedDate}
-								</span>
-							)}
-						</div>
-						{health?.summary && (
-							<p className="text-xs text-neutral/70 mt-1.5 line-clamp-2 max-w-md">
-								{health.summary}
-							</p>
+						{health && (
+							<StatusBadge
+								label={localizeLevelLabel(health.status || health.level)}
+								variant={status}
+								size="sm"
+							/>
+						)}
+						{assessedDate && (
+							<span className="text-xs text-slate-500">
+								Dinilai {assessedDate}
+							</span>
 						)}
 					</div>
+					{health?.summary && (
+						<p className="text-sm text-slate-600 mt-1.5 line-clamp-2">
+							{health.summary}
+						</p>
+					)}
 				</div>
 			</div>
 
@@ -133,16 +132,16 @@ export default function CareerSummaryCard() {
 					label="Risiko Karier"
 					value={riskLevel ?? "—"}
 					icon={ShieldAlert}
-					tone="risiko-karier"
+					tone="neutral"
 					status={riskLevel ? getLevelStatus(riskLevel) : "neutral"}
 					href="/dashboard/risiko-karier"
 				/>
 				<StatCard
-					label="Skill Relevance"
+					label="Relevansi Skill"
 					value={relevance != null ? `${relevance}%` : "—"}
-					icon={Sparkles}
-					tone="skill"
-					status={relevance != null ? getScoreStatus(relevance) : "neutral"}
+					icon={Cpu}
+					tone="indigo"
+					status="insight"
 					progress={relevance}
 					href="/dashboard/skill"
 				/>

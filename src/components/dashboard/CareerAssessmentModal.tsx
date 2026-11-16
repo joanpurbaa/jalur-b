@@ -33,7 +33,7 @@ interface AssessmentStep {
 }
 
 const inputClass =
-	"w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-neutral placeholder:text-neutral/40";
+	"w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/25 text-sm text-slate-900 placeholder:text-slate-400 transition";
 
 function getOnboardingData(): OnboardingData {
 	try {
@@ -154,25 +154,26 @@ export default function CareerAssessmentModal({
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral/40 backdrop-blur-sm"
+			className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-[2px]"
 			onClick={onClose}>
 			<div
-				className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-neutral/5"
+				className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200"
 				onClick={(e) => e.stopPropagation()}>
-				<div className="flex items-start justify-between mb-6">
+				<div className="flex items-start justify-between mb-6 gap-4">
 					<div>
-						<h2 className="text-xl sm:text-2xl font-bold text-neutral">
+						<h2 className="text-xl sm:text-2xl font-bold text-slate-900">
 							Lengkapi Data Karier
 						</h2>
-						<p className="text-sm text-neutral/60 mt-1">
-Satu kali simpan — berlaku untuk semua analisis: Kesehatan
-						Karier, Risiko Karier, Skill &amp; AI, dan Jalur Karier.
+						<p className="text-sm text-slate-500 mt-1 leading-relaxed">
+							Satu kali simpan — berlaku untuk semua analisis: Kesehatan
+							Karier, Risiko Karier, Skill &amp; AI, dan Jalur Karier.
 						</p>
 					</div>
 					<button
 						type="button"
 						onClick={onClose}
-						className="text-neutral/40 hover:text-neutral transition cursor-pointer">
+						aria-label="Tutup modal"
+						className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer shrink-0">
 						<svg
 							className="w-5 h-5"
 							fill="none"
@@ -190,45 +191,45 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 
 				{submitting && !submitError ? (
 					<div className="py-6 flex flex-col items-center text-center">
-						<div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-							<Loader2 size={26} className="text-primary animate-spin" />
+						<div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-4">
+							<Loader2 size={22} className="text-indigo-600 animate-spin" />
 						</div>
-						<h3 className="text-lg font-bold text-neutral">
+						<h3 className="text-lg font-bold text-slate-900">
 							Menganalisis data kariermu…
 						</h3>
-						<p className="text-sm text-neutral/50 mt-1 mb-7">
+						<p className="text-sm text-slate-500 mt-1 mb-7">
 							Semua modul penilaian sedang diproses satu per satu secara
 							real-time.
 						</p>
 
-						<div className="w-full max-w-sm space-y-3">
+						<div className="w-full max-w-sm space-y-2.5">
 							{ASSESSMENT_STEPS.map((step, i) => {
 								const done = i < (currentStep ?? -1);
 								const running = i === currentStep;
 								return (
 									<div
 										key={step.label}
-										className={`flex items-center gap-3 p-3.5 rounded-2xl border transition ${
+										className={`flex items-center gap-3 p-3.5 rounded-xl border transition ${
 											running
-												? "border-primary/40 bg-primary/5"
+												? "border-indigo-200 bg-indigo-50/70"
 												: done
 													? "border-emerald-200 bg-emerald-50/60"
-													: "border-neutral/10 bg-white"
+													: "border-slate-200 bg-white"
 										}`}>
 										<div
 											className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
 												done
-													? "bg-emerald-500"
+													? "bg-emerald-600"
 													: running
-														? "bg-primary"
-														: "bg-neutral/10"
+														? "bg-indigo-600"
+														: "bg-slate-100"
 											}`}>
 											{done ? (
 												<Check size={15} className="text-white" />
 											) : running ? (
 												<Loader2 size={15} className="text-white animate-spin" />
 											) : (
-												<span className="text-xs font-semibold text-neutral/40">
+												<span className="text-xs font-semibold text-slate-500">
 													{i + 1}
 												</span>
 											)}
@@ -237,24 +238,24 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 											<p
 												className={`text-sm font-semibold ${
 													running
-														? "text-neutral"
+														? "text-slate-900"
 														: done
-															? "text-emerald-700"
-															: "text-neutral/40"
+															? "text-emerald-800"
+															: "text-slate-500"
 												}`}>
 												{step.label}
 											</p>
 											{running && (
-												<p className="text-xs text-primary">
+												<p className="text-xs text-indigo-700">
 													Sedang menganalisis…
 												</p>
 											)}
 											{done && (
-												<p className="text-xs text-emerald-600">Selesai</p>
+												<p className="text-xs text-emerald-700">Selesai</p>
 											)}
 										</div>
 										{done && (
-											<span className="text-xs font-semibold text-emerald-600 shrink-0">
+											<span className="text-xs font-semibold text-emerald-700 shrink-0">
 												Berhasil
 											</span>
 										)}
@@ -266,8 +267,8 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 				) : (
 					<div className="space-y-5">
 						<div>
-							<label className="block text-xs font-semibold text-neutral mb-2">
-								Role / Jabatan <span className="text-red-500">*</span>
+							<label className="block text-xs font-semibold text-slate-700 mb-1.5">
+								Role / Jabatan <span className="text-rose-600">*</span>
 							</label>
 						<input
 							type="text"
@@ -279,8 +280,8 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
-							Bidang / Industri <span className="text-red-500">*</span>
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
+							Bidang / Industri <span className="text-rose-600">*</span>
 						</label>
 						<input
 							type="text"
@@ -292,8 +293,8 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
-							Lama Bekerja (bulan) <span className="text-red-500">*</span>
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
+							Lama Bekerja (bulan) <span className="text-rose-600">*</span>
 						</label>
 						<input
 							type="text"
@@ -308,14 +309,14 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 							placeholder="Contoh: 48"
 							className={inputClass}
 						/>
-						<p className="text-xs text-neutral/50 mt-2">
+						<p className="text-xs text-slate-500 mt-1.5">
 							Dihitung dalam bulan, misalnya 3 tahun = 36 bulan.
 						</p>
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
-							Tanggung Jawab & Pekerjaan <span className="text-red-500">*</span>
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
+							Tanggung Jawab &amp; Pekerjaan <span className="text-rose-600">*</span>
 						</label>
 						<textarea
 							rows={4}
@@ -329,7 +330,7 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
 							Pencapaian (opsional)
 						</label>
 						<textarea
@@ -342,7 +343,7 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
 							Feedback / Performance Review (opsional)
 						</label>
 						<textarea
@@ -359,17 +360,17 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 							onChange={(e) =>
 								setFeedbackFileName(e.target.files?.[0]?.name ?? "")
 							}
-							className="mt-2 w-full text-xs text-neutral/60 file:mr-3 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:bg-primary/10 file:text-primary file:font-medium hover:file:bg-primary/20"
+							className="mt-2 w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border file:border-indigo-200 file:bg-indigo-50 file:text-indigo-700 file:font-medium hover:file:bg-indigo-100 file:cursor-pointer"
 						/>
 						{feedbackFileName && (
-							<p className="text-xs text-neutral/60 mt-1">
+							<p className="text-xs text-slate-600 mt-1">
 								File terpilih: {feedbackFileName}
 							</p>
 						)}
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
 							Riwayat Perkembangan Karier (opsional)
 						</label>
 						<textarea
@@ -384,7 +385,7 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
 							Deskripsi Pekerjaan (opsional)
 						</label>
 						<textarea
@@ -397,8 +398,8 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 					</div>
 
 					<div>
-						<label className="block text-xs font-semibold text-neutral mb-2">
-							Tools & Metode (opsional)
+						<label className="block text-xs font-semibold text-slate-700 mb-1.5">
+							Tools &amp; Metode (opsional)
 						</label>
 						<input
 							type="text"
@@ -409,7 +410,7 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 							placeholder="Pisahkan dengan koma. Contoh: Figma, Agile, SQL"
 							className={inputClass}
 						/>
-						<p className="text-xs text-neutral/50 mt-2">
+						<p className="text-xs text-slate-500 mt-1.5">
 							Pisahkan tiap tools/metode dengan koma (,).
 						</p>
 					</div>
@@ -417,21 +418,21 @@ Satu kali simpan — berlaku untuk semua analisis: Kesehatan
 				)}
 
 				{submitError && (
-					<div className="mt-4 px-4 py-3 rounded-2xl bg-red-50 border border-red-100">
-						<p className="text-xs font-semibold text-red-600 mb-0.5">
+					<div className="mt-4 px-4 py-3 rounded-xl bg-rose-50 border border-rose-200">
+						<p className="text-xs font-semibold text-rose-800 mb-0.5">
 							Gagal menjalankan penilaian
 						</p>
-						<p className="text-xs text-red-500">{submitError}</p>
+						<p className="text-xs text-rose-700">{submitError}</p>
 					</div>
 				)}
 
-				<div className="mt-8 pt-6 border-t border-neutral/10">
+				<div className="mt-8 pt-5 border-t border-slate-200">
 					<div className="flex items-center justify-end gap-3">
 						<button
 							type="button"
 							onClick={onClose}
 							disabled={submitting}
-							className="px-5 py-2.5 text-sm font-medium rounded-full border border-neutral/20 text-neutral hover:bg-tertiary transition cursor-pointer disabled:opacity-40">
+							className="min-h-[44px] px-5 py-2.5 text-sm font-medium rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition cursor-pointer disabled:opacity-40">
 							Batal
 						</button>
 						<PrimaryButton

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { ChevronDown, type LucideIcon } from "lucide-react";
-import { getScoreStatus } from "../../lib/status";
+import {
+	getHealthStatus,
+	localizeLevelLabel,
+} from "../../lib/status";
 import IconTile from "../ui/IconTile";
 import MeterBar from "../ui/MeterBar";
 import StatusBadge from "../ui/StatusBadge";
@@ -25,66 +28,49 @@ export default function FactorCard({
 	priorityRank,
 }: FactorCardProps) {
 	const [open, setOpen] = useState(priorityRank === 1);
-	const variant = getScoreStatus(score);
-	const tone =
-		variant === "healthy"
-			? "safe"
-			: variant === "warning"
-				? "caution"
-				: "danger";
+	const variant = getHealthStatus(level, score);
+	const displayLevel = level ? localizeLevelLabel(level) : undefined;
+	const showPriorityMarker = priorityRank === 1 && variant !== "healthy";
 
 	return (
 		<Card lift padding="md" className="flex flex-col justify-between h-full">
 			<div>
 				<div className="flex items-start justify-between gap-3 mb-3">
-					<div className="flex items-center gap-3 min-w-0">
-						<IconTile icon={Icon} tone={tone} size="sm" />
+					<div className="flex items-start gap-3 min-w-0">
+						<IconTile icon={Icon} tone="neutral" size="sm" />
 						<div className="min-w-0">
-							{priorityRank === 1 && score < 75 && (
-								<span className="inline-block text-[10px] font-extrabold uppercase tracking-wider text-rose-600 mb-0.5">
-									Prioritas Utama
+							{showPriorityMarker && (
+								<span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-800 mb-0.5">
+									<span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+									Perlu fokus lebih dulu
 								</span>
 							)}
-							<h4 className="text-sm sm:text-base font-extrabold text-neutral truncate">
+							<h4 className="text-sm sm:text-base font-semibold text-slate-900 leading-snug">
 								{title}
 							</h4>
 						</div>
 					</div>
 					<StatusBadge
 						variant={variant}
-						label={
-							level ||
-							(variant === "healthy"
-								? "Kuat"
-								: variant === "warning"
-									? "Cukup"
-									: "Fokus")
-						}
+						label={displayLevel}
 						size="sm"
 					/>
 				</div>
 
-				<div className="flex items-baseline justify-between gap-2 mt-2 mb-2">
+				<div className="flex items-baseline justify-between gap-2 mt-3 mb-2">
 					<div className="flex items-baseline gap-1">
-						<span className="num-display text-3xl text-neutral">
+						<span className="num-display text-2xl sm:text-3xl text-slate-900">
 							<CountUp value={score} />
 						</span>
-						<span className="text-xs font-semibold text-neutral/45">/100</span>
+						<span className="text-xs font-medium text-slate-500">/100</span>
 					</div>
-					<span className="text-xs text-neutral/55 font-medium">
-						{score >= 75
-							? "Pertahankan ritme"
-							: score >= 60
-								? "Ruang penguatan"
-								: "Area untuk ditingkatkan"}
-					</span>
 				</div>
 
 				<MeterBar
 					value={score}
 					max={100}
 					status={variant}
-					height="md"
+					height="sm"
 					ariaLabel={`${title} ${score} dari 100`}
 				/>
 			</div>
@@ -95,8 +81,8 @@ export default function FactorCard({
 						type="button"
 						onClick={() => setOpen((v) => !v)}
 						aria-expanded={open}
-						className="w-full flex items-center justify-between text-xs font-bold text-rose-700 hover:text-rose-800 transition cursor-pointer">
-						<span>{open ? "Sembunyikan detail" : "Lihat selengkapnya"}</span>
+						className="w-full min-h-[36px] flex items-center justify-between text-xs font-semibold text-indigo-700 hover:text-indigo-800 transition cursor-pointer">
+						<span>{open ? "Tutup detail" : "Baca selengkapnya"}</span>
 						<ChevronDown
 							size={15}
 							className={`transition-transform duration-200 ${
@@ -105,13 +91,13 @@ export default function FactorCard({
 						/>
 					</button>
 					<div
-						className={`grid transition-all duration-250 ease-out ${
+						className={`grid transition-all duration-200 ease-out ${
 							open
-								? "grid-rows-[1fr] opacity-100 mt-2.5"
+								? "grid-rows-[1fr] opacity-100 mt-2"
 								: "grid-rows-[0fr] opacity-0"
 						}`}>
 						<div className="overflow-hidden">
-							<p className="text-xs sm:text-sm text-neutral/70 leading-relaxed">
+							<p className="text-sm text-slate-600 leading-relaxed">
 								{explanation}
 							</p>
 						</div>

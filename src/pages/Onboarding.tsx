@@ -1,9 +1,34 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+	ArrowLeft,
+	ArrowRight,
+	Award,
+	Briefcase,
+	Building2,
+	Check,
+	Clock,
+	Compass,
+	FileText,
+	GitFork,
+	HelpCircle,
+	Layers,
+	Rocket,
+	Search,
+	TrendingUp,
+	User,
+	X,
+	type LucideIcon,
+} from "lucide-react";
 import { ApiError } from "../types/api";
 import { onboardingApi } from "../services/onboarding";
 import { masterApi } from "../services/master";
 import { cvApi } from "../services/cv";
+import IconTile from "../components/ui/IconTile";
+import Card from "../components/ui/Card";
+import { PageTransition } from "../components/ui/Motion";
+import { capitalizeName, firstName } from "../lib/format";
+import type { Tone } from "../lib/modules";
 import type { CareerGoal, OnboardingPayload } from "../types/onboarding";
 
 function formatFileSize(bytes: number): string {
@@ -25,6 +50,133 @@ interface FormData {
 	targetIndustry: string;
 }
 
+const STEP_META: Record<
+	number,
+	{ icon: LucideIcon; tone: Tone; badge: string }
+> = {
+	1: {
+		icon: User,
+		tone: "indigo",
+		badge: "Langkah 1 · Perkenalan",
+	},
+	2: {
+		icon: Briefcase,
+		tone: "indigo",
+		badge: "Langkah 2 · Peran Saat Ini",
+	},
+	3: {
+		icon: Building2,
+		tone: "indigo",
+		badge: "Langkah 3 · Industri",
+	},
+	4: {
+		icon: Clock,
+		tone: "indigo",
+		badge: "Langkah 4 · Jam Terbang",
+	},
+	5: {
+		icon: Layers,
+		tone: "indigo",
+		badge: "Langkah 5 · Rutinitas Kerja",
+	},
+	6: {
+		icon: Award,
+		tone: "indigo",
+		badge: "Langkah 6 · Keahlian Utama",
+	},
+	7: {
+		icon: Compass,
+		tone: "indigo",
+		badge: "Langkah 7 · Arah Karier",
+	},
+	8: {
+		icon: FileText,
+		tone: "indigo",
+		badge: "Langkah 8 · Dokumen CV",
+	},
+	9: {
+		icon: Rocket,
+		tone: "safe",
+		badge: "Selesai · Siap Meluncur",
+	},
+};
+
+const experienceCards: {
+	label: string;
+	sub: string;
+	icon: LucideIcon;
+	tone: Tone;
+}[] = [
+	{
+		label: "Belum 1 tahun",
+		sub: "Baru memulai perjalanan profesional",
+		icon: Award,
+		tone: "indigo",
+	},
+	{
+		label: "1–3 tahun",
+		sub: "Sedang membangun fondasi keahlian",
+		icon: TrendingUp,
+		tone: "indigo",
+	},
+	{
+		label: "3–5 tahun",
+		sub: "Mandiri & mulai memegang tanggung jawab",
+		icon: Briefcase,
+		tone: "indigo",
+	},
+	{
+		label: "5–10 tahun",
+		sub: "Berpengalaman & matang secara teknis",
+		icon: Compass,
+		tone: "indigo",
+	},
+	{
+		label: "Lebih dari 10 tahun",
+		sub: "Senior dengan jam terbang tinggi",
+		icon: Rocket,
+		tone: "indigo",
+	},
+];
+
+const careerGoalOptions: {
+	title: string;
+	desc: string;
+	icon: LucideIcon;
+	tone: Tone;
+}[] = [
+	{
+		title: "Tetap berkembang",
+		desc: "Tetap di role sekarang dan memperdalam keahlian.",
+		icon: TrendingUp,
+		tone: "indigo",
+	},
+	{
+		title: "Naik level",
+		desc: "Mengejar promosi atau tanggung jawab lebih besar.",
+		icon: Rocket,
+		tone: "indigo",
+	},
+	{
+		title: "Pindah role",
+		desc: "Berpindah ke fungsi atau profesi yang berbeda.",
+		icon: GitFork,
+		tone: "indigo",
+	},
+	{
+		title: "Pindah industri",
+		desc: "Membawa keahlianmu ke sektor industri baru.",
+		icon: Building2,
+		tone: "indigo",
+	},
+	{
+		title: "Belum tahu",
+		desc: "Ingin melihat rekomendasi jalur yang paling cocok.",
+		icon: HelpCircle,
+		tone: "indigo",
+	},
+];
+
 export default function Onboarding() {
 	const navigate = useNavigate();
 	const [step, setStep] = useState<number>(1);
@@ -32,12 +184,13 @@ export default function Onboarding() {
 		useState<boolean>(false);
 	const [industrySearch, setIndustrySearch] = useState<string>("");
 	const [skillInput, setSkillInput] = useState<string>("");
+	const [skillFilter, setSkillFilter] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	const [masterIndustries, setMasterIndustries] = useState<string[]>([]);
-	const [masterSkillSuggestions, setMasterSkillSuggestions] = useState<string[]>(
-		[],
-	);
+	const [masterSkillSuggestions, setMasterSkillSuggestions] = useState<
+		string[]
+	>([]);
 
 	const [cvFile, setCvFile] = useState<File | null>(null);
 
@@ -63,38 +216,23 @@ export default function Onboarding() {
 		"Human Resources",
 	];
 
-	const experienceOptions = [
-		"Belum 1 tahun",
-		"1–3 tahun",
-		"3–5 tahun",
-		"5–10 tahun",
-		"Lebih dari 10 tahun",
-	];
-
 	const skillSuggestions = [
 		"Problem Solving",
 		"Communication",
 		"Programming",
 		"System Design",
 		"Debugging",
-	];
-
-	const careerGoalOptions = [
-		{
-			title: "Tetap berkembang",
-			desc: "Tetap di role sekarang dan meningkatkan kemampuan.",
-		},
-		{
-			title: "Naik level",
-			desc: "Mengejar posisi atau tanggung jawab yang lebih tinggi.",
-		},
-		{ title: "Pindah role", desc: "Mencoba pekerjaan yang berbeda." },
-		{ title: "Pindah industri", desc: "Membawa skill ke industri baru." },
-		{ title: "Belum tahu", desc: "Masih ingin mencari tahu pilihan yang cocok." },
+		"Project Management",
+		"Data Analysis",
+		"Product Strategy",
 	];
 
 	const handleAddSkill = (skill: string) => {
-		if (skill && !formData.skills.includes(skill) && formData.skills.length < 8) {
+		if (
+			skill &&
+			!formData.skills.includes(skill) &&
+			formData.skills.length < 8
+		) {
 			setFormData({ ...formData, skills: [...formData.skills, skill] });
 			setSkillInput("");
 			setErrorMessage("");
@@ -133,7 +271,9 @@ export default function Onboarding() {
 
 	const handleNext = () => {
 		if (!isStepValid()) {
-			setErrorMessage("Harap isi bidang ini terlebih dahulu sebelum melanjutkan.");
+			setErrorMessage(
+				"Yuk, lengkapi bagian ini dulu supaya kami bisa memetakan profilmu dengan tepat.",
+			);
 			return;
 		}
 		setErrorMessage("");
@@ -180,47 +320,47 @@ export default function Onboarding() {
 	};
 
 	const handleFinish = async () => {
-			setIsSubmitting(true);
-			setErrorMessage("");
-			try {
-				const payload: OnboardingPayload = {
-					full_name: formData.fullName,
-					current_role_name: formData.role,
-					industry_name: formData.industry,
-					work_duration_months: experienceToMonths(formData.experience),
-					is_first_job: formData.isFirstJob === "Ya",
-					daily_activities: formData.dailyActivities,
-					career_goal: careerGoalToEnum(formData.careerGoal),
-					target_role_name: formData.targetRole.trim() || null,
-					target_industry_name: formData.targetIndustry.trim() || null,
-					skills: formData.skills,
-				};
-				await onboardingApi.complete(payload);
-				localStorage.setItem("jalurB_onboarding", JSON.stringify(formData));
-				if (cvFile) {
-					try {
-						const preview = await cvApi.preview(cvFile);
-						await cvApi.confirm({
-							preview_token: preview.preview_token,
-							profile: preview.profile,
-							skills: preview.skills,
-							experiences: preview.experiences,
-						});
-					} catch {
-						// CV bersifat opsional — kegagalan baca CV tidak menghalangi onboarding.
-					}
+		setIsSubmitting(true);
+		setErrorMessage("");
+		try {
+			const payload: OnboardingPayload = {
+				full_name: capitalizeName(formData.fullName),
+				current_role_name: formData.role,
+				industry_name: formData.industry,
+				work_duration_months: experienceToMonths(formData.experience),
+				is_first_job: formData.isFirstJob === "Ya",
+				daily_activities: formData.dailyActivities,
+				career_goal: careerGoalToEnum(formData.careerGoal),
+				target_role_name: formData.targetRole.trim() || null,
+				target_industry_name: formData.targetIndustry.trim() || null,
+				skills: formData.skills,
+			};
+			await onboardingApi.complete(payload);
+			localStorage.setItem("jalurB_onboarding", JSON.stringify(formData));
+			if (cvFile) {
+				try {
+					const preview = await cvApi.preview(cvFile);
+					await cvApi.confirm({
+						preview_token: preview.preview_token,
+						profile: preview.profile,
+						skills: preview.skills,
+						experiences: preview.experiences,
+					});
+				} catch {
+					// CV bersifat opsional — kegagalan baca CV tidak menghalangi onboarding.
 				}
-				navigate("/dashboard");
-			} catch (err) {
-				setErrorMessage(
-					err instanceof ApiError
-						? err.message
-						: "Gagal menyimpan profil. Silakan coba lagi.",
-				);
-			} finally {
-				setIsSubmitting(false);
 			}
-		};
+			navigate("/dashboard");
+		} catch (err) {
+			setErrorMessage(
+				err instanceof ApiError
+					? err.message
+					: "Gagal menyimpan profil. Silakan coba lagi.",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 
 	useEffect(() => {
 		let active = true;
@@ -228,7 +368,7 @@ export default function Onboarding() {
 			try {
 				const [opts, skillsRes] = await Promise.all([
 					onboardingApi.options(),
-					masterApi.skills({ limit: 20 }).catch(() => null),
+					masterApi.skills({ limit: 40 }).catch(() => null),
 				]);
 				if (!active) return;
 				if (opts?.industries?.length) {
@@ -250,7 +390,9 @@ export default function Onboarding() {
 		};
 	}, []);
 
-	const industrySource = masterIndustries.length ? masterIndustries : industries;
+	const industrySource = masterIndustries.length
+		? masterIndustries
+		: industries;
 	const skillSource = masterSkillSuggestions.length
 		? masterSkillSuggestions
 		: skillSuggestions;
@@ -259,169 +401,168 @@ export default function Onboarding() {
 		i.toLowerCase().includes(industrySearch.toLowerCase()),
 	);
 
+	// Saran skill dibatasi tampilannya (maks 10 chip) dan diberi pencarian
+	const visibleSkillSuggestions = skillSource
+		.filter(
+			(s) =>
+				!formData.skills.includes(s) &&
+				s.toLowerCase().includes(skillFilter.trim().toLowerCase()),
+		)
+		.slice(0, 10);
+
+	const userFirst = firstName(formData.fullName);
+	const meta = STEP_META[step] ?? STEP_META[1];
+
 	return (
-		<div className="min-h-screen bg-[#F9F9FB] text-neutral flex flex-col items-center p-4 sm:p-6 font-sans">
-			<div className="w-full max-w-2xl flex items-center justify-between mb-8">
-				<div className="flex items-center gap-2">
-					<img className="w-10 h-10 rounded-full" src="/icon.png" alt="" />
-					<span className="font-semibold text-neutral">Jalur B</span>
+		<div className="min-h-screen bg-app text-slate-900 flex flex-col items-center p-4 sm:p-8 font-sans">
+			<div className="w-full max-w-2xl mb-6 space-y-4">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2.5">
+						<img
+							className="w-9 h-9 rounded-xl shadow-xs border border-slate-200"
+							src="/icon.png"
+							alt="Logo Jalur B"
+						/>
+						<div>
+							<span className="font-bold text-slate-900 text-base block leading-none">
+								Jalur B
+							</span>
+							<span className="text-xs text-slate-500 font-medium mt-0.5 block">
+								Persiapan Profil Karier
+							</span>
+						</div>
+					</div>
+					<span className="px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-indigo-700 tabular">
+						{step > 8 ? "Selesai" : `Langkah ${step} dari 8`}
+					</span>
 				</div>
-				<div className="flex items-center gap-4">
-					<div className="flex gap-1.5">
-						{[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+
+				<div
+					role="progressbar"
+					aria-valuemin={1}
+					aria-valuemax={8}
+					aria-valuenow={Math.min(8, step)}
+					className="grid grid-cols-8 gap-1.5">
+					{[1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
+						const active = i <= step;
+						return (
 							<div
 								key={i}
-								className={`h-1.5 rounded-full transition-all duration-300 ${
-									i <= step ? "w-8 bg-primary" : "w-6 bg-neutral/10"
+								className={`h-2 rounded-full transition-colors duration-300 ${
+									active ? "bg-indigo-600" : "bg-slate-200"
 								}`}
 							/>
-						))}
-					</div>
-					<span className="text-xs text-neutral/50 font-medium">
-						{step > 8 ? "8 dari 8" : `${step} dari 8`}
-					</span>
+						);
+					})}
 				</div>
 			</div>
 
-			<div className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-neutral/5">
-				{step === 1 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 1
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Halo, kenalan dulu yuk!
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Boleh tahu nama lengkapmu? Kami akan memanggilmu dengan nama ini.
-						</p>
-
-						<div className="mt-8">
-							<label className="block text-xs font-semibold text-neutral mb-2">
-								Nama Lengkap
-							</label>
-							<input
-								type="text"
-								placeholder="Contoh: Joan Orlando Purba"
-								value={formData.fullName}
-								onChange={(e) => {
-									setFormData({ ...formData, fullName: e.target.value });
-									if (errorMessage) setErrorMessage("");
-								}}
-								onKeyDown={(e) => {
-									if (e.key === "Enter" && isStepValid()) {
-										e.preventDefault();
-										handleNext();
-									}
-								}}
-								className="w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-neutral placeholder:text-neutral/40"
-							/>
-							<p className="text-xs text-neutral/50 mt-2">
-								Nama kamu akan digunakan untuk mempersonalisasi dashboard dan
-								rekomendasi kariermu.
-							</p>
+			<Card padding="lg" className="w-full max-w-2xl">
+				<PageTransition routeKey={String(step)}>
+					<div className="flex items-center gap-3.5 mb-5">
+						<IconTile icon={meta.icon} tone={meta.tone} size="lg" />
+						<div>
+							<span className="text-xs font-semibold text-indigo-700">
+								{meta.badge}
+							</span>
+							{userFirst && step > 1 && step < 9 && (
+								<p className="text-xs font-medium text-slate-500 mt-0.5">
+									Halo {userFirst}, sedikit lagi profilmu lengkap.
+								</p>
+							)}
 						</div>
 					</div>
-				)}
 
-				{step === 2 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 2
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Kenalan dulu dengan kariermu.
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Saat ini kamu bekerja sebagai apa?
-						</p>
-
-						<div className="mt-8">
-							<label className="block text-xs font-semibold text-neutral mb-2">
-								Role / Jabatan
-							</label>
-							<input
-								type="text"
-								placeholder="Contoh: Software Engineer, Product Manager"
-								value={formData.role}
-								onChange={(e) => {
-									setFormData({ ...formData, role: e.target.value });
-									if (errorMessage) setErrorMessage("");
-								}}
-								className="w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-neutral placeholder:text-neutral/40"
-							/>
-							<p className="text-xs text-neutral/50 mt-2">
-								Role kamu membantu Jalur B memahami konteks pekerjaanmu.
+					{step === 1 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Halo, kenalan dulu
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Siapa nama lengkapmu? Kami akan menyapamu dengan nama ini di
+								seluruh ruang kerja Jalur B.
 							</p>
+
+							<div className="mt-7">
+								<label className="block text-xs font-semibold text-slate-600 mb-2">
+									Nama Lengkap
+								</label>
+								<input
+									type="text"
+									autoFocus
+									placeholder="Contoh: Joan Orlando Purba"
+									value={formData.fullName}
+									onChange={(e) => {
+										setFormData({ ...formData, fullName: e.target.value });
+										if (errorMessage) setErrorMessage("");
+									}}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" && isStepValid()) {
+											e.preventDefault();
+											handleNext();
+										}
+									}}
+									className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 text-base font-medium text-slate-900 placeholder:text-slate-400"
+								/>
+								<p className="text-xs text-slate-500 mt-2">
+									Tenang, namamu hanya tampil untuk mempersonalisasi pengalamanmu.
+								</p>
+							</div>
 						</div>
-					</div>
-				)}
+					)}
 
-				{step === 3 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 3
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Kamu bekerja di bidang apa?
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Pilih bidang yang paling mendekati pekerjaanmu.
-						</p>
+					{step === 2 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Senang bertemu denganmu, {userFirst || "Teman"}. Saat ini kamu
+								bekerja sebagai apa?
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Tulis jabatan atau peran utamamu sehari-hari.
+							</p>
 
-						<div className="mt-8 relative">
-							<label className="block text-xs font-semibold text-neutral mb-2">
-								Bidang / Industri
-							</label>
-							<button
-								type="button"
-								onClick={() => setIndustryDropdownOpen(!industryDropdownOpen)}
-								className="w-full px-4 py-3 rounded-2xl border border-neutral/20 text-left flex justify-between items-center text-neutral focus:outline-none focus:border-primary">
-								<span
-									className={formData.industry ? "text-neutral" : "text-neutral/40"}>
-									{formData.industry || "Pilih bidang..."}
-								</span>
-								<svg
-									className={`w-4 h-4 text-neutral/60 transition-transform ${
-										industryDropdownOpen ? "rotate-180" : ""
-									}`}
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24">
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 9l-7 7-7-7"
-									/>
-								</svg>
-							</button>
+							<div className="mt-7">
+								<label className="block text-xs font-semibold text-slate-600 mb-2">
+									Role / Jabatan Saat Ini
+								</label>
+								<input
+									type="text"
+									autoFocus
+									placeholder="Contoh: Software Engineer, Product Manager, Finance Analyst"
+									value={formData.role}
+									onChange={(e) => {
+										setFormData({ ...formData, role: e.target.value });
+										if (errorMessage) setErrorMessage("");
+									}}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" && isStepValid()) {
+											e.preventDefault();
+											handleNext();
+										}
+									}}
+									className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 text-base font-medium text-slate-900 placeholder:text-slate-400"
+								/>
+							</div>
+						</div>
+					)}
 
-							{industryDropdownOpen && (
-								<div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-neutral/10 shadow-lg z-20 p-2">
-									<div className="flex items-center px-3 py-2 border-b border-neutral/10 mb-1">
-										<svg
-											className="w-4 h-4 text-neutral/40 mr-2"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24">
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-											/>
-										</svg>
-										<input
-											type="text"
-											placeholder="Cari bidang..."
-											value={industrySearch}
-											onChange={(e) => setIndustrySearch(e.target.value)}
-											className="w-full text-sm outline-none bg-transparent placeholder:text-neutral/40"
-										/>
-									</div>
-									<div className="max-h-48 overflow-y-auto">
-										{filteredIndustries.map((item) => (
+					{step === 3 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Di industri apa kamu berkarya sekarang, {userFirst || "Teman"}?
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Tiap industri punya dinamika pasar dan adopsi AI yang berbeda.
+							</p>
+
+							<div className="mt-6">
+								<label className="block text-xs font-semibold text-slate-600 mb-2">
+									Pilih Bidang / Industri
+								</label>
+								<div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-3">
+									{industrySource.slice(0, 6).map((item) => {
+										const selected = formData.industry === item;
+										return (
 											<button
 												key={item}
 												type="button"
@@ -430,540 +571,520 @@ export default function Onboarding() {
 													setIndustryDropdownOpen(false);
 													if (errorMessage) setErrorMessage("");
 												}}
-												className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition ${
-													formData.industry === item
-														? "bg-primary/10 text-primary font-medium"
-														: "hover:bg-tertiary text-neutral"
+												className={`min-h-[44px] p-3 rounded-xl border text-left text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center justify-between gap-2 ${
+													selected
+														? "border-indigo-600 bg-indigo-50 text-indigo-900 ring-1 ring-indigo-500/25"
+														: "border-slate-200 bg-white hover:bg-slate-50 text-slate-800"
 												}`}>
-												{item}
+												<span className="truncate">{item}</span>
+												{selected && (
+													<Check size={14} className="text-indigo-600 shrink-0" />
+												)}
 											</button>
-										))}
-									</div>
+										);
+									})}
 								</div>
-							)}
-							<p className="text-xs text-neutral/50 mt-2">
-								Bidang ini membantu Jalur B memahami perubahan yang terjadi di dunia
-								kerjamu.
-							</p>
-						</div>
-					</div>
-				)}
 
-				{step === 4 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 4
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Seberapa lama kamu sudah bekerja?
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Pilih yang paling mendekati.
-						</p>
-
-						<div className="mt-6 space-y-3">
-							{experienceOptions.map((opt) => {
-								const selected = formData.experience === opt;
-								return (
+								<div className="relative">
 									<button
-										key={opt}
 										type="button"
-										onClick={() => {
-											setFormData({ ...formData, experience: opt });
-											if (errorMessage) setErrorMessage("");
-										}}
-										className={`w-full p-4 rounded-2xl border text-left flex justify-between items-center transition ${
-											selected
-												? "border-primary bg-primary/5 font-medium text-neutral"
-												: "border-neutral/15 hover:border-neutral/30 text-neutral"
-										}`}>
-										<span className="text-sm">{opt}</span>
-										<div
-											className={`w-5 h-5 rounded-full flex items-center justify-center border ${
-												selected
-													? "bg-primary border-primary text-white"
-													: "border-neutral/30"
-											}`}>
-											{selected && (
-												<svg
-													className="w-3 h-3"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24">
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth={3}
-														d="M5 13l4 4L19 7"
-													/>
-												</svg>
-											)}
-										</div>
+										onClick={() =>
+											setIndustryDropdownOpen(!industryDropdownOpen)
+										}
+										className="w-full min-h-[44px] px-4 py-3 rounded-xl border border-slate-200 bg-white text-left flex justify-between items-center text-sm font-medium text-slate-900 focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20">
+										<span
+											className={
+												formData.industry ? "text-slate-900" : "text-slate-400"
+											}>
+											{formData.industry || "Atau cari industri lainnya..."}
+										</span>
+										<Search size={15} className="text-slate-400" />
 									</button>
-								);
-							})}
-						</div>
 
-						<div className="mt-6">
-							<label className="block text-xs font-semibold text-neutral mb-2">
-								Apakah pekerjaan ini adalah pekerjaan pertamamu?
-							</label>
-							<div className="grid grid-cols-2 gap-3">
-								{["Ya", "Tidak"].map((opt) => {
-									const selected = formData.isFirstJob === opt;
+									{industryDropdownOpen && (
+										<div className="mt-2 bg-white rounded-xl border border-slate-200 shadow-lg z-20 p-2">
+											<div className="flex items-center px-3 py-2 border-b border-slate-100 mb-1">
+												<Search size={14} className="text-slate-400 mr-2" />
+												<input
+													type="text"
+													placeholder="Ketik nama industri..."
+													value={industrySearch}
+													onChange={(e) => setIndustrySearch(e.target.value)}
+													className="w-full text-sm outline-none bg-transparent placeholder:text-slate-400 text-slate-900"
+												/>
+											</div>
+											<div className="max-h-48 overflow-y-auto">
+												{filteredIndustries.map((item) => (
+													<button
+														key={item}
+														type="button"
+														onClick={() => {
+															setFormData({ ...formData, industry: item });
+															setIndustryDropdownOpen(false);
+															if (errorMessage) setErrorMessage("");
+														}}
+														className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+															formData.industry === item
+																? "bg-indigo-50 text-indigo-800 font-semibold"
+																: "hover:bg-slate-50 text-slate-800"
+														}`}>
+														{item}
+													</button>
+												))}
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						</div>
+					)}
+
+					{step === 4 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Sudah berapa lama kamu menjalani peran ini?
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Masa kerja membantu kami memperkirakan kematangan peran dan hak
+								normatifmu.
+							</p>
+
+							<div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+								{experienceCards.map((opt) => {
+									const selected = formData.experience === opt.label;
 									return (
 										<button
-											key={opt}
+											key={opt.label}
 											type="button"
 											onClick={() => {
-												setFormData({ ...formData, isFirstJob: opt });
+												setFormData({ ...formData, experience: opt.label });
 												if (errorMessage) setErrorMessage("");
 											}}
-											className={`p-3.5 rounded-2xl border flex justify-between items-center transition ${
+											className={`p-4 rounded-xl border text-left flex items-center gap-3.5 transition cursor-pointer ${
 												selected
-													? "border-primary bg-primary/5 font-medium text-neutral"
-													: "border-neutral/15 hover:border-neutral/30 text-neutral"
+													? "border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-500/25"
+													: "border-slate-200 bg-white hover:border-indigo-200"
 											}`}>
-											<span className="text-sm">{opt}</span>
-											<div
-												className={`w-4 h-4 rounded-full flex items-center justify-center border ${
-													selected
-														? "bg-primary border-primary text-white"
-														: "border-neutral/30"
-												}`}>
-												{selected && (
-													<svg
-														className="w-2.5 h-2.5"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24">
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={3}
-															d="M5 13l4 4L19 7"
-														/>
-													</svg>
-												)}
+											<IconTile icon={opt.icon} tone={opt.tone} size="sm" />
+											<div className="min-w-0 flex-1">
+												<p className="text-sm font-bold text-slate-900">
+													{opt.label}
+												</p>
+												<p className="text-xs text-slate-500 mt-0.5">
+													{opt.sub}
+												</p>
 											</div>
+											{selected && (
+												<span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0">
+													<Check size={12} strokeWidth={3} />
+												</span>
+											)}
 										</button>
 									);
 								})}
 							</div>
+
+							<div className="mt-6 pt-5 border-t border-slate-100">
+								<label className="block text-xs font-semibold text-slate-600 mb-2.5">
+									Apakah ini pekerjaan pertamamu?
+								</label>
+								<div className="grid grid-cols-2 gap-3">
+									{[
+										{ id: "Ya", desc: "Ya, pekerjaan pertamaku" },
+										{ id: "Tidak", desc: "Bukan, sudah pernah pindah" },
+									].map((opt) => {
+										const selected = formData.isFirstJob === opt.id;
+										return (
+											<button
+												key={opt.id}
+												type="button"
+												onClick={() => {
+													setFormData({ ...formData, isFirstJob: opt.id });
+													if (errorMessage) setErrorMessage("");
+												}}
+												className={`p-3.5 rounded-xl border text-left flex items-center justify-between transition cursor-pointer ${
+													selected
+														? "border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-500/25 text-slate-900"
+														: "border-slate-200 bg-white hover:border-indigo-200 text-slate-900"
+												}`}>
+												<div>
+													<span className="text-sm font-bold block">
+														{opt.id}
+													</span>
+													<span className="text-xs text-slate-500">
+														{opt.desc}
+													</span>
+												</div>
+												{selected && (
+													<span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0">
+														<Check size={12} strokeWidth={3} />
+													</span>
+												)}
+											</button>
+										);
+									})}
+								</div>
+							</div>
 						</div>
-					</div>
-				)}
+					)}
 
-				{step === 5 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 5
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Sehari-hari kamu mengerjakan apa?
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Ceritakan dengan bahasa sehari-hari. Nggak perlu formal.
-						</p>
-
-						<div className="mt-6">
-							<label className="block text-xs font-semibold text-neutral mb-2">
-								Aktivitas harianmu
-							</label>
-							<textarea
-								rows={4}
-								value={formData.dailyActivities}
-								onChange={(e) => {
-									setFormData({ ...formData, dailyActivities: e.target.value });
-									if (errorMessage) setErrorMessage("");
-								}}
-								placeholder="Contoh: Aku mengurus campaign, riset pasar, membuat laporan, dan koordinasi dengan beberapa tim."
-								className="w-full p-4 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-neutral resize-none placeholder:text-neutral/40"
-							/>
-							<p className="text-xs text-neutral/50 mt-2">
-								Ceritakan aktivitas yang paling sering kamu lakukan. Jalur B akan
-								membantu memahami pola pekerjaanmu.
+					{step === 5 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Sehari-hari kamu mengerjakan apa saja, {userFirst || "Teman"}?
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Ceritakan santai dengan bahasa sehari-hari—tidak perlu bahasa CV
+								yang kaku.
 							</p>
-						</div>
-					</div>
-				)}
 
-				{step === 6 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 6
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Apa yang paling kamu kuasai?
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Pilih skill yang paling menggambarkan value-mu saat ini.
-						</p>
-
-						<div className="mt-6">
-							<label className="block text-xs font-semibold text-neutral mb-2">
-								Skill
-							</label>
-							<div className="min-h-[100px] p-3 rounded-2xl border border-neutral/20 focus-within:border-primary flex flex-wrap gap-2 items-start">
-								{formData.skills.map((skill) => (
-									<span
-										key={skill}
-										className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-										{skill}
-										<button
-											type="button"
-											onClick={() => handleRemoveSkill(skill)}
-											className="hover:opacity-70">
-											<svg
-												className="w-3.5 h-3.5"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24">
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M6 18L18 6M6 6l12 12"
-												/>
-											</svg>
-										</button>
-									</span>
-								))}
-								<input
-									type="text"
-									value={skillInput}
-									onChange={(e) => setSkillInput(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											e.preventDefault();
-											handleAddSkill(skillInput.trim());
-										}
+							<div className="mt-6">
+								<label className="block text-xs font-semibold text-slate-600 mb-2">
+									Aktivitas Harian Utama
+								</label>
+								<textarea
+									rows={4}
+									value={formData.dailyActivities}
+									onChange={(e) => {
+										setFormData({
+											...formData,
+											dailyActivities: e.target.value,
+										});
+										if (errorMessage) setErrorMessage("");
 									}}
-									placeholder={
-										formData.skills.length === 0
-											? "Ketik skill lalu tekan Enter..."
-											: "Tambah skill..."
-									}
-									className="flex-1 min-w-[140px] outline-none text-sm p-1 text-neutral placeholder:text-neutral/40"
+									placeholder="Contoh: Aku mengurus pengembangan fitur aplikasi, code review, berdiskusi dengan tim produk, dan memperbaiki bug produksi."
+									className="w-full p-4 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 text-sm text-slate-900 resize-none placeholder:text-slate-400 leading-relaxed"
 								/>
-							</div>
-
-							<div className="flex items-center gap-2 mt-4 text-xs flex-wrap">
-								<span className="text-neutral/50">Saran:</span>
-								<div className="flex flex-wrap gap-2">
-									{skillSource.map((sug) => (
-										<button
-											key={sug}
-											type="button"
-											onClick={() => handleAddSkill(sug)}
-											className="px-3 py-1 rounded-full border border-neutral/20 text-neutral hover:bg-tertiary transition">
-											+ {sug}
-										</button>
-									))}
-								</div>
-							</div>
-							<p className="text-xs text-neutral/50 mt-3">
-								Pilih atau ketik minimal 1 skill. Maksimal 8 skill.
-							</p>
-						</div>
-					</div>
-				)}
-
-				{step === 7 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 7
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Kamu ingin membawa kariermu ke mana?
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Untuk 1–2 tahun ke depan, mana yang paling sesuai dengan rencanamu?
-						</p>
-
-						<div className="mt-6 space-y-3">
-							{careerGoalOptions.map((opt) => {
-								const selected = formData.careerGoal === opt.title;
-								return (
-									<button
-										key={opt.title}
-										type="button"
-										onClick={() => {
-											setFormData({ ...formData, careerGoal: opt.title });
-											if (errorMessage) setErrorMessage("");
-										}}
-										className={`w-full p-4 rounded-2xl border text-left flex items-start justify-between transition ${
-											selected
-												? "border-primary bg-primary/5"
-												: "border-neutral/15 hover:border-neutral/30"
-										}`}>
-										<div>
-											<p
-												className={`text-sm font-semibold ${selected ? "text-primary" : "text-neutral"}`}>
-												{opt.title}
-											</p>
-											<p className="text-xs text-neutral/60 mt-0.5">{opt.desc}</p>
-										</div>
-										<div
-											className={`w-5 h-5 rounded-full flex items-center justify-center border mt-0.5 ${
-												selected
-													? "bg-primary border-primary text-white"
-													: "border-neutral/30"
-											}`}>
-											{selected && (
-												<svg
-													className="w-3 h-3"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24">
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth={3}
-														d="M5 13l4 4L19 7"
-													/>
-												</svg>
-											)}
-										</div>
-									</button>
-								);
-							})}
-						</div>
-
-						<div className="mt-6 space-y-4">
-							<div>
-								<label className="block text-xs font-semibold text-neutral mb-1">
-									Role yang kamu incar (opsional)
-								</label>
-								<input
-									type="text"
-									value={formData.targetRole}
-									onChange={(e) =>
-										setFormData({ ...formData, targetRole: e.target.value })
-									}
-									placeholder="Contoh: Tech Lead, Senior Marketing Specialist"
-									className="w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary text-sm text-neutral placeholder:text-neutral/40"
-								/>
-							</div>
-
-							<div>
-								<label className="block text-xs font-semibold text-neutral mb-1">
-									Industri yang kamu incar (opsional)
-								</label>
-								<input
-									type="text"
-									value={formData.targetIndustry}
-									onChange={(e) =>
-										setFormData({ ...formData, targetIndustry: e.target.value })
-									}
-									placeholder="Contoh: FinTech, E-Commerce"
-									className="w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary text-sm text-neutral placeholder:text-neutral/40"
-								/>
-							</div>
-							<p className="text-xs text-neutral/50">
-								Belum punya target? Nggak apa-apa. Kamu bisa mengisinya nanti.
-							</p>
-						</div>
-					</div>
-				)}
-
-				{step === 8 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							Langkah 8
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Lampirkan CV kamu? (opsional)
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Bisa membantu Jalur B membaca pengalaman kariermu lebih detail.
-							Boleh dilewati dulu, kamu bisa mengunggahnya nanti dari halaman
-							Profil.
-						</p>
-
-						<div className="mt-8">
-							{cvFile ? (
-								<div className="flex items-center gap-4 p-4 rounded-2xl border border-primary/20 bg-primary/5">
-									<div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-										<svg
-											className="w-5 h-5"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24">
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-											/>
-										</svg>
-									</div>
-									<div className="flex-1 min-w-0">
-										<p className="text-sm font-semibold text-neutral truncate">
-											{cvFile.name}
-										</p>
-										<p className="text-xs text-neutral/50">
-											{formatFileSize(cvFile.size)}
-										</p>
-									</div>
-									<button
-										type="button"
-										onClick={() => setCvFile(null)}
-										className="text-xs font-semibold text-primary hover:opacity-70">
-										Hapus
-									</button>
-								</div>
-							) : (
-								<div>
-									<input
-										id="cv-upload"
-										type="file"
-										accept=".pdf,.doc,.docx"
-										onChange={(e) => {
-											const file = e.target.files?.[0] ?? null;
-											setCvFile(file);
-											if (errorMessage) setErrorMessage("");
-										}}
-										className="sr-only"
-									/>
-									<label
-										htmlFor="cv-upload"
-										className="flex flex-col items-center justify-center w-full p-8 rounded-2xl border-2 border-dashed border-neutral/20 hover:border-primary/40 transition cursor-pointer text-center">
-										<svg
-											className="w-8 h-8 text-neutral/40 mb-3"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24">
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-											/>
-										</svg>
-										<p className="text-sm font-semibold text-neutral">
-											Klik untuk memilih file CV
-										</p>
-										<p className="text-xs text-neutral/50 mt-1">
-											PDF, DOC, atau DOCX — maksimal 5 MB
-										</p>
-									</label>
-								</div>
-							)}
-						</div>
-
-						{cvFile && (
-							<p className="text-xs text-neutral/50 mt-3">
-								CV akan dibaca setelah profil tersimpan. Hasilnya bisa kamu
-								cek di halaman Profil.
-							</p>
-						)}
-
-						<p className="text-xs text-neutral/50 mt-3">
-							Unggah CV bersifat opsional. Kamu tetap bisa melanjutkan tanpa
-							melampirkan CV.
-						</p>
-					</div>
-				)}
-
-				{step === 9 && (
-					<div>
-						<span className="text-xs font-bold text-primary tracking-wider uppercase">
-							SELESAI
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-bold mt-2 text-neutral">
-							Profil kariermu sudah siap,{" "}
-							{formData.fullName.trim()
-								? formData.fullName.split(" ")[0]
-								: ""}{" "}
-							👋
-						</h1>
-						<p className="text-sm text-neutral/60 mt-1">
-							Ini gambaran awal yang kami dapat dari jawabanmu.
-						</p>
-
-						<div className="mt-6 p-6 rounded-2xl bg-tertiary/60 border border-neutral/10 space-y-4">
-							<div>
-								<h3 className="text-lg font-bold text-neutral capitalize">
-									{formData.fullName.trim() || "Belum diisi"}
-								</h3>
-								<p className="text-xs text-neutral/60 mt-0.5">
-									{formData.role || "Belum diisi"} ·{" "}
-									{formData.industry || "Belum diisi"} ·{" "}
-									{formData.experience || "-"} pengalaman
+								<p className="text-xs text-slate-500 mt-2">
+									Dari cerita singkat ini, Jalur B akan memetakan aktivitas mana
+									yang bisa dibantu AI dan mana yang menjadi keahlian unikmu.
 								</p>
 							</div>
+						</div>
+					)}
 
-							<div>
-								<span className="text-xs text-neutral/50 block mb-1.5">Skills</span>
-								<div className="flex flex-wrap gap-2">
-									{formData.skills.map((s) => (
+					{step === 6 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Skill apa yang paling menjadi andalanmu?
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Pilih atau ketik 1 hingga 8 keahlian yang paling menggambarkan
+								nilai jualmu ({formData.skills.length}/8 terpilih).
+							</p>
+
+							<div className="mt-6 space-y-4">
+								<div className="min-h-[84px] p-3.5 rounded-xl border border-slate-200 bg-white focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 flex flex-wrap gap-2 items-center transition">
+									{formData.skills.map((skill) => (
 										<span
-											key={s}
-											className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-											{s}
+											key={skill}
+											className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-semibold">
+											{skill}
+											<button
+												type="button"
+												onClick={() => handleRemoveSkill(skill)}
+												aria-label={`Hapus ${skill}`}
+												className="hover:text-rose-700 cursor-pointer">
+												<X size={13} />
+											</button>
 										</span>
 									))}
+									<input
+										type="text"
+										value={skillInput}
+										onChange={(e) => setSkillInput(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter") {
+												e.preventDefault();
+												handleAddSkill(skillInput.trim());
+											}
+										}}
+										placeholder={
+											formData.skills.length === 0
+												? "Ketik skill lalu tekan Enter..."
+												: "Tambah skill lain lalu Enter..."
+										}
+										className="flex-1 min-w-[160px] outline-none text-sm p-1 font-medium text-slate-900 placeholder:text-slate-400"
+									/>
 								</div>
-							</div>
 
-							<div className="pt-2 border-t border-neutral/10 space-y-2 text-xs">
-								<div className="flex justify-between py-1">
-									<span className="text-neutral/50">Pekerjaan pertama</span>
-									<span className="font-semibold text-neutral">
-										{formData.isFirstJob || "-"}
-									</span>
-								</div>
-								<div className="flex justify-between py-1 border-t border-neutral/5">
-									<span className="text-neutral/50">Arah karier</span>
-									<span className="font-semibold text-neutral">
-										{formData.careerGoal || "-"}
-									</span>
-								</div>
-								<div className="flex justify-between py-1 border-t border-neutral/5">
-									<span className="text-neutral/50">Role incaran</span>
-									<span className="font-semibold text-neutral">
-										{formData.targetRole || "-"}
-									</span>
-								</div>
-								<div className="flex justify-between py-1 border-t border-neutral/5">
-									<span className="text-neutral/50">Industri incaran</span>
-									<span className="font-semibold text-neutral">
-										{formData.targetIndustry || "-"}
-									</span>
+								<div className="rounded-xl bg-slate-50 border border-slate-200 p-4">
+									<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+										<span className="text-xs font-semibold text-slate-600">
+											Rekomendasi Populer (klik untuk menambah)
+										</span>
+										<div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5">
+											<Search size={13} className="text-slate-400" />
+											<input
+												type="text"
+												value={skillFilter}
+												onChange={(e) => setSkillFilter(e.target.value)}
+												placeholder="Cari saran skill..."
+												className="text-xs outline-none bg-transparent w-36 text-slate-900 placeholder:text-slate-400"
+											/>
+										</div>
+									</div>
+
+									<div className="flex flex-wrap gap-2">
+										{visibleSkillSuggestions.length > 0 ? (
+											visibleSkillSuggestions.map((sug) => (
+												<button
+													key={sug}
+													type="button"
+													onClick={() => handleAddSkill(sug)}
+													className="min-h-[36px] px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 transition cursor-pointer">
+													+ {sug}
+												</button>
+											))
+										) : (
+											<p className="text-xs text-slate-500">
+												Ketik skill di kotak atas lalu tekan Enter untuk
+												menambahkan manual.
+											</p>
+										)}
+									</div>
 								</div>
 							</div>
 						</div>
+					)}
 
-						<p className="text-xs text-neutral/50 mt-6 leading-relaxed">
-							Jalur B akan menggunakan profil ini untuk membaca kesehatan karier,
-							risiko pekerjaan, relevansi skill, dan peluang karier alternatifmu.
-						</p>
-					</div>
-				)}
+					{step === 7 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Ke mana kamu ingin membawa kariermu 1–2 tahun ke depan,{" "}
+								{userFirst || "Teman"}?
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Pilih arah yang paling sesuai dengan kondisimu saat ini.
+							</p>
+
+							<div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+								{careerGoalOptions.map((opt) => {
+									const selected = formData.careerGoal === opt.title;
+									return (
+										<button
+											key={opt.title}
+											type="button"
+											onClick={() => {
+												setFormData({ ...formData, careerGoal: opt.title });
+												if (errorMessage) setErrorMessage("");
+											}}
+											className={`p-4 rounded-xl border text-left flex items-start gap-3.5 transition cursor-pointer ${
+												selected
+													? "border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-500/25"
+													: "border-slate-200 bg-white hover:border-indigo-200"
+											}`}>
+											<IconTile icon={opt.icon} tone={opt.tone} size="sm" />
+											<div className="flex-1 min-w-0">
+												<p className="text-sm font-bold text-slate-900">
+													{opt.title}
+												</p>
+												<p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+													{opt.desc}
+												</p>
+											</div>
+											{selected && (
+												<span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+													<Check size={12} strokeWidth={3} />
+												</span>
+											)}
+										</button>
+									);
+								})}
+							</div>
+
+							<div className="mt-6 pt-5 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div>
+									<label className="block text-xs font-semibold text-slate-600 mb-1.5">
+										Role yang kamu incar (opsional)
+									</label>
+									<input
+										type="text"
+										value={formData.targetRole}
+										onChange={(e) =>
+											setFormData({ ...formData, targetRole: e.target.value })
+										}
+										placeholder="Contoh: Tech Lead, Product Manager"
+										className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 text-sm text-slate-900 placeholder:text-slate-400"
+									/>
+								</div>
+
+								<div>
+									<label className="block text-xs font-semibold text-slate-600 mb-1.5">
+										Industri incaran (opsional)
+									</label>
+									<input
+										type="text"
+										value={formData.targetIndustry}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												targetIndustry: e.target.value,
+											})
+										}
+										placeholder="Contoh: FinTech, EduTech"
+										className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 text-sm text-slate-900 placeholder:text-slate-400"
+									/>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{step === 8 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Ingin melampirkan CV sekalian? (Opsional)
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								CV membantu Jalur B mengekstrak riwayat pengalaman kerjamu secara
+								otomatis. Kamu juga bebas melewati langkah ini dan mengunggahnya
+								nanti di halaman Profil.
+							</p>
+
+							<div className="mt-7">
+								{cvFile ? (
+									<div className="flex items-center gap-4 p-4 rounded-xl border border-indigo-200 bg-indigo-50/50">
+										<IconTile icon={FileText} tone="indigo" size="md" />
+										<div className="flex-1 min-w-0">
+											<p className="text-sm font-bold text-slate-900 truncate">
+												{cvFile.name}
+											</p>
+											<p className="text-xs text-slate-600">
+												{formatFileSize(cvFile.size)} · Siap diproses
+											</p>
+										</div>
+										<button
+											type="button"
+											onClick={() => setCvFile(null)}
+											className="text-xs font-semibold text-rose-700 hover:underline cursor-pointer">
+											Hapus
+										</button>
+									</div>
+								) : (
+									<div>
+										<input
+											id="cv-upload"
+											type="file"
+											accept=".pdf,.doc,.docx"
+											onChange={(e) => {
+												const file = e.target.files?.[0] ?? null;
+												setCvFile(file);
+												if (errorMessage) setErrorMessage("");
+											}}
+											className="sr-only"
+										/>
+										<label
+											htmlFor="cv-upload"
+											className="flex flex-col items-center justify-center w-full p-8 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/70 hover:border-indigo-400 hover:bg-indigo-50/40 transition cursor-pointer text-center">
+											<IconTile
+												icon={FileText}
+												tone="indigo"
+												size="md"
+												className="mb-3"
+											/>
+											<p className="text-sm font-bold text-slate-900">
+												Klik untuk memilih berkas CV
+											</p>
+											<p className="text-xs text-slate-500 mt-1">
+												Format PDF, DOC, atau DOCX — maksimal 5 MB
+											</p>
+										</label>
+									</div>
+								)}
+							</div>
+						</div>
+					)}
+
+					{step === 9 && (
+						<div>
+							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+								Profil kariermu sudah siap, {userFirst || "Teman"}.
+							</h1>
+							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
+								Ini ringkasan profil awal yang akan digunakan Jalur B untuk
+								memetakan ketahanan karier dan finansialmu.
+							</p>
+
+							<div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+								<div className="flex items-center justify-between gap-3">
+									<div>
+										<h3 className="text-lg font-bold text-slate-900">
+											{capitalizeName(formData.fullName) || "Belum diisi"}
+										</h3>
+										<p className="text-xs font-medium text-indigo-700 mt-0.5">
+											{formData.role || "Belum diisi"} ·{" "}
+											{formData.industry || "Belum diisi"} ·{" "}
+											{formData.experience || "-"}
+										</p>
+									</div>
+									<span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+										Siap Dianalisis
+									</span>
+								</div>
+
+								<div>
+									<span className="text-xs font-semibold text-slate-500 block mb-2">
+										Keahlian Utama ({formData.skills.length})
+									</span>
+									<div className="flex flex-wrap gap-2">
+										{formData.skills.map((s) => (
+											<span
+												key={s}
+												className="px-3 py-1 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs font-medium">
+												{s}
+											</span>
+										))}
+									</div>
+								</div>
+
+								<div className="pt-3 border-t border-slate-200 grid grid-cols-2 gap-3 text-xs">
+									<div>
+										<span className="text-slate-500 block">
+											Pekerjaan pertama
+										</span>
+										<span className="font-semibold text-slate-900">
+											{formData.isFirstJob || "—"}
+										</span>
+									</div>
+									<div>
+										<span className="text-slate-500 block">Arah karier</span>
+										<span className="font-semibold text-slate-900">
+											{formData.careerGoal || "—"}
+										</span>
+									</div>
+									<div>
+										<span className="text-slate-500 block">Role incaran</span>
+										<span className="font-semibold text-slate-900">
+											{formData.targetRole || "Otomatis"}
+										</span>
+									</div>
+									<div>
+										<span className="text-slate-500 block">
+											Industri incaran
+										</span>
+										<span className="font-semibold text-slate-900">
+											{formData.targetIndustry || "Otomatis"}
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
+				</PageTransition>
 
 				{errorMessage && (
-					<p className="text-xs text-red-500 font-medium mt-4">{errorMessage}</p>
+					<p className="text-xs text-rose-700 font-semibold mt-4">
+						{errorMessage}
+					</p>
 				)}
 
-				<div className="mt-8 pt-6 border-t border-neutral/10 flex items-center justify-between">
+				<div className="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between">
 					{step > 1 ? (
 						<button
 							type="button"
 							onClick={handleBack}
-							className="flex items-center gap-2 text-sm font-medium text-neutral/70 hover:text-neutral transition cursor-pointer">
-							<svg
-								className="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24">
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M15 19l-7-7 7-7"
-								/>
-							</svg>
+							className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer">
+							<ArrowLeft size={15} />
 							Kembali
 						</button>
 					) : (
@@ -975,54 +1096,32 @@ export default function Onboarding() {
 							type="button"
 							onClick={handleNext}
 							disabled={!isStepValid()}
-							className={`px-6 py-2.5 text-sm font-medium rounded-full transition flex items-center gap-2 shadow-sm ${
+							className={`min-h-[44px] px-6 py-2.5 text-sm font-semibold rounded-xl transition inline-flex items-center gap-2 ${
 								isStepValid()
-									? "bg-primary text-white hover:opacity-90 cursor-pointer"
-									: "bg-neutral/20 text-neutral/40 cursor-not-allowed"
+									? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs cursor-pointer"
+									: "bg-slate-200 text-slate-400 cursor-not-allowed"
 							}`}>
-							Lanjut
-							<svg
-								className="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24">
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M9 5l7 7-7 7"
-								/>
-							</svg>
+							<span>{step === 8 && !cvFile ? "Lewati & Lanjut" : "Lanjut"}</span>
+							<ArrowRight size={15} />
 						</button>
 					) : (
 						<button
 							type="button"
-							onClick={() => handleFinish()}
+							onClick={() => void handleFinish()}
 							disabled={isSubmitting}
-							className={`px-6 py-2.5 text-white text-sm font-medium rounded-full transition flex items-center gap-2 shadow-sm ${
+							className={`min-h-[44px] px-6 py-2.5 text-white text-sm font-semibold rounded-xl transition inline-flex items-center gap-2 ${
 								isSubmitting
-									? "bg-primary/70 cursor-not-allowed"
-									: "bg-primary hover:opacity-90 cursor-pointer"
+									? "bg-indigo-400 cursor-not-allowed"
+									: "bg-indigo-600 hover:bg-indigo-700 shadow-xs cursor-pointer"
 							}`}>
-							{isSubmitting ? "Menyimpan..." : "Lihat Dashboard"}
-							{isSubmitting ? null : (
-								<svg
-									className="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24">
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M9 5l7 7-7 7"
-									/>
-								</svg>
-							)}
+							<span>
+								{isSubmitting ? "Menyimpan Profil..." : "Masuk ke Dashboard"}
+							</span>
+							{!isSubmitting && <ArrowRight size={16} />}
 						</button>
 					)}
 				</div>
-			</div>
+			</Card>
 		</div>
 	);
 }

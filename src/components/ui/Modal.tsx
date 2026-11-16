@@ -42,19 +42,19 @@ export default function Modal({
 					className="absolute inset-0 bg-slate-950/45 backdrop-blur-xs"
 					onClick={onClose}
 				/>
-				<div className="relative z-10 w-full max-w-lg bg-white h-full shadow-2xl border-l border-slate-200/70 flex flex-col overflow-hidden">
+				<div className="relative z-10 w-full max-w-lg bg-white h-full shadow-2xl border-l border-slate-200 flex flex-col overflow-hidden">
 					<div className="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-100 shrink-0">
 						<div>
-							<h3 className="text-lg font-bold text-neutral">{title}</h3>
+							<h3 className="text-lg font-bold text-slate-900">{title}</h3>
 							{subtitle && (
-								<p className="text-sm text-neutral/60 mt-0.5">{subtitle}</p>
+								<p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>
 							)}
 						</div>
 						<button
 							type="button"
 							onClick={onClose}
 							aria-label="Tutup dialog"
-							className="p-2 rounded-xl text-neutral/50 hover:text-neutral hover:bg-slate-100 transition cursor-pointer">
+							className="min-w-[40px] min-h-[40px] p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer flex items-center justify-center">
 							<X size={18} />
 						</button>
 					</div>
@@ -75,19 +75,19 @@ export default function Modal({
 				onClick={onClose}
 			/>
 			<div
-				className={`relative bg-white rounded-3xl shadow-2xl border border-white/80 w-full ${maxWidth} max-h-[90vh] flex flex-col overflow-hidden`}>
+				className={`relative bg-white rounded-2xl shadow-xl border border-slate-200 w-full ${maxWidth} max-h-[90vh] flex flex-col overflow-hidden`}>
 				<div className="flex items-start justify-between gap-3 px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
 					<div>
-						<h3 className="text-lg font-bold text-neutral">{title}</h3>
+						<h3 className="text-lg font-bold text-slate-900">{title}</h3>
 						{subtitle && (
-							<p className="text-sm text-neutral/60 mt-0.5">{subtitle}</p>
+							<p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>
 						)}
 					</div>
 					<button
 						type="button"
 						onClick={onClose}
 						aria-label="Tutup dialog"
-						className="p-2 rounded-xl text-neutral/50 hover:text-neutral hover:bg-slate-100 transition cursor-pointer">
+						className="min-w-[40px] min-h-[40px] p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer flex items-center justify-center">
 						<X size={18} />
 					</button>
 				</div>

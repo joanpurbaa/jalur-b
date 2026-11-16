@@ -30,7 +30,6 @@ export default function BerandaView() {
 					}
 					return;
 				}
-				// Fallback ke data onboarding bila full_name di dashboard belum terisi
 				const ob = await onboardingApi.get().catch(() => null);
 				if (!active) return;
 				if (ob?.profile?.full_name) {
@@ -54,9 +53,9 @@ export default function BerandaView() {
 	return (
 		<div>
 			<PageHeader
-				eyebrow={roleSummary ?? "Beranda · Command Center"}
+				eyebrow={roleSummary ?? undefined}
 				title={`${greeting}, ${displayName}`}
-				subtitle="Tarik napas dulu. Ini peta kondisi karier dan satu langkah paling tenang yang bisa kamu ambil hari ini."
+				subtitle="Ringkasan kondisi karier, finansial, dan langkah berikutnya minggu ini."
 			/>
 			<CareerHealthCard />
 			<CareerSnapshotGrid />

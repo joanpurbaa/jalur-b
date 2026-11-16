@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Flag, Sparkles } from "lucide-react";
+import { ArrowRight, Compass, Wrench } from "lucide-react";
 import SkillPill from "../ui/SkillPill";
 import ScoreRing from "../ui/ScoreRing";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
-import StatusBadge from "../ui/StatusBadge";
-import { getScoreStatus } from "../../lib/status";
+import { PrimaryButton } from "../ui/PrimaryButton";
 
 interface RoleDetailPanelProps {
 	roleName: string;
@@ -18,82 +17,66 @@ export default function RoleDetailPanel({
 	matchScore,
 	missingSkills,
 }: RoleDetailPanelProps) {
-	const status = getScoreStatus(matchScore);
-
 	return (
-		<Card
-			padding="lg"
-			className="mb-5 bg-gradient-to-br from-white via-emerald-50/35 to-teal-50/30">
-			<div className="flex items-start justify-between gap-3 mb-4">
-				<div className="flex items-center gap-2.5 min-w-0">
-					<IconTile icon={Sparkles} tone="jalur-karier" size="sm" />
-					<div className="min-w-0">
-						<span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-							Detail Target Peran
-						</span>
-						<h3 className="text-base sm:text-lg font-extrabold text-neutral leading-snug">
-							{roleName}
-						</h3>
-					</div>
+		<Card padding="lg" className="mb-5">
+			<div className="flex items-start gap-3 mb-4">
+				<IconTile icon={Compass} tone="indigo" size="sm" />
+				<div className="min-w-0">
+					<span className="text-xs font-medium text-indigo-700">
+						Target Peran Terpilih
+					</span>
+					<h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+						{roleName}
+					</h3>
 				</div>
-				<StatusBadge
-					variant={status}
-					label={
-						matchScore >= 75
-							? "Sangat Cocok"
-							: matchScore >= 60
-								? "Potensial"
-								: "Perlu Jembatan"
-					}
-					size="sm"
-				/>
 			</div>
 
-			<div className="flex items-center gap-4 py-3 px-4 rounded-2xl bg-white/80 border border-emerald-100 mb-5">
+			<div className="flex items-center gap-4 py-3.5 px-4 rounded-xl bg-slate-50 border border-slate-200/80 mb-5">
 				<ScoreRing
 					value={matchScore}
 					max={100}
-					size={88}
-					stroke={9}
-					colors={["#10b981", "#14b8a6"]}
+					size={84}
+					stroke={8}
+					status="insight"
 					suffix="%"
 					label={`Kecocokan ${roleName}`}
 				/>
 				<div>
-					<p className="text-xs font-bold uppercase tracking-wider text-neutral/50">
+					<p className="text-xs font-semibold text-slate-500">
 						Kecocokan Profil
 					</p>
-					<p className="text-sm text-neutral/75 mt-1 leading-relaxed">
+					<p className="text-sm text-slate-700 mt-1 leading-relaxed">
 						{matchScore >= 75
 							? "Sebagian besar keahlian intinya sudah kamu miliki."
-							: "Kamu sudah punya modal dasar, tinggal menutup beberapa gap skill."}
+							: "Kamu punya fondasi awal, tinggal melengkapi skill jembatan."}
 					</p>
 				</div>
 			</div>
 
 			<div className="border-t border-slate-100 pt-4">
-				<div className="flex items-center gap-2 text-xs font-extrabold text-neutral mb-3">
-					<Flag size={14} className="text-amber-600" />
-					<span>Skill jembatan yang perlu dikembangkan ({missingSkills.length})</span>
+				<div className="flex items-center gap-2 text-xs font-semibold text-slate-700 mb-3">
+					<Wrench size={14} className="text-slate-500" />
+					<span>Skill jembatan yang perlu dipelajari ({missingSkills.length})</span>
 				</div>
 				{missingSkills.length > 0 ? (
 					<div className="flex flex-wrap gap-2">
 						{missingSkills.map((skill) => (
-							<SkillPill key={skill} label={skill} tone="improve" />
+							<SkillPill key={skill} label={skill} tone="neutral" />
 						))}
 					</div>
 				) : (
-					<p className="text-xs text-emerald-700 font-semibold">
-						Tidak ada gap skill mayor yang terdeteksi!
+					<p className="text-xs text-slate-600">
+						Tidak ada gap skill mayor yang terdeteksi.
 					</p>
 				)}
 
-				<Link
-					to="/dashboard/bukti-karier"
-					className="press mt-4 inline-flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/80 text-xs font-bold text-emerald-900">
-					<span>Bangun portofolio untuk peran ini</span>
-					<ArrowRight size={14} />
-				</Link>
+				<div className="mt-5">
+					<Link to="/dashboard/bukti-karier">
+						<PrimaryButton fullWidth size="sm" icon={<ArrowRight size={14} />}>
+							Bangun Bukti untuk Peran Ini
+						</PrimaryButton>
+					</Link>
+				</div>
 			</div>
 		</Card>
 	);

@@ -23,27 +23,21 @@ export default function RiskDimensionCard({
 }: RiskDimensionCardProps) {
 	const variant = getLevelStatus(level);
 	const activeCount = level === "Rendah" ? 1 : level === "Sedang" ? 2 : 3;
-	const tone =
-		variant === "healthy"
-			? "safe"
-			: variant === "warning"
-				? "caution"
-				: "danger";
 
 	const activeBarClass =
 		variant === "healthy"
-			? "bg-emerald-500 shadow-[0_2px_8px_rgba(16,185,129,0.45)]"
+			? "bg-emerald-500"
 			: variant === "warning"
-				? "bg-amber-500 shadow-[0_2px_8px_rgba(245,158,11,0.45)]"
-				: "bg-rose-500 shadow-[0_2px_8px_rgba(244,63,94,0.45)]";
+				? "bg-amber-500"
+				: "bg-rose-500";
 
 	return (
 		<Card lift padding="md" className="flex flex-col justify-between h-full">
 			<div>
 				<div className="flex items-start justify-between gap-3 mb-4">
-					<div className="flex items-center gap-3 min-w-0">
-						<IconTile icon={Icon} tone={tone} size="sm" />
-						<h4 className="text-sm sm:text-base font-extrabold text-neutral leading-snug">
+					<div className="flex items-start gap-3 min-w-0">
+						<IconTile icon={Icon} tone="neutral" size="sm" />
+						<h4 className="text-sm sm:text-base font-semibold text-slate-900 leading-snug">
 							{title}
 						</h4>
 					</div>
@@ -54,7 +48,7 @@ export default function RiskDimensionCard({
 					/>
 				</div>
 
-				{/* Meter 3 level berwarna */}
+				{/* Meter 3 level dengan status muted */}
 				<div
 					role="meter"
 					aria-label={`Tingkat risiko ${title}: ${level}`}
@@ -68,13 +62,13 @@ export default function RiskDimensionCard({
 							return (
 								<div key={lvl} className="space-y-1">
 									<div
-										className={`h-2.5 rounded-full transition-all ${
-											filled ? activeBarClass : "bg-slate-900/[0.07]"
+										className={`h-2 rounded-full transition-colors ${
+											filled ? activeBarClass : "bg-slate-200/80"
 										}`}
 									/>
 									<span
-										className={`block text-[10px] font-bold text-center ${
-											lvl === level ? "text-neutral" : "text-neutral/40"
+										className={`block text-[11px] font-medium text-center ${
+											lvl === level ? "text-slate-900 font-semibold" : "text-slate-400"
 										}`}>
 										{lvl}
 									</span>
@@ -85,7 +79,7 @@ export default function RiskDimensionCard({
 				</div>
 			</div>
 
-			<p className="text-xs sm:text-sm text-neutral/70 leading-relaxed pt-2 border-t border-slate-100">
+			<p className="text-sm text-slate-600 leading-relaxed pt-3 border-t border-slate-100">
 				{description}
 			</p>
 		</Card>

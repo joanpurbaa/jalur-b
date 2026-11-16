@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GitFork, ShieldAlert, Sparkles, Wallet } from "lucide-react";
+import { GitFork, ShieldAlert, Cpu, Wallet } from "lucide-react";
 import StatCard from "../ui/StatCard";
 import { SkeletonStatCard } from "../ui/Skeleton";
 import { Stagger, StaggerItem, CountUp } from "../ui/Motion";
@@ -13,7 +13,6 @@ import { formatMonths } from "../../lib/format";
 import {
 	getLevelStatus,
 	getRunwayStatus,
-	getScoreStatus,
 	normalizeRiskLevel,
 	type RiskLevel,
 	type StatusVariant,
@@ -90,7 +89,6 @@ export default function CareerSnapshotGrid() {
 				);
 			}
 
-			// Utamakan sumber finansial langsung bila ada, fallback ke ringkasan dashboard
 			if (finResult.status === "fulfilled" && finResult.value.runway) {
 				const parsed = parseRunwayMonths(finResult.value.runway);
 				next.runwayMonths = parsed.current;
@@ -115,12 +113,10 @@ export default function CareerSnapshotGrid() {
 
 	if (loading) {
 		return (
-			<section className="mb-8" aria-label="Career Snapshot">
-				<div className="flex items-center justify-between mb-3.5">
-					<h2 className="text-base font-extrabold text-neutral">
-						Ringkasan 4 Pilar
-					</h2>
-				</div>
+			<section className="mb-8" aria-label="Ringkasan Kondisi Karier">
+				<h2 className="text-base font-bold text-slate-900 mb-3.5">
+					Ringkasan 4 Pilar
+				</h2>
 				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 					{[0, 1, 2, 3].map((i) => (
 						<SkeletonStatCard key={i} />
@@ -135,18 +131,6 @@ export default function CareerSnapshotGrid() {
 		: "neutral";
 	const riskSeg: 1 | 2 | 3 =
 		data.riskLevel === "Rendah" ? 1 : data.riskLevel === "Sedang" ? 2 : 3;
-
-	const skillStatus: StatusVariant =
-		data.skillProgress != null ? getScoreStatus(data.skillProgress) : "neutral";
-
-	const pivotStatus: StatusVariant =
-		data.pivotMatch == null
-			? "neutral"
-			: data.pivotMatch >= 70
-				? "healthy"
-				: data.pivotMatch >= 45
-					? "warning"
-					: "risk";
 
 	const runwayStatus: StatusVariant =
 		data.runwayMonths == null
@@ -164,14 +148,14 @@ export default function CareerSnapshotGrid() {
 			: null;
 
 	return (
-		<section className="mb-8" aria-label="Ringkasan 4 Pilar Karier">
+		<section className="mb-8" aria-label="Ringkasan Kondisi Karier">
 			<div className="flex items-center justify-between mb-3.5">
 				<div>
-					<h2 className="text-base sm:text-lg font-extrabold text-neutral">
-						Peta Kondisi Saat Ini
+					<h2 className="text-base font-bold text-slate-900">
+						Ringkasan 4 Pilar
 					</h2>
-					<p className="text-xs sm:text-sm text-neutral/60">
-						Ketuk kartu untuk mendalami tiap modul
+					<p className="text-xs text-slate-500">
+						Pilih kartu untuk melihat faktor dan rincian tiap area
 					</p>
 				</div>
 			</div>
@@ -191,9 +175,8 @@ export default function CareerSnapshotGrid() {
 										: "Lengkapi penilaian karier"
 						}
 						icon={ShieldAlert}
-						tone="risiko-karier"
+						tone="neutral"
 						status={riskStatus}
-						statusLabel={data.riskLevel ?? "Belum dinilai"}
 						segments={
 							data.riskLevel
 								? { active: riskSeg, status: riskStatus }
@@ -215,10 +198,10 @@ export default function CareerSnapshotGrid() {
 								"—"
 							)
 						}
-						subtitle="Daya tahan skill di era AI"
-						icon={Sparkles}
-						tone="skill"
-						status={skillStatus}
+						subtitle="Kesesuaian skill terhadap kebutuhan pasar"
+						icon={Cpu}
+						tone="indigo"
+						status="insight"
 						progress={data.skillProgress}
 						href="/dashboard/skill"
 					/>
@@ -242,8 +225,8 @@ export default function CareerSnapshotGrid() {
 								: "Alternatif jalur karier"
 						}
 						icon={GitFork}
-						tone="jalur-karier"
-						status={pivotStatus}
+						tone="indigo"
+						status="insight"
 						progress={data.pivotMatch}
 						href="/dashboard/jalur-karier"
 					/>
@@ -259,22 +242,23 @@ export default function CareerSnapshotGrid() {
 						}
 						subtitle={
 							data.runwayMonths != null
-								? `Target aman ${formatMonths(data.targetRunwayMonths)}`
+								? `Target minimum ${formatMonths(data.targetRunwayMonths)}`
 								: "Atur parameter finansial"
 						}
 						icon={Wallet}
-						tone="finansial"
+						tone="neutral"
 						status={runwayStatus}
 						statusLabel={
 							data.runwayMonths == null
-								? "Belum diisi"
+								? undefined
 								: runwayStatus === "healthy"
 									? "Di atas target"
 									: runwayStatus === "warning"
 										? "Mendekati target"
-										: "Area ditingkatkan"
+										: "Di bawah target"
 						}
 						progress={runwayProgress}
+						progressUseStatusColor
 						href="/dashboard/finansial"
 					/>
 				</StaggerItem>

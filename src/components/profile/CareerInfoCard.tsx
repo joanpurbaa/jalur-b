@@ -5,6 +5,7 @@ import Skeleton from "../ui/Skeleton";
 import { careerRiskApi } from "../../services/careerRisk";
 import { aiExposureApi } from "../../services/aiExposure";
 import { parseDecimal } from "../../lib/parseNumeric";
+import { localizeLevelLabel } from "../../lib/status";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
 import type { OnboardingProfile } from "../../types/onboarding";
 
@@ -16,10 +17,10 @@ interface CareerInfoCardProps {
 
 function tenureFromMonths(months: number | null): string | null {
 	if (months === null || months === undefined) return null;
-	if (months < 12) return `${months} bulan`;
+	if (months < 12) return `${months} bln`;
 	const years = Math.floor(months / 12);
 	const rem = months % 12;
-	return rem > 0 ? `${years} tahun ${rem} bulan` : `${years} tahun`;
+	return rem > 0 ? `${years} thn ${rem} bln` : `${years} thn`;
 }
 
 interface CareerStats {
@@ -46,7 +47,9 @@ export default function CareerInfoCard({
 			]);
 			if (!active) return;
 			const riskLevel =
-				risk.status === "fulfilled" ? risk.value.level : null;
+				risk.status === "fulfilled"
+					? localizeLevelLabel(risk.value.level)
+					: null;
 			const score =
 				exposure.status === "fulfilled"
 					? Math.min(100, Math.round(parseDecimal(exposure.value.score)))
@@ -71,8 +74,8 @@ export default function CareerInfoCard({
 		};
 	}, [refreshKey]);
 
-	const role = profile?.current_role_name || "-";
-	const tenure = tenureFromMonths(profile?.work_duration_months ?? null) || "-";
+	const role = profile?.current_role_name || "—";
+	const tenure = tenureFromMonths(profile?.work_duration_months ?? null) || "—";
 
 	if (loading || statsLoading) {
 		return (
@@ -85,7 +88,7 @@ export default function CareerInfoCard({
 						</div>
 					))}
 				</div>
-				<Skeleton className="h-10 w-44 rounded-full" />
+				<Skeleton className="h-10 w-44 rounded-xl" />
 			</div>
 		);
 	}
@@ -95,14 +98,16 @@ export default function CareerInfoCard({
 			<div className="grid grid-cols-2 gap-y-5 gap-x-6 mb-6">
 				<InfoStat label="Jabatan" value={role} />
 				<InfoStat label="Lama Bekerja" value={tenure} />
-				<InfoStat label="Career Risk" value={stats?.careerRisk ?? "-"} />
-				<InfoStat label="AI Exposure" value={stats?.aiExposure ?? "-"} />
+				<InfoStat label="Risiko Karier" value={stats?.careerRisk ?? "—"} />
+				<InfoStat label="Paparan AI" value={stats?.aiExposure ?? "—"} />
 				<InfoStat
-					label="Skill Relevance"
-					value={stats?.skillRelevance ?? "-"}
+					label="Relevansi Skill"
+					value={stats?.skillRelevance ?? "—"}
 				/>
 			</div>
-			<SecondaryButton onClick={onEdit}>Edit Data Karier</SecondaryButton>
+			<SecondaryButton size="sm" onClick={onEdit}>
+				Edit Data Karier
+			</SecondaryButton>
 		</div>
 	);
 }

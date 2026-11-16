@@ -16,8 +16,13 @@ import {
 	ArrowLeft,
 	PlaySquare,
 } from "lucide-react";
-import { getScoreStatus, normalizeRiskLevel } from "../../../lib/status";
-import { formatDecimal1 } from "../../../lib/format";
+import {
+	getHealthStatus,
+	getLevelStatus,
+	localizeLevelLabel,
+	normalizeRiskLevel,
+} from "../../../lib/status";
+import { formatMonths } from "../../../lib/format";
 import StatusBadge from "../../ui/StatusBadge";
 import InfoStat from "../../ui/InfoStat";
 import Card from "../../ui/Card";
@@ -70,9 +75,9 @@ function clampPercent(value: string): number {
 function formatTenure(months: number): string {
 	const years = Math.floor(months / 12);
 	const rest = months % 12;
-	if (years > 0 && rest > 0) return `${years} tahun ${rest} bulan`;
-	if (years > 0) return `${years} tahun`;
-	if (rest > 0) return `${rest} bulan`;
+	if (years > 0 && rest > 0) return `${years} thn ${rest} bln`;
+	if (years > 0) return `${years} thn`;
+	if (rest > 0) return `${rest} bln`;
 	return "";
 }
 
@@ -218,7 +223,13 @@ export default function SimulationSetup({
 		};
 	}, []);
 
-	const healthVariant = getScoreStatus(conditions.careerHealth ?? 0);
+	const healthVariant = getHealthStatus(
+		conditions.careerHealthStatus,
+		conditions.careerHealth ?? undefined,
+	);
+	const riskVariant = conditions.careerRisk
+		? getLevelStatus(normalizeRiskLevel(conditions.careerRisk))
+		: "neutral";
 
 	const updateConfig = <K extends keyof LayoffSimulationRequest>(
 		key: K,
@@ -288,14 +299,14 @@ export default function SimulationSetup({
 			{/* Ringkasan Kondisi Awal (Karier & Finansial) */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 				<Card padding="md">
-					<div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100">
-						<IconTile icon={Briefcase} tone="beranda" size="sm" />
+					<div className="flex items-center gap-3 pb-3.5 mb-4 border-b border-slate-100">
+						<IconTile icon={Briefcase} tone="neutral" size="sm" />
 						<div>
-							<h3 className="text-sm font-extrabold text-neutral">
+							<h3 className="text-sm font-bold text-slate-900">
 								Data Dasar Karier
 							</h3>
-							<p className="text-xs text-neutral/55">
-								Diambil otomatis dari profil & penilaianmu
+							<p className="text-xs text-slate-500">
+								Diambil otomatis dari profil dan penilaianmu
 							</p>
 						</div>
 					</div>
@@ -313,7 +324,7 @@ export default function SimulationSetup({
 								conditions.careerHealth != null &&
 								conditions.careerHealthStatus ? (
 									<StatusBadge
-										label={conditions.careerHealthStatus}
+										label={localizeLevelLabel(conditions.careerHealthStatus)}
 										variant={healthVariant}
 										size="sm"
 									/>
@@ -323,9 +334,18 @@ export default function SimulationSetup({
 						<InfoStat
 							label="Career Risk"
 							value={conditions.careerRisk ?? "—"}
+							badge={
+								conditions.careerRisk ? (
+									<StatusBadge
+										label={conditions.careerRisk}
+										variant={riskVariant}
+										size="sm"
+									/>
+								) : undefined
+							}
 						/>
 						<InfoStat
-							label="AI Exposure"
+							label="Paparan AI"
 							value={
 								conditions.aiExposure != null
 									? `${conditions.aiExposure}%`
@@ -333,7 +353,7 @@ export default function SimulationSetup({
 							}
 						/>
 						<InfoStat
-							label="Skill Relevance"
+							label="Relevansi Skill"
 							value={
 								conditions.skillRelevance != null
 									? `${conditions.skillRelevance}%`
@@ -344,13 +364,13 @@ export default function SimulationSetup({
 				</Card>
 
 				<Card padding="md">
-					<div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100">
-						<IconTile icon={Landmark} tone="finansial" size="sm" />
+					<div className="flex items-center gap-3 pb-3.5 mb-4 border-b border-slate-100">
+						<IconTile icon={Landmark} tone="neutral" size="sm" />
 						<div>
-							<h3 className="text-sm font-extrabold text-neutral">
+							<h3 className="text-sm font-bold text-slate-900">
 								Data Dasar Finansial
 							</h3>
-							<p className="text-xs text-neutral/55">
+							<p className="text-xs text-slate-500">
 								Basis perhitungan dana cadangan & pengeluaran
 							</p>
 						</div>
@@ -385,18 +405,18 @@ export default function SimulationSetup({
 							}
 						/>
 					</div>
-					<div className="rounded-2xl bg-emerald-50/70 border border-emerald-200/80 px-4 py-3 flex items-center justify-between">
+					<div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 flex items-center justify-between">
 						<div>
-							<p className="text-[11px] font-bold text-emerald-900 uppercase tracking-wide">
+							<p className="text-xs font-semibold text-slate-700">
 								Runway Tanpa Pesangon
 							</p>
-							<p className="text-xs text-neutral/60">
+							<p className="text-xs text-slate-500">
 								Sebelum komponen kompensasi PHK
 							</p>
 						</div>
-						<p className="num-display text-xl text-emerald-700">
+						<p className="num-display text-xl text-indigo-700">
 							{conditions.runwayMonths != null
-								? `${formatDecimal1(conditions.runwayMonths)} bln`
+								? formatMonths(conditions.runwayMonths)
 								: "—"}
 						</p>
 					</div>
@@ -417,30 +437,30 @@ export default function SimulationSetup({
 										key={s.id}
 										type="button"
 										onClick={() => setWizardStep(s.id)}
-										className={`press rounded-2xl p-3 text-left transition border cursor-pointer flex items-center gap-2.5 ${
+										className={`press rounded-xl p-3 text-left transition border cursor-pointer flex items-center gap-2.5 ${
 											active
-												? "bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white border-transparent shadow-md"
+												? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
 												: done
-													? "bg-emerald-50/80 border-emerald-200 text-emerald-950"
-													: "bg-slate-50/80 border-slate-200/80 text-neutral/70 hover:bg-white"
+													? "bg-indigo-50/70 border-indigo-200 text-indigo-900"
+													: "bg-slate-50 border-slate-200 text-slate-600 hover:bg-white"
 										}`}>
 										<span
-											className={`inline-flex items-center justify-center w-7 h-7 rounded-xl text-xs font-extrabold shrink-0 ${
+											className={`inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold shrink-0 ${
 												active
 													? "bg-white/20 text-white"
 													: done
-														? "bg-emerald-600 text-white"
+														? "bg-indigo-600 text-white"
 														: "bg-slate-200 text-slate-700"
 											}`}>
 											{done ? "✓" : s.id}
 										</span>
 										<div className="min-w-0">
-											<p className="text-xs font-extrabold truncate">
+											<p className="text-xs font-semibold truncate">
 												{s.title}
 											</p>
 											<p
-												className={`text-[10px] truncate hidden sm:block ${
-													active ? "text-indigo-100" : "text-neutral/55"
+												className={`text-[11px] truncate hidden sm:block ${
+													active ? "text-indigo-100" : "text-slate-500"
 												}`}>
 												{s.sub}
 											</p>
@@ -455,32 +475,32 @@ export default function SimulationSetup({
 					{wizardStep === 1 && (
 						<Card padding="lg" className="space-y-6">
 							<div>
-								<span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600">
+								<span className="text-xs font-semibold text-indigo-700">
 									Langkah 1 dari 3
 								</span>
-								<h3 className="text-lg sm:text-xl font-extrabold text-neutral mt-0.5">
+								<h3 className="text-lg font-bold text-slate-900 mt-0.5">
 									Pilih Skenario PHK & Ketentuan Kerja
 								</h3>
-								<p className="text-xs sm:text-sm text-neutral/65 mt-1">
+								<p className="text-sm text-slate-600 mt-1">
 									Jenis berhentinya hubungan kerja menentukan rumus uang pesangon,
 									penghargaan masa kerja, dan kompensasi menurut PP 35/2021.
 								</p>
 							</div>
 
 							{/* Ketentuan Kerja / Employment Terms */}
-							<div className="rounded-2xl bg-slate-50/90 p-4 sm:p-5 border border-slate-200/90 space-y-4">
+							<div className="rounded-xl bg-slate-50/80 p-4 sm:p-5 border border-slate-200 space-y-4">
 								<div className="flex items-center justify-between gap-2">
 									<div className="flex items-center gap-2.5">
 										<IconTile icon={DollarSign} tone="indigo" size="xs" />
-										<h4 className="text-sm font-extrabold text-neutral">
-											Data Ketentuan Kerja (Employment Terms)
+										<h4 className="text-sm font-bold text-slate-900">
+											Ketentuan Kerja (Employment Terms)
 										</h4>
 									</div>
 									{terms && !showTermsEditor && (
 										<button
 											type="button"
 											onClick={() => setShowTermsEditor(true)}
-											className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:underline cursor-pointer">
+											className="text-xs font-semibold text-indigo-700 flex items-center gap-1 hover:underline cursor-pointer">
 											<Edit2 size={13} />
 											Ubah
 										</button>
@@ -488,48 +508,48 @@ export default function SimulationSetup({
 								</div>
 
 								{termsLoading ? (
-									<p className="text-xs text-neutral/50">
+									<p className="text-xs text-slate-500">
 										Memuat data ketentuan kerja…
 									</p>
 								) : terms && !showTermsEditor ? (
-									<div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-neutral/75 pt-1">
+									<div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-600 pt-1">
 										<div>
-											<span className="text-neutral/50">Gaji Pokok: </span>
-											<span className="font-extrabold text-neutral">
+											<span className="text-slate-500">Gaji Pokok: </span>
+											<span className="font-bold text-slate-900">
 												{formatRupiah(terms.monthly_wage_base)}/bln
 											</span>
 										</div>
 										<div>
-											<span className="text-neutral/50">Status: </span>
-											<span className="font-bold text-neutral uppercase">
+											<span className="text-slate-500">Status: </span>
+											<span className="font-semibold text-slate-900 uppercase">
 												{terms.employment_type === "pkwtt"
 													? "Tetap (PKWTT)"
 													: "Kontrak (PKWT)"}
 											</span>
 										</div>
 										<div>
-											<span className="text-neutral/50">Masa Kerja: </span>
-											<span className="font-bold text-neutral">
+											<span className="text-slate-500">Masa Kerja: </span>
+											<span className="font-semibold text-slate-900">
 												{terms.tenure_months != null
 													? formatTenure(terms.tenure_months)
 													: "—"}
 											</span>
 										</div>
 										<div>
-											<span className="text-neutral/50">BPJS TK: </span>
-											<span className="font-bold text-neutral">
+											<span className="text-slate-500">BPJS TK: </span>
+											<span className="font-semibold text-slate-900">
 												{terms.bpjs_tk_active ? "Aktif" : "Tidak"}
 											</span>
 										</div>
-										<div className="inline-flex items-center gap-1 text-emerald-700 font-bold">
+										<div className="inline-flex items-center gap-1 text-emerald-700 font-semibold">
 											<CheckCircle2 size={14} />
-											<span>Siap dihitung</span>
+											<span>Lengkap</span>
 										</div>
 									</div>
 								) : (
 									<div className="space-y-4 pt-1">
 										{!terms && (
-											<div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+											<div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs">
 												<AlertCircle size={16} className="shrink-0 mt-0.5" />
 												<p>
 													<strong>Data ketentuan kerja belum terisi.</strong>{" "}
@@ -543,9 +563,9 @@ export default function SimulationSetup({
 											<div>
 												<label
 													htmlFor="monthly_wage_base"
-													className="block text-xs font-bold text-neutral mb-1">
+													className="block text-xs font-semibold text-slate-700 mb-1">
 													Gaji Pokok / Upah Bulanan (Rp){" "}
-													<span className="text-rose-500">*</span>
+													<span className="text-rose-600">*</span>
 												</label>
 												<input
 													id="monthly_wage_base"
@@ -559,15 +579,15 @@ export default function SimulationSetup({
 															monthly_wage_base: e.target.value,
 														}))
 													}
-													className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-neutral focus:outline-none focus:border-indigo-500"
+													className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-indigo-600"
 												/>
-												<p className="text-[11px] text-neutral/55 mt-1">
+												<p className="text-xs text-slate-500 mt-1">
 													Upah pokok + tunjangan tetap sesuai kontrak.
 												</p>
 											</div>
 
 											<div>
-												<label className="block text-xs font-bold text-neutral mb-1">
+												<label className="block text-xs font-semibold text-slate-700 mb-1">
 													Status Karyawan
 												</label>
 												<div className="grid grid-cols-2 gap-2">
@@ -579,10 +599,10 @@ export default function SimulationSetup({
 																employment_type: "pkwtt" as EmploymentType,
 															}))
 														}
-														className={`press py-2.5 px-3 text-xs font-bold rounded-xl border text-center transition cursor-pointer ${
+														className={`press min-h-[42px] py-2 px-3 text-xs font-semibold rounded-xl border text-center transition cursor-pointer ${
 															termsForm.employment_type === "pkwtt"
 																? "bg-indigo-600 text-white border-indigo-600"
-																: "bg-white text-neutral/75 border-slate-200 hover:bg-slate-50"
+																: "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
 														}`}>
 														Tetap (PKWTT)
 													</button>
@@ -594,10 +614,10 @@ export default function SimulationSetup({
 																employment_type: "pkwt" as EmploymentType,
 															}))
 														}
-														className={`press py-2.5 px-3 text-xs font-bold rounded-xl border text-center transition cursor-pointer ${
+														className={`press min-h-[42px] py-2 px-3 text-xs font-semibold rounded-xl border text-center transition cursor-pointer ${
 															termsForm.employment_type === "pkwt"
 																? "bg-indigo-600 text-white border-indigo-600"
-																: "bg-white text-neutral/75 border-slate-200 hover:bg-slate-50"
+																: "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
 														}`}>
 														Kontrak (PKWT)
 													</button>
@@ -607,7 +627,7 @@ export default function SimulationSetup({
 											<div>
 												<label
 													htmlFor="tenure_months"
-													className="block text-xs font-bold text-neutral mb-1">
+													className="block text-xs font-semibold text-slate-700 mb-1">
 													Masa Kerja di Perusahaan (Bulan)
 												</label>
 												<input
@@ -622,9 +642,9 @@ export default function SimulationSetup({
 															tenure_months: Number(e.target.value) || 0,
 														}))
 													}
-													className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-neutral focus:outline-none focus:border-indigo-500"
+													className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-indigo-600"
 												/>
-												<p className="text-[11px] text-neutral/55 mt-1">
+												<p className="text-xs text-slate-500 mt-1">
 													{termsForm.tenure_months
 														? formatTenure(Number(termsForm.tenure_months))
 														: "—"}
@@ -634,7 +654,7 @@ export default function SimulationSetup({
 											<div>
 												<label
 													htmlFor="unused_leave_days"
-													className="block text-xs font-bold text-neutral mb-1">
+													className="block text-xs font-semibold text-slate-700 mb-1">
 													Sisa Cuti Tahunan (Hari, Opsional)
 												</label>
 												<input
@@ -649,7 +669,7 @@ export default function SimulationSetup({
 															unused_leave_days: Number(e.target.value) || 0,
 														}))
 													}
-													className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-neutral focus:outline-none focus:border-indigo-500"
+													className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-indigo-600"
 												/>
 											</div>
 										</div>
@@ -663,11 +683,11 @@ export default function SimulationSetup({
 														bpjs_tk_active: !prev.bpjs_tk_active,
 													}))
 												}
-												className="flex items-center gap-2 text-xs font-semibold text-neutral cursor-pointer">
+												className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
 												{termsForm.bpjs_tk_active ? (
 													<CheckSquare size={16} className="text-indigo-600" />
 												) : (
-													<Square size={16} className="text-neutral/40" />
+													<Square size={16} className="text-slate-400" />
 												)}
 												<span>
 													Peserta aktif BPJS Ketenagakerjaan (program JKP & JHT)
@@ -678,7 +698,7 @@ export default function SimulationSetup({
 												<button
 													type="button"
 													onClick={() => setShowTermsEditor(false)}
-													className="px-3 py-1.5 text-xs font-bold text-neutral/60 hover:text-neutral cursor-pointer">
+													className="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 cursor-pointer">
 													Tutup
 												</button>
 											)}
@@ -687,15 +707,15 @@ export default function SimulationSetup({
 								)}
 
 								{termsError && (
-									<p className="text-xs font-semibold text-rose-700 bg-rose-50 p-3 rounded-xl border border-rose-200">
+									<p className="text-xs font-semibold text-rose-800 bg-rose-50 p-3 rounded-xl border border-rose-200">
 										{termsError}
 									</p>
 								)}
 							</div>
 
 							<div>
-								<label className="block text-xs font-extrabold text-neutral/80 uppercase tracking-wider mb-3">
-									Pilih Jenis Skenario PHK / Exit Ground
+								<label className="block text-xs font-semibold text-slate-700 mb-3">
+									Pilih Jenis Skenario PHK
 								</label>
 								<ExitTypePicker
 									selected={currentExitType}
@@ -706,7 +726,6 @@ export default function SimulationSetup({
 
 							<div className="flex justify-end pt-2">
 								<PrimaryButton
-									tone="simulasi"
 									icon={<ArrowRight size={15} />}
 									onClick={() => setWizardStep(2)}>
 									Lanjut ke Asumsi Waktu
@@ -719,36 +738,35 @@ export default function SimulationSetup({
 					{wizardStep === 2 && (
 						<Card padding="lg" className="space-y-6">
 							<div>
-								<span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600">
+								<span className="text-xs font-semibold text-indigo-700">
 									Langkah 2 dari 3
 								</span>
-								<h3 className="text-lg sm:text-xl font-extrabold text-neutral mt-0.5">
+								<h3 className="text-lg font-bold text-slate-900 mt-0.5">
 									Atur Estimasi Waktu & Hak Normatif
 								</h3>
-								<p className="text-xs sm:text-sm text-neutral/65 mt-1">
-									Geser slider atau ketuk chip bulan untuk melihat pengaruhnya
-									terhadap target ketahananmu.
+								<p className="text-sm text-slate-600 mt-1">
+									Geser pengatur atau pilih durasi bulan untuk melihat
+									pengaruhnya pada proyeksi ketahananmu.
 								</p>
 							</div>
 
 							<div className="space-y-5">
-								<div className="rounded-2xl bg-slate-50/90 p-5 border border-slate-200/80 space-y-3">
+								<div className="rounded-xl bg-slate-50 p-5 border border-slate-200 space-y-3">
 									<div className="flex items-center justify-between gap-2">
 										<div className="flex items-center gap-2.5">
 											<IconTile icon={Clock} tone="indigo" size="xs" />
 											<label
 												htmlFor="search_time_months"
-												className="text-sm font-extrabold text-neutral">
+												className="text-sm font-semibold text-slate-900">
 												Estimasi Waktu Cari Kerja
 											</label>
 										</div>
-										<span className="num-display text-2xl text-indigo-600">
-											{currentSearchMonths} bulan
+										<span className="num-display text-xl text-indigo-700">
+											{currentSearchMonths} bln
 										</span>
 									</div>
-									<p className="text-xs text-neutral/60">
-										Berapa lama waktu yang kamu perlukan sampai mendapatkan
-										pekerjaan baru?
+									<p className="text-xs text-slate-600">
+										Perkiraan durasi hingga kamu mendapatkan pekerjaan baru.
 									</p>
 									<input
 										id="search_time_months"
@@ -770,32 +788,32 @@ export default function SimulationSetup({
 												key={m}
 												type="button"
 												onClick={() => updateConfig("search_time_months", m)}
-												className={`press px-3 py-1.5 text-xs rounded-xl font-bold transition cursor-pointer ${
+												className={`press min-h-[36px] px-3 py-1.5 text-xs rounded-xl font-semibold transition cursor-pointer ${
 													currentSearchMonths === m
-														? "bg-indigo-600 text-white shadow-xs"
-														: "bg-white border border-slate-200 text-neutral/75 hover:bg-slate-100"
+														? "bg-indigo-600 text-white"
+														: "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
 												}`}>
-												{m} bulan
+												{m} bln
 											</button>
 										))}
 									</div>
 								</div>
 
-								<div className="rounded-2xl bg-slate-50/90 p-5 border border-slate-200/80 space-y-3">
+								<div className="rounded-xl bg-slate-50 p-5 border border-slate-200 space-y-3">
 									<div className="flex items-center justify-between gap-2">
 										<div className="flex items-center gap-2.5">
-											<IconTile icon={Calendar} tone="simulasi" size="xs" />
+											<IconTile icon={Calendar} tone="indigo" size="xs" />
 											<label
 												htmlFor="horizon_months"
-												className="text-sm font-extrabold text-neutral">
+												className="text-sm font-semibold text-slate-900">
 												Horizon Perencanaan
 											</label>
 										</div>
-										<span className="num-display text-2xl text-fuchsia-600">
-											{currentHorizonMonths} bulan
+										<span className="num-display text-xl text-indigo-700">
+											{currentHorizonMonths} bln
 										</span>
 									</div>
-									<p className="text-xs text-neutral/60">
+									<p className="text-xs text-slate-600">
 										Rentang waktu evaluasi proyeksi ketahanan finansialmu.
 									</p>
 									<input
@@ -811,7 +829,7 @@ export default function SimulationSetup({
 												Math.max(1, Math.min(60, Number(e.target.value) || 12)),
 											)
 										}
-										className="w-full accent-fuchsia-600 cursor-pointer"
+										className="w-full accent-indigo-600 cursor-pointer"
 									/>
 									<div className="flex flex-wrap gap-2 pt-1">
 										{horizonPresetMonths.map((m) => (
@@ -819,12 +837,12 @@ export default function SimulationSetup({
 												key={m}
 												type="button"
 												onClick={() => updateConfig("horizon_months", m)}
-												className={`press px-3 py-1.5 text-xs rounded-xl font-bold transition cursor-pointer ${
+												className={`press min-h-[36px] px-3 py-1.5 text-xs rounded-xl font-semibold transition cursor-pointer ${
 													currentHorizonMonths === m
-														? "bg-fuchsia-600 text-white shadow-xs"
-														: "bg-white border border-slate-200 text-neutral/75 hover:bg-slate-100"
+														? "bg-indigo-600 text-white"
+														: "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
 												}`}>
-												{m} bulan
+												{m} bln
 											</button>
 										))}
 									</div>
@@ -838,22 +856,22 @@ export default function SimulationSetup({
 											!isNormativeCollectable,
 										)
 									}
-									className="press w-full rounded-2xl bg-white p-4 border border-slate-200/90 flex items-start gap-3 text-left cursor-pointer">
+									className="press w-full rounded-xl bg-white p-4 border border-slate-200 flex items-start gap-3 text-left cursor-pointer hover:border-slate-300">
 									<div className="mt-0.5">
 										{isNormativeCollectable ? (
 											<CheckSquare size={18} className="text-indigo-600" />
 										) : (
-											<Square size={18} className="text-neutral/40" />
+											<Square size={18} className="text-slate-400" />
 										)}
 									</div>
 									<div>
-										<p className="text-sm font-extrabold text-neutral">
+										<p className="text-sm font-semibold text-slate-900">
 											Hak Normatif Dapat Dicairkan Penuh
 										</p>
-										<p className="text-xs text-neutral/60 mt-0.5 leading-relaxed">
+										<p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
 											Centang bila uang pesangon, sisa cuti, atau kompensasi
 											diasumsikan cair tepat waktu. Matikan untuk menguji
-											skenario terburuk (hanya mengandalkan tabungan pribadi).
+											skenario terburuk.
 										</p>
 									</div>
 								</button>
@@ -866,7 +884,6 @@ export default function SimulationSetup({
 									Kembali
 								</SecondaryButton>
 								<PrimaryButton
-									tone="simulasi"
 									icon={<ArrowRight size={15} />}
 									onClick={() => setWizardStep(3)}>
 									Lanjut ke Target Peran
@@ -879,24 +896,24 @@ export default function SimulationSetup({
 					{wizardStep === 3 && (
 						<Card padding="lg" className="space-y-6">
 							<div>
-								<span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600">
+								<span className="text-xs font-semibold text-indigo-700">
 									Langkah 3 dari 3
 								</span>
-								<h3 className="text-lg sm:text-xl font-extrabold text-neutral mt-0.5">
+								<h3 className="text-lg font-bold text-slate-900 mt-0.5">
 									Target Peran Tujuan (Opsional)
 								</h3>
-								<p className="text-xs sm:text-sm text-neutral/65 mt-1">
+								<p className="text-sm text-slate-600 mt-1">
 									Masukkan posisi yang ingin kamu tuju saat mencari kerja kembali
 									untuk menghitung kecocokan dan gap persiapan.
 								</p>
 							</div>
 
-							<div className="rounded-2xl bg-slate-50/90 p-5 border border-slate-200/80 space-y-3">
+							<div className="rounded-xl bg-slate-50 p-5 border border-slate-200 space-y-3">
 								<div className="flex items-center gap-2.5">
-									<IconTile icon={Target} tone="jalur-karier" size="xs" />
+									<IconTile icon={Target} tone="indigo" size="xs" />
 									<label
 										htmlFor="preferred_role_name"
-										className="text-sm font-extrabold text-neutral">
+										className="text-sm font-semibold text-slate-900">
 										Nama Peran / Posisi Tujuan
 									</label>
 								</div>
@@ -909,12 +926,12 @@ export default function SimulationSetup({
 									onChange={(e) =>
 										updateConfig("preferred_role_name", e.target.value)
 									}
-									className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-neutral focus:outline-none focus:border-indigo-500"
+									className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:border-indigo-600"
 								/>
 
 								{pivotSuggestions.length > 0 && (
 									<div className="pt-2">
-										<p className="text-xs font-bold text-neutral/55 mb-2">
+										<p className="text-xs font-medium text-slate-500 mb-2">
 											Saran cepat dari analisis Jalur Kariermu:
 										</p>
 										<div className="flex flex-wrap gap-2">
@@ -925,12 +942,12 @@ export default function SimulationSetup({
 													onClick={() =>
 														updateConfig("preferred_role_name", role)
 													}
-													className={`press px-3 py-1.5 text-xs rounded-xl border font-bold transition cursor-pointer ${
+													className={`press min-h-[36px] px-3 py-1.5 text-xs rounded-xl border font-semibold transition cursor-pointer ${
 														config.preferred_role_name === role
-															? "border-emerald-600 bg-emerald-600 text-white"
-															: "border-slate-200 bg-white text-neutral/75 hover:border-emerald-300"
+															? "border-indigo-600 bg-indigo-600 text-white"
+															: "border-slate-200 bg-white text-slate-700 hover:border-indigo-300"
 													}`}>
-													+ {role}
+													{role}
 												</button>
 											))}
 										</div>
@@ -945,7 +962,6 @@ export default function SimulationSetup({
 									Kembali
 								</SecondaryButton>
 								<PrimaryButton
-									tone="simulasi"
 									size="lg"
 									icon={<PlaySquare size={16} />}
 									onClick={() => void handleStart()}
@@ -959,16 +975,14 @@ export default function SimulationSetup({
 
 				{/* Ringkasan Sticky di Kanan */}
 				<div className="lg:col-span-4 lg:sticky lg:top-6">
-					<Card
-						padding="lg"
-						className="bg-gradient-to-br from-indigo-50/80 via-white to-fuchsia-50/70 space-y-5">
-						<div className="flex items-center gap-3 pb-3 border-b border-indigo-100">
-							<IconTile icon={PlaySquare} tone="simulasi" size="sm" />
+					<Card variant="hero" padding="lg" className="space-y-5">
+						<div className="flex items-center gap-3 pb-3 border-b border-slate-200/70">
+							<IconTile icon={PlaySquare} tone="indigo" size="sm" />
 							<div>
-								<h4 className="text-sm font-extrabold text-neutral">
+								<h4 className="text-sm font-bold text-slate-900">
 									Ringkasan Konfigurasi
 								</h4>
-								<p className="text-xs text-neutral/55">
+								<p className="text-xs text-slate-500">
 									Siap diproyeksikan kapan saja
 								</p>
 							</div>
@@ -976,51 +990,50 @@ export default function SimulationSetup({
 
 						<dl className="space-y-3 text-xs">
 							<div className="flex items-center justify-between gap-2">
-								<dt className="text-neutral/60 font-medium">Skenario PHK</dt>
-								<dd className="font-extrabold text-neutral text-right">
+								<dt className="text-slate-500 font-medium">Skenario PHK</dt>
+								<dd className="font-semibold text-slate-900 text-right">
 									{selectedExitLabel}
 								</dd>
 							</div>
 							<div className="flex items-center justify-between gap-2">
-								<dt className="text-neutral/60 font-medium">Upah Pokok</dt>
-								<dd className="font-extrabold text-neutral">
+								<dt className="text-slate-500 font-medium">Upah Pokok</dt>
+								<dd className="font-semibold text-slate-900 tabular">
 									{formatRupiah(
 										terms?.monthly_wage_base || termsForm.monthly_wage_base,
 									)}
 								</dd>
 							</div>
 							<div className="flex items-center justify-between gap-2">
-								<dt className="text-neutral/60 font-medium">
+								<dt className="text-slate-500 font-medium">
 									Estimasi Cari Kerja
 								</dt>
-								<dd className="font-extrabold text-indigo-700">
-									{currentSearchMonths} bulan
+								<dd className="font-semibold text-indigo-700 tabular">
+									{currentSearchMonths} bln
 								</dd>
 							</div>
 							<div className="flex items-center justify-between gap-2">
-								<dt className="text-neutral/60 font-medium">
+								<dt className="text-slate-500 font-medium">
 									Horizon Evaluasi
 								</dt>
-								<dd className="font-extrabold text-fuchsia-700">
-									{currentHorizonMonths} bulan
+								<dd className="font-semibold text-indigo-700 tabular">
+									{currentHorizonMonths} bln
 								</dd>
 							</div>
 							<div className="flex items-center justify-between gap-2">
-								<dt className="text-neutral/60 font-medium">Hak Normatif</dt>
-								<dd className="font-extrabold text-neutral">
+								<dt className="text-slate-500 font-medium">Hak Normatif</dt>
+								<dd className="font-semibold text-slate-900">
 									{isNormativeCollectable ? "Dapat dicairkan" : "Diabaikan"}
 								</dd>
 							</div>
 							<div className="flex items-center justify-between gap-2">
-								<dt className="text-neutral/60 font-medium">Target Role</dt>
-								<dd className="font-extrabold text-neutral truncate max-w-[150px]">
-									{config.preferred_role_name?.trim() || "Otomatis (Peran Ini)"}
+								<dt className="text-slate-500 font-medium">Target Role</dt>
+								<dd className="font-semibold text-slate-900 truncate max-w-[150px]">
+									{config.preferred_role_name?.trim() || "Otomatis"}
 								</dd>
 							</div>
 						</dl>
 
 						<PrimaryButton
-							tone="simulasi"
 							size="lg"
 							fullWidth
 							icon={<PlaySquare size={16} />}
@@ -1029,10 +1042,11 @@ export default function SimulationSetup({
 							{savingTerms ? "Menyimpan Data..." : "Mulai Simulasi"}
 						</PrimaryButton>
 
-						<div className="flex items-start gap-2 text-[11px] text-neutral/55">
-							<Info size={13} className="shrink-0 mt-0.5 text-indigo-500" />
+						<div className="flex items-start gap-2 text-xs text-slate-500">
+							<Info size={13} className="shrink-0 mt-0.5 text-indigo-600" />
 							<span>
-								Simulasi ini bersifat aman dan tidak mengubah data profil utamamu.
+								Simulasi ini bersifat aman dan tidak mengubah data profil
+								utamamu.
 							</span>
 						</div>
 					</Card>

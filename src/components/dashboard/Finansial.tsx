@@ -1,23 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
-import { Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Lock } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
 import FinancialRunwayHero from "./FinancialRunwayHero";
 import FinancialProfileCard from "./FinancialProfileCard";
 import FinancialParameters from "./FinancialParameters";
+import Card from "../ui/Card";
+import { PrimaryButton } from "../ui/PrimaryButton";
 import { financialApi, parseRunwayMonths } from "../../services/financial";
-import { formatDecimal1 } from "../../lib/format";
+import { formatMonths, formatMonthsLong } from "../../lib/format";
 
 function runwayDescription(current: number, target: number): string {
 	if (current <= 0)
-		return "Lengkapi parameter pengeluaran dan tabungan di bawah untuk melihat berapa bulan dana cadanganmu mampu menopang hidup tenang.";
+		return "Lengkapi parameter pengeluaran dan tabungan di bawah untuk melihat berapa bulan dana cadanganmu mampu menopang hidup.";
 	const gap = target - current;
 	if (gap <= 0)
-		return `Kamu masih punya waktu ${formatDecimal1(current)} bulan napas finansial — sudah berada di atas target aman ${formatDecimal1(target)} bulan. Pertahankan kebiasaan baik ini!`;
-	return `Kamu punya waktu ${formatDecimal1(
+		return `Kamu masih punya waktu ${formatMonthsLong(current)} napas finansial — sudah di atas target minimum ${formatMonths(target)}. Pertahankan kebiasaan baik ini.`;
+	return `Kamu punya waktu ${formatMonthsLong(
 		current,
-	)} bulan napas finansial saat ini. Mari tambah cadangan sekitar ${formatDecimal1(
+	)} napas finansial saat ini. Mari tambah cadangan sekitar ${formatMonths(
 		gap,
-	)} bulan lagi agar mencapai target aman ${formatDecimal1(target)} bulan.`;
+	)} lagi untuk mencapai target minimum ${formatMonths(target)}.`;
 }
 
 export default function Finansial() {
@@ -64,7 +67,7 @@ export default function Finansial() {
 		<div>
 			<PageHeader
 				title="Finansial"
-				subtitle="Ketahui berapa bulan dana daruratmu siap menopang hidup tenang jika sewaktu-waktu terjadi transisi karier."
+				subtitle="Ketahui berapa bulan dana cadanganmu cukup menutup kebutuhan jika pemasukan berhenti sementara."
 			/>
 
 			<FinancialRunwayHero
@@ -74,11 +77,30 @@ export default function Finansial() {
 			<FinancialProfileCard onChanged={refresh} />
 			<FinancialParameters onChanged={refresh} />
 
-			<div className="flex items-center justify-center gap-2 mt-10 pt-6 border-t border-slate-200/70">
-				<Lock size={13} className="text-emerald-600" />
-				<p className="text-xs font-medium text-neutral/60">
-					Data finansialmu dienkripsi, bersifat privat, dan hanya digunakan
-					untuk menghitung ketahanan financial runway-mu.
+			<Card
+				padding="md"
+				className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+				<div>
+					<h3 className="text-sm font-bold text-slate-900">
+						Uji dengan Skenario Pesangon & PHK
+					</h3>
+					<p className="text-sm text-slate-600 mt-0.5">
+						Gabungkan angka runway ini dengan estimasi hak normatif di modul
+						Simulasi.
+					</p>
+				</div>
+				<Link to="/dashboard/simulasi" className="shrink-0">
+					<PrimaryButton icon={<ArrowRight size={15} />}>
+						Buka Simulasi
+					</PrimaryButton>
+				</Link>
+			</Card>
+
+			<div className="flex items-center justify-center gap-2 mt-8 pt-6 border-t border-slate-200">
+				<Lock size={13} className="text-slate-400" />
+				<p className="text-xs text-slate-500">
+					Data finansialmu bersifat privat dan hanya digunakan untuk menghitung
+					ketahanan financial runway.
 				</p>
 			</div>
 		</div>

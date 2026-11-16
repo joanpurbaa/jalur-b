@@ -7,6 +7,7 @@ import IconTile from "../ui/IconTile";
 import Modal from "../ui/Modal";
 import StatusBadge from "../ui/StatusBadge";
 import MeterBar from "../ui/MeterBar";
+import ExpandableText from "../ui/ExpandableText";
 import { SecondaryButton } from "../ui/PrimaryButton";
 import { careerRiskApi } from "../../services/careerRisk";
 import { parseDecimal } from "../../lib/parseNumeric";
@@ -51,15 +52,13 @@ export default function InsightCard() {
 				<div>
 					<div className="flex items-center justify-between gap-3 mb-4">
 						<div className="flex items-center gap-3">
-							<span className="motion-safe:animate-spark inline-flex">
-								<IconTile icon={Sparkles} tone="skill" size="sm" />
-							</span>
+							<IconTile icon={Sparkles} tone="indigo" size="sm" />
 							<div>
-								<h3 className="text-base font-extrabold text-neutral">
-									AI Career Insight
+								<h3 className="text-sm font-bold text-slate-900">
+									Insight Risiko AI
 								</h3>
-								<p className="text-xs text-neutral/55">
-									Ringkasan sinyal pasar & posisi peranmu
+								<p className="text-xs text-slate-500">
+									Ringkasan analisis peran terhadap tren pasar
 								</p>
 							</div>
 						</div>
@@ -79,12 +78,14 @@ export default function InsightCard() {
 							<Skeleton className="h-4 w-3/4" />
 						</div>
 					) : result && (result.summary || result.analysis) ? (
-						<div className="space-y-2.5">
-							<p className="text-sm sm:text-[15px] text-neutral/85 leading-relaxed line-clamp-3">
-								{result.summary || result.analysis}
-							</p>
+						<div className="space-y-3">
+							<ExpandableText
+								text={result.summary || result.analysis}
+								maxLines={3}
+								className="text-sm text-slate-700 leading-relaxed"
+							/>
 							{result.early_warning && (
-								<div className="flex items-start gap-2 rounded-xl bg-amber-50/90 border border-amber-200/80 px-3 py-2 text-xs text-amber-900">
+								<div className="flex items-start gap-2 rounded-xl bg-amber-50/70 border border-amber-200/80 px-3 py-2.5 text-xs text-amber-900">
 									<AlertTriangle
 										size={14}
 										className="text-amber-600 shrink-0 mt-0.5"
@@ -94,27 +95,27 @@ export default function InsightCard() {
 							)}
 						</div>
 					) : (
-						<p className="text-sm text-neutral/70 leading-relaxed">
+						<p className="text-sm text-slate-600 leading-relaxed">
 							Belum ada insight AI. Setelah kamu melengkapi penilaian karier,
-							bagian ini akan merangkum sinyal risiko industri dan peluang
-							penguatanmu secara tenang dan objektif.
+							bagian ini akan merangkum sinyal perubahan industri dan area yang
+							perlu dipantau.
 						</p>
 					)}
 				</div>
 
-				<div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+				<div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
 					{result ? (
 						<SecondaryButton size="sm" onClick={() => setDrawerOpen(true)}>
-							Pelajari kenapa →
+							Pelajari kenapa
 						</SecondaryButton>
 					) : (
 						<SecondaryButton size="sm" onClick={openCareerAssessment}>
-							Isi Penilaian Karier →
+							Isi Penilaian Karier
 						</SecondaryButton>
 					)}
 					<Link
 						to="/dashboard/risiko-karier"
-						className="text-xs font-bold text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1">
+						className="text-xs font-semibold text-indigo-700 hover:text-indigo-800 inline-flex items-center gap-1">
 						Buka Risiko Karier
 						<ArrowRight size={13} />
 					</Link>
@@ -129,9 +130,9 @@ export default function InsightCard() {
 				subtitle="Penjelasan faktor risiko dan sinyal awal pada peranmu">
 				{result && (
 					<div className="space-y-6">
-						<div className="rounded-2xl bg-indigo-50/70 border border-indigo-100 p-4">
+						<div className="rounded-xl bg-indigo-50/60 border border-indigo-100 p-4">
 							<div className="flex items-center justify-between gap-2 mb-2">
-								<span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
+								<span className="text-xs font-semibold text-indigo-800">
 									Ringkasan Analisis
 								</span>
 								{riskLevel && (
@@ -142,16 +143,16 @@ export default function InsightCard() {
 									/>
 								)}
 							</div>
-							<p className="text-sm text-neutral/85 leading-relaxed">
+							<p className="text-sm text-slate-700 leading-relaxed">
 								{result.analysis || result.summary}
 							</p>
 						</div>
 
 						{result.early_warning && (
-							<div className="rounded-2xl bg-amber-50 border border-amber-200 p-4">
-								<div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-800 mb-1.5">
+							<div className="rounded-xl bg-amber-50/70 border border-amber-200/80 p-4">
+								<div className="flex items-center gap-2 text-xs font-semibold text-amber-800 mb-1.5">
 									<AlertTriangle size={14} />
-									<span>Sinyal Awal yang Perlu Diwaspadai</span>
+									<span>Sinyal Awal</span>
 								</div>
 								<p className="text-sm text-amber-950/85 leading-relaxed">
 									{result.early_warning}
@@ -161,7 +162,7 @@ export default function InsightCard() {
 
 						{result.factors.length > 0 && (
 							<div>
-								<h4 className="text-sm font-extrabold text-neutral mb-3">
+								<h4 className="text-sm font-bold text-slate-900 mb-3">
 									Rincian Dimensi Risiko
 								</h4>
 								<div className="space-y-3">
@@ -172,9 +173,9 @@ export default function InsightCard() {
 										return (
 											<div
 												key={f.key}
-												className="rounded-2xl border border-slate-200/80 p-3.5 bg-slate-50/50">
+												className="rounded-xl border border-slate-200 p-3.5 bg-slate-50/60">
 												<div className="flex items-center justify-between gap-2 mb-2">
-													<span className="text-sm font-bold text-neutral">
+													<span className="text-sm font-semibold text-slate-900">
 														{f.title}
 													</span>
 													<StatusBadge
@@ -189,7 +190,7 @@ export default function InsightCard() {
 													status={fStatus}
 													height="sm"
 												/>
-												<p className="text-xs text-neutral/70 mt-2 leading-relaxed">
+												<p className="text-xs text-slate-600 mt-2 leading-relaxed">
 													{f.explanation}
 												</p>
 											</div>
@@ -202,9 +203,9 @@ export default function InsightCard() {
 						<Link
 							to="/dashboard/risiko-karier"
 							onClick={() => setDrawerOpen(false)}
-							className="press w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-indigo-600 text-white text-sm font-bold shadow-md">
+							className="press w-full min-h-[44px] inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold">
 							Lihat Halaman Risiko Karier Lengkap
-							<ArrowRight size={16} />
+							<ArrowRight size={15} />
 						</Link>
 					</div>
 				)}

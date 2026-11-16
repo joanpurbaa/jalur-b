@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GitFork, Sparkles, Upload } from "lucide-react";
+import { GitFork, Sparkles } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
 import CareerPathMap from "./CareerPathMap";
 import RoleDetailPanel from "./RoleDetailPanel";
@@ -7,17 +7,15 @@ import PrepTimeCard from "./PrepTimeCard";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
 import EmptyState from "../ui/EmptyState";
+import ExpandableText from "../ui/ExpandableText";
 import { PrimaryButton } from "../ui/PrimaryButton";
 import { SkeletonHero, SkeletonStatCard } from "../ui/Skeleton";
 import InfoTooltip from "../ui/InfoTooltip";
 import { careerPivotApi } from "../../services/careerPivot";
 import { parseDecimal } from "../../lib/parseNumeric";
+import { normalizeConfidence } from "../../lib/status";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
 import type { CareerPivotResult } from "../../types/careerPivot";
-
-function clampPercent(value: number): number {
-	return Math.min(100, Math.max(0, Math.round(value)));
-}
 
 export default function JalurKarier() {
 	const { refreshKey, openCareerAssessment } = useCareerAssessment();
@@ -47,9 +45,7 @@ export default function JalurKarier() {
 		};
 	}, [refreshKey]);
 
-	const confidence = result
-		? clampPercent(parseDecimal(result.data_confidence) * 100)
-		: 0;
+	const confidence = result ? normalizeConfidence(result.data_confidence) : 0;
 	const activeRole =
 		result && result.roles.length > 0
 			? result.roles[Math.min(selectedIdx, result.roles.length - 1)]
@@ -59,36 +55,31 @@ export default function JalurKarier() {
 		<div>
 			<PageHeader
 				title="Jalur Karier"
-				subtitle="Kalau suatu hari kamu ingin atau harus berpindah haluan, ini peta peran terdekat yang paling cocok dengan modal keahlianmu."
-				action={
-					<PrimaryButton
-						tone="jalur-karier"
-						icon={<Upload size={15} />}
-						onClick={openCareerAssessment}>
-						{result ? "Perbarui Data Karier" : "Lengkapi Data Karier"}
-					</PrimaryButton>
-				}
+				subtitle="Jika suatu saat kamu ingin berpindah peran, ini peta alternatif yang paling dekat dengan modal skill-mu."
 			/>
 
 			{result && (
 				<Card
+					variant="hero"
 					padding="md"
-					className="mb-6 bg-gradient-to-r from-emerald-50/80 via-white to-teal-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-					<div className="flex items-start gap-3.5">
-						<IconTile icon={Sparkles} tone="jalur-karier" size="sm" />
-						<div>
-							<p className="text-xs font-extrabold uppercase tracking-wider text-emerald-700 mb-0.5">
-								Rekomendasi Kompas Karier
+					className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+					<div className="flex items-start gap-3.5 min-w-0">
+						<IconTile icon={Sparkles} tone="indigo" size="sm" />
+						<div className="min-w-0">
+							<p className="text-xs font-semibold text-indigo-700 mb-0.5">
+								Ringkasan Rekomendasi AI
 							</p>
-							<p className="text-sm sm:text-[15px] text-neutral/80 leading-relaxed">
-								{result.summary}
-							</p>
+							<ExpandableText
+								text={result.summary}
+								maxLines={3}
+								className="text-sm text-slate-700 leading-relaxed"
+							/>
 						</div>
 					</div>
 					{confidence > 0 && (
-						<span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100/80 text-emerald-900 text-xs font-bold">
-							Kelengkapan {confidence}%
-							<InfoTooltip text="Seberapa lengkap data yang kamu isi. Bukan ukuran ketepatan prediksi." />
+						<span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-semibold">
+							Cakupan data {confidence}%
+							<InfoTooltip text="Tingkat kelengkapan informasi analisis ini, bukan jaminan ketepatan prediksi." />
 						</span>
 					)}
 				</Card>
@@ -97,7 +88,7 @@ export default function JalurKarier() {
 			{loading ? (
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 					<div className="lg:col-span-2">
-						<SkeletonHero className="h-[480px]" />
+						<SkeletonHero className="h-[460px]" />
 					</div>
 					<div className="space-y-4">
 						<SkeletonStatCard />
@@ -134,14 +125,11 @@ export default function JalurKarier() {
 				<EmptyState
 					illustration="compass"
 					icon={GitFork}
-					tone="jalur-karier"
+					tone="indigo"
 					title="Belum ada rekomendasi jalur karier"
 					description="Lengkapi data karier supaya Jalur B bisa memetakan peran alternatif dengan kecocokan tertinggi beserta estimasi waktu persiapannya."
 					action={
-						<PrimaryButton
-							tone="jalur-karier"
-							icon={<Sparkles size={15} />}
-							onClick={openCareerAssessment}>
+						<PrimaryButton onClick={openCareerAssessment}>
 							Petakan Jalur Karier
 						</PrimaryButton>
 					}

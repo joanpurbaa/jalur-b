@@ -15,19 +15,21 @@ export default function ProfileSection({
 	children,
 }: ProfileSectionProps) {
 	return (
-		<section className="mb-2">
+		<section className="h-full flex flex-col">
 			<div className="flex items-center justify-between gap-2 mb-3">
 				<div>
-					<h3 className="text-base font-extrabold text-neutral">{title}</h3>
+					<h3 className="text-base font-bold text-slate-900">{title}</h3>
 					{description && (
-						<p className="text-xs sm:text-sm text-neutral/60 mt-0.5">
+						<p className="text-xs sm:text-sm text-slate-500 mt-0.5">
 							{description}
 						</p>
 					)}
 				</div>
 				{action}
 			</div>
-			<Card padding="lg">{children}</Card>
+			<Card padding="lg" className="flex-1">
+				{children}
+			</Card>
 		</section>
 	);
 }

@@ -4,7 +4,7 @@ import { ArrowRight, Lock } from "lucide-react";
 import { financialApi, parseRunwayMonths } from "../../services/financial";
 import type { FinancialProfileResponse } from "../../types/financial";
 import { getRunwayStatus, statusStyles } from "../../lib/status";
-import { formatDecimal1, formatRupiah } from "../../lib/format";
+import { formatMonths, formatRupiah } from "../../lib/format";
 import MeterBar from "../ui/MeterBar";
 import StatusBadge from "../ui/StatusBadge";
 import Skeleton from "../ui/Skeleton";
@@ -54,11 +54,11 @@ export default function FinancialSummaryCard({
 		profile != null
 			? [
 					{
-						label: "Pengeluaran Esensial / Bulan",
+						label: "Pengeluaran Esensial / Bln",
 						value: formatRupiah(profile.monthly_essential_expenses),
 					},
 					{
-						label: "Cicilan Utang / Bulan",
+						label: "Cicilan Utang / Bln",
 						value: formatRupiah(profile.monthly_debt_payment),
 					},
 					{
@@ -74,29 +74,27 @@ export default function FinancialSummaryCard({
 	return (
 		<div>
 			{loading ? (
-				<div className="rounded-2xl p-5 mb-5 bg-slate-50 border border-slate-200">
+				<div className="rounded-xl p-5 mb-5 bg-slate-50 border border-slate-200">
 					<Skeleton className="h-3 w-24 mb-2" />
 					<Skeleton className="h-8 w-32 mb-3" />
 					<Skeleton className="h-3 w-full" />
 				</div>
 			) : (
-				<div className={`rounded-2xl p-5 mb-5 ${s.bg} border ${s.border}`}>
+				<div className={`rounded-xl p-5 mb-5 ${s.bg} border ${s.border}`}>
 					<div className="flex items-start justify-between gap-2 mb-3">
 						<div>
-							<p className="text-[11px] font-bold text-neutral/55 uppercase tracking-wide">
+							<p className="text-xs font-medium text-slate-600">
 								Runway Saat Ini
 							</p>
-							<p className="num-display text-2xl text-neutral mt-0.5">
-								{formatDecimal1(current)} bulan
+							<p className="num-display text-2xl text-slate-900 mt-1">
+								{formatMonths(current)}
 							</p>
 						</div>
-						<div className="text-right">
-							<StatusBadge
-								variant={variant}
-								label={`Target ${formatDecimal1(target)} bln`}
-								size="sm"
-							/>
-						</div>
+						<StatusBadge
+							variant={variant}
+							label={`Target ${formatMonths(target)}`}
+							size="sm"
+						/>
 					</div>
 					<MeterBar
 						value={current}
@@ -114,10 +112,10 @@ export default function FinancialSummaryCard({
 						<div
 							key={item.label}
 							className="flex items-center justify-between py-2.5">
-							<span className="text-xs sm:text-sm text-neutral/65">
+							<span className="text-xs sm:text-sm text-slate-600">
 								{item.label}
 							</span>
-							<span className="text-xs sm:text-sm font-extrabold text-neutral tabular">
+							<span className="text-xs sm:text-sm font-semibold text-slate-900 tabular">
 								{item.value}
 							</span>
 						</div>
@@ -126,15 +124,15 @@ export default function FinancialSummaryCard({
 			)}
 
 			<div className="flex items-center gap-2 mb-4">
-				<Lock size={12} className="text-emerald-600 shrink-0" />
-				<p className="text-xs text-neutral/55">
-					Data finansialmu bersifat privat dan terenkripsi.
+				<Lock size={12} className="text-slate-400 shrink-0" />
+				<p className="text-xs text-slate-500">
+					Data finansialmu bersifat privat.
 				</p>
 			</div>
 
 			<Link
 				to="/dashboard/finansial"
-				className="inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-700 hover:text-emerald-800 transition">
+				className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-800 transition">
 				Kelola Data Finansial
 				<ArrowRight size={13} />
 			</Link>

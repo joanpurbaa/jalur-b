@@ -5,8 +5,6 @@ import {
 	ShieldCheck,
 	ArrowUpRight,
 	Wrench,
-	Sparkles,
-	Upload,
 } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
 import FeaturedMetricCard from "./FeaturedMetricCard";
@@ -17,7 +15,7 @@ import { PrimaryButton } from "../ui/PrimaryButton";
 import { SkeletonHero, SkeletonStatCard } from "../ui/Skeleton";
 import { aiExposureApi } from "../../services/aiExposure";
 import { parseDecimal } from "../../lib/parseNumeric";
-import { getInverseScoreStatus, getScoreStatus } from "../../lib/status";
+import { localizeLevelLabel, normalizeConfidence } from "../../lib/status";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
 import type { AiExposureResult } from "../../types/aiExposure";
 
@@ -53,26 +51,16 @@ export default function Skill() {
 	const relevance = result
 		? clampPercent(parseDecimal(result.skill_relevance_score))
 		: 0;
-	const confidence = result
-		? clampPercent(parseDecimal(result.data_confidence) * 100)
-		: 0;
+	const confidence = result ? normalizeConfidence(result.data_confidence) : 0;
 	const panelDescription = result
-		? `${result.summary}${confidence > 0 ? ` (Kelengkapan data ${confidence}%)` : ""}`
+		? `${result.summary}${confidence > 0 ? ` (Cakupan data analisis: ${confidence}%)` : ""}`
 		: "";
 
 	return (
 		<div>
 			<PageHeader
 				title="Skill & AI"
-				subtitle="Lihat porsi tugas yang terpapar otomasi AI dan perkuat skill yang membuat peranmu tak tergantikan."
-				action={
-					<PrimaryButton
-						tone="skill"
-						icon={<Upload size={15} />}
-						onClick={openCareerAssessment}>
-						{result ? "Perbarui Data Karier" : "Lengkapi Data Karier"}
-					</PrimaryButton>
-				}
+				subtitle="Lihat porsi tugas yang terpapar otomasi AI dan perkuat keahlian yang menjaga posisi tawarmu."
 			/>
 
 			{loading ? (
@@ -89,35 +77,24 @@ export default function Skill() {
 				</div>
 			) : result ? (
 				<>
+					{/* 1. Bagaimana kondisiku? */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 						<FeaturedMetricCard
-							title="AI Exposure"
+							title="Paparan AI (AI Exposure)"
 							value={score}
-							description="Porsi aktivitas rutin yang dapat dipercepat atau diotomasi dengan bantuan AI. Manfaatkan AI sebagai co-pilot untuk menghemat waktu."
+							description="Porsi aktivitas rutin yang dapat dipercepat AI. Jadikan AI sebagai co-pilot untuk efisiensi kerja."
 							icon={Cpu}
-							tone="skill"
-							variant={getInverseScoreStatus(score)}
-							ringColors={["#8b5cf6", "#06b6d4"]}
-							badgeLabel={result.level || "Paparan AI"}
+							badgeLabel={localizeLevelLabel(result.level)}
 						/>
 						<FeaturedMetricCard
-							title="Skill Relevance"
+							title="Relevansi Skill"
 							value={relevance}
-							description="Daya saing dan relevansi portofolio keahlianmu terhadap kebutuhan industri saat ini maupun 1–2 tahun ke depan."
+							description="Kesesuaian portofolio keahlianmu terhadap kebutuhan industri saat ini maupun ke depan."
 							icon={TrendingUp}
-							tone="jalur-karier"
-							variant={getScoreStatus(relevance)}
-							ringColors={["#10b981", "#14b8a6"]}
-							badgeLabel={
-								relevance >= 75
-									? "Sangat Relevan"
-									: relevance >= 60
-										? "Cukup Relevan"
-										: "Perlu Diperkuat"
-							}
 						/>
 					</div>
 
+					{/* 2. Kenapa begitu? */}
 					{result.activities.length > 0 && (
 						<ActivityImpactPanel
 							description={panelDescription}
@@ -125,12 +102,14 @@ export default function Skill() {
 						/>
 					)}
 
-					<div className="mb-3">
-						<h3 className="text-base sm:text-lg font-extrabold text-neutral">
-							Peta Portofolio Skill
+					{/* 3. Peta skill & langkah penguatan */}
+					<div className="mb-3.5">
+						<h3 className="text-base font-bold text-slate-900">
+							Portofolio Skill
 						</h3>
-						<p className="text-xs sm:text-sm text-neutral/60">
-							Kelompok skill berdasarkan daya tahan dan peluang pertumbuhannya
+						<p className="text-xs sm:text-sm text-slate-500">
+							Kelompok keahlian berdasarkan kekuatan, tren permintaan, dan area
+							penguatan
 						</p>
 					</div>
 
@@ -139,44 +118,32 @@ export default function Skill() {
 							title="Skill Kuat"
 							subtitle="Keunggulan utamamu saat ini"
 							icon={ShieldCheck}
-							tone="safe"
-							variant="healthy"
 							skills={result.strong_skills}
-							pillTone="strong"
 						/>
 						<SkillAnalysisCard
 							title="Skill Sedang Naik"
 							subtitle="Makin dicari di pasar"
 							icon={ArrowUpRight}
-							tone="cyan"
-							variant="insight"
 							skills={result.rising_skills}
-							pillTone="rising"
 						/>
 						<SkillAnalysisCard
 							title="Perlu Diperkuat"
 							subtitle="Prioritas latihan berikutnya"
 							icon={Wrench}
-							tone="caution"
-							variant="warning"
 							skills={result.skills_to_improve}
-							pillTone="improve"
-							ctaLabel="Catat bukti latihan di Bukti Karier"
+							ctaLabel="Catat bukti di Bukti Karier"
 							ctaHref="/dashboard/bukti-karier"
 						/>
 					</div>
 				</>
 			) : (
 				<EmptyState
-					icon={Sparkles}
-					tone="skill"
+					icon={Cpu}
+					tone="indigo"
 					title="Belum ada pemetaan Skill & AI"
-					description="Lengkapi penilaian karier agar Jalur B dapat mengukur tingkat AI exposure pada aktivitas harianmu dan menyusun rekomendasi skill."
+					description="Lengkapi penilaian karier agar Jalur B dapat mengukur tingkat paparan AI pada aktivitas harianmu dan menyusun rekomendasi skill."
 					action={
-						<PrimaryButton
-							tone="skill"
-							icon={<Sparkles size={15} />}
-							onClick={openCareerAssessment}>
+						<PrimaryButton onClick={openCareerAssessment}>
 							Mulai Pemetaan Skill
 						</PrimaryButton>
 					}

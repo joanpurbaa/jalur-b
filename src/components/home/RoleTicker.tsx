@@ -1,17 +1,35 @@
+import {
+	Briefcase,
+	Bug,
+	Code2,
+	Database,
+	FileSpreadsheet,
+	Headset,
+	Landmark,
+	ShieldCheck,
+	TrendingUp,
+	Wrench,
+	type LucideIcon,
+} from "lucide-react";
+
 const SOURCE_URL =
 	"https://www.cbsnews.com/news/anthropic-ai-jobs-most-exposed-risk/";
 
-const ROLES = [
-	{ role: "Computer Programmer", value: "75%" },
-	{ role: "Customer Service Representative", value: "70%" },
-	{ role: "Data Entry Clerk", value: "67%" },
-	{ role: "Medical Records Specialist", value: "67%" },
-	{ role: "Market Research Analyst & Marketing Specialist", value: "65%" },
-	{ role: "Sales Representative", value: "63%" },
-	{ role: "Financial & Investment Analyst", value: "57%" },
-	{ role: "Software QA Analyst", value: "52%" },
-	{ role: "Information Security Analyst", value: "49%" },
-	{ role: "Computer User Support Specialist", value: "47%" },
+const ROLES: { role: string; value: string; icon: LucideIcon }[] = [
+	{ role: "Computer Programmer", value: "75%", icon: Code2 },
+	{ role: "Customer Service Representative", value: "70%", icon: Headset },
+	{ role: "Data Entry Clerk", value: "67%", icon: Database },
+	{ role: "Medical Records Specialist", value: "67%", icon: FileSpreadsheet },
+	{
+		role: "Market Research Analyst & Marketing Specialist",
+		value: "65%",
+		icon: TrendingUp,
+	},
+	{ role: "Sales Representative", value: "63%", icon: Briefcase },
+	{ role: "Financial & Investment Analyst", value: "57%", icon: Landmark },
+	{ role: "Software QA Analyst", value: "52%", icon: Bug },
+	{ role: "Information Security Analyst", value: "49%", icon: ShieldCheck },
+	{ role: "Computer User Support Specialist", value: "47%", icon: Wrench },
 ];
 
 export default function RoleTicker() {
@@ -50,19 +68,23 @@ export default function RoleTicker() {
 
 			<div className="group relative overflow-hidden">
 				<div className="flex w-max animate-marquee group-hover:[animation-play-state:paused]">
-					{[...ROLES, ...ROLES].map((item, index) => (
-						<a
-							key={`${item.role}-${index}`}
-							href={SOURCE_URL}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="mx-3 whitespace-nowrap rounded-full border border-neutral/40 bg-transparent px-6 py-2.5 text-sm font-medium text-neutral/60 transition-colors duration-200 hover:border-primary hover:text-primary">
-							{item.role}
-							<span className="ml-2 font-semibold text-neutral/60 transition-colors duration-200 hover:text-primary font-[Georgia,serif]">
-								{item.value}
-							</span>
-						</a>
-					))}
+					{[...ROLES, ...ROLES].map((item, index) => {
+						const Icon = item.icon;
+						return (
+							<a
+								key={`${item.role}-${index}`}
+								href={SOURCE_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="mx-3 inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-neutral/30 bg-white/80 px-5 py-2.5 text-sm font-medium text-neutral/70 transition-colors duration-200 hover:border-primary hover:text-primary shadow-2xs">
+								<Icon size={15} className="text-primary shrink-0" />
+								<span>{item.role}</span>
+								<span className="ml-1 font-semibold text-primary font-[Georgia,serif]">
+									{item.value}
+								</span>
+							</a>
+						);
+					})}
 				</div>
 
 				<div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent" />

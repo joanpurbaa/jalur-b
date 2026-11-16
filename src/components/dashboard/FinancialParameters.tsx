@@ -5,7 +5,7 @@ import {
 	Wallet,
 	TrendingUp,
 	Coins,
-	PlusCircle,
+	Plus,
 	PieChart,
 } from "lucide-react";
 import { financialApi } from "../../services/financial";
@@ -19,7 +19,8 @@ import AddParameterCard from "../ui/AddParameterCard";
 import Card from "../ui/Card";
 import IconTile from "../ui/IconTile";
 import Skeleton from "../ui/Skeleton";
-import { PrimaryButton } from "../ui/PrimaryButton";
+import { PrimaryButton, SecondaryButton } from "../ui/PrimaryButton";
+import { formatRupiah } from "../../lib/format";
 import type { FinanceTone } from "../../lib/status";
 
 const iconMap = {
@@ -61,12 +62,7 @@ const assetIcon: Record<FinancialAssetType, keyof typeof iconMap> = {
 };
 
 const inputClass =
-	"w-full px-4 py-3 rounded-2xl border border-neutral/20 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-neutral placeholder:text-neutral/40";
-
-function formatRupiah(raw: string | number): string {
-	const n = Number(raw);
-	return Number.isFinite(n) ? `Rp ${n.toLocaleString("id-ID")}` : "Rp 0";
-}
+	"w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/15 text-sm text-slate-900 placeholder:text-slate-400";
 
 function typeLabel(type: FinancialAssetType): string {
 	return savingsTypes.find((t) => t.value === type)?.label ?? type;
@@ -244,12 +240,13 @@ export default function FinancialParameters({
 		0,
 	);
 
+	// Skala hue tunggal indigo dengan 5 tingkat intensitas (<= 3 hue anggaran)
 	const donutColors: Record<FinancialAssetType, string> = {
-		main_savings: "#6366f1",
-		emergency_fund: "#10b981",
-		long_term_savings: "#8b5cf6",
-		investment: "#f59e0b",
-		other: "#0ea5e9",
+		main_savings: "#3730a3",
+		emergency_fund: "#4f46e5",
+		long_term_savings: "#6366f1",
+		investment: "#818cf8",
+		other: "#a5b4fc",
 	};
 
 	const groupedByType = savingsTypes
@@ -270,37 +267,34 @@ export default function FinancialParameters({
 		<div>
 			<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
 				<div>
-					<h3 className="text-base sm:text-lg font-extrabold text-neutral">
+					<h3 className="text-base font-bold text-slate-900">
 						Aset & Parameter Tabungan
 					</h3>
-					<p className="text-xs sm:text-sm text-neutral/60">
-						Daftar dana cadangan dan tingkat likuiditasnya
+					<p className="text-xs sm:text-sm text-slate-500">
+						Daftar dana cadangan dan tingkat kemudahan pencairannya
 					</p>
 				</div>
-				<PrimaryButton
-					tone="finansial"
+				<SecondaryButton
 					size="sm"
-					icon={<PlusCircle size={15} />}
+					icon={<Plus size={15} />}
 					onClick={() => setIsModalOpen(true)}>
-					+ Tambah Aset
-				</PrimaryButton>
+					Tambah Aset
+				</SecondaryButton>
 			</div>
 
 			{!loading && groupedByType.length > 0 && totalAssetsAmount > 0 && (
-				<Card
-					padding="md"
-					className="mb-5 bg-gradient-to-r from-emerald-50/50 via-white to-teal-50/40">
+				<Card padding="md" className="mb-5">
 					<div className="flex flex-col sm:flex-row items-center gap-6">
-						<div className="relative shrink-0 w-36 h-36 flex items-center justify-center">
+						<div className="relative shrink-0 w-32 h-32 flex items-center justify-center">
 							<svg
-								width={144}
-								height={144}
-								viewBox="0 0 144 144"
+								width={128}
+								height={128}
+								viewBox="0 0 128 128"
 								className="-rotate-90"
 								role="img"
 								aria-label="Grafik komposisi dana berdasarkan jenis aset">
 								{(() => {
-									const r = 54;
+									const r = 48;
 									const c = 2 * Math.PI * r;
 									let offset = 0;
 									return groupedByType.map((g) => {
@@ -308,12 +302,12 @@ export default function FinancialParameters({
 										const el = (
 											<circle
 												key={g.type}
-												cx={72}
-												cy={72}
+												cx={64}
+												cy={64}
 												r={r}
 												fill="none"
 												stroke={g.color}
-												strokeWidth={18}
+												strokeWidth={16}
 												strokeDasharray={`${len} ${c - len}`}
 												strokeDashoffset={-offset}
 											/>
@@ -324,23 +318,23 @@ export default function FinancialParameters({
 								})()}
 							</svg>
 							<div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-								<span className="text-[10px] font-bold uppercase text-neutral/50">
+								<span className="text-[11px] font-medium text-slate-500">
 									Total Aset
 								</span>
-								<span className="text-xs font-extrabold text-neutral tabular">
+								<span className="text-xs font-bold text-slate-900 tabular">
 									{assets.length} pos
 								</span>
 							</div>
 						</div>
 
 						<div className="flex-1 w-full">
-							<div className="flex items-center gap-2 mb-2">
-								<IconTile icon={PieChart} tone="finansial" size="xs" />
-								<span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800">
+							<div className="flex items-center gap-2 mb-1.5">
+								<IconTile icon={PieChart} tone="indigo" size="xs" />
+								<span className="text-xs font-semibold text-indigo-700">
 									Komposisi Dana Tersimpan
 								</span>
 							</div>
-							<p className="num-display text-2xl text-neutral mb-3">
+							<p className="num-display text-2xl text-slate-900 mb-3">
 								{formatRupiah(totalAssetsAmount)}
 							</p>
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -349,15 +343,15 @@ export default function FinancialParameters({
 									return (
 										<div
 											key={g.type}
-											className="flex items-center justify-between gap-2 rounded-xl bg-white/85 border border-slate-200/80 px-3 py-2 text-xs">
-											<span className="flex items-center gap-2 font-semibold text-neutral truncate">
+											className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 border border-slate-200/80 px-3 py-2 text-xs">
+											<span className="flex items-center gap-2 font-medium text-slate-800 truncate">
 												<span
 													className="w-2.5 h-2.5 rounded-full shrink-0"
 													style={{ backgroundColor: g.color }}
 												/>
 												<span className="truncate">{g.label}</span>
 											</span>
-											<span className="font-extrabold text-neutral/80 tabular shrink-0">
+											<span className="font-semibold text-slate-700 tabular shrink-0">
 												{pct}% · {formatRupiah(g.amount)}
 											</span>
 										</div>
@@ -442,7 +436,7 @@ export default function FinancialParameters({
 						<div className="space-y-5">
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Nama Tabungan <span className="text-red-500">*</span>
+									Nama Tabungan <span className="text-rose-600">*</span>
 								</label>
 								<input
 									autoFocus
@@ -453,7 +447,7 @@ export default function FinancialParameters({
 									className={inputClass}
 								/>
 								{errors.name && (
-									<p className="text-xs text-red-500 mt-1">
+									<p className="text-xs text-rose-600 mt-1">
 										Nama tabungan wajib diisi.
 									</p>
 								)}
@@ -461,7 +455,7 @@ export default function FinancialParameters({
 
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Nominal <span className="text-red-500">*</span>
+									Nominal <span className="text-rose-600">*</span>
 								</label>
 								<input
 									type="text"
@@ -481,7 +475,7 @@ export default function FinancialParameters({
 									className={inputClass}
 								/>
 								{errors.nominal && (
-									<p className="text-xs text-red-500 mt-1">
+									<p className="text-xs text-rose-600 mt-1">
 										Nominal wajib diisi.
 									</p>
 								)}
@@ -489,7 +483,7 @@ export default function FinancialParameters({
 
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Jenis Tabungan <span className="text-red-500">*</span>
+									Jenis Tabungan <span className="text-rose-600">*</span>
 								</label>
 								<select
 									value={form.type}
@@ -507,7 +501,7 @@ export default function FinancialParameters({
 									))}
 								</select>
 								{errors.type && (
-									<p className="text-xs text-red-500 mt-1">
+									<p className="text-xs text-rose-600 mt-1">
 										Jenis tabungan wajib dipilih.
 									</p>
 								)}
@@ -515,7 +509,7 @@ export default function FinancialParameters({
 
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Kemudahan Dicairkan <span className="text-red-500">*</span>
+									Kemudahan Dicairkan <span className="text-rose-600">*</span>
 								</label>
 								<select
 									value={form.liquidity}
@@ -533,7 +527,7 @@ export default function FinancialParameters({
 									))}
 								</select>
 								{errors.liquidity && (
-									<p className="text-xs text-red-500 mt-1">
+									<p className="text-xs text-rose-600 mt-1">
 										Kemudahan dicairkan wajib dipilih.
 									</p>
 								)}
@@ -552,7 +546,7 @@ export default function FinancialParameters({
 								/>
 							</div>
 							{errors.api && (
-								<p className="text-xs text-red-500 font-medium">
+								<p className="text-xs text-rose-600 font-medium">
 									Gagal menyimpan tabungan. Silakan coba lagi.
 								</p>
 							)}
@@ -611,7 +605,7 @@ export default function FinancialParameters({
 						<div className="space-y-5">
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Nama <span className="text-red-500">*</span>
+									Nama <span className="text-rose-600">*</span>
 								</label>
 								<input
 									autoFocus
@@ -624,7 +618,7 @@ export default function FinancialParameters({
 									className={inputClass}
 								/>
 								{editErrors.name && (
-									<p className="text-xs text-red-500 mt-1">
+									<p className="text-xs text-rose-600 mt-1">
 										Nama wajib diisi.
 									</p>
 								)}
@@ -632,7 +626,7 @@ export default function FinancialParameters({
 
 							<div>
 								<label className="block text-xs font-semibold text-neutral mb-2">
-									Nilai <span className="text-red-500">*</span>
+									Nilai <span className="text-rose-600">*</span>
 								</label>
 								<input
 									type="text"
@@ -654,7 +648,7 @@ export default function FinancialParameters({
 									className={inputClass}
 								/>
 								{editErrors.nominal && (
-									<p className="text-xs text-red-500 mt-1">
+									<p className="text-xs text-rose-600 mt-1">
 										Nilai wajib diisi.
 									</p>
 								)}
@@ -717,7 +711,7 @@ export default function FinancialParameters({
 								/>
 							</div>
 							{editErrors.api && (
-								<p className="text-xs text-red-500 font-medium">
+								<p className="text-xs text-rose-600 font-medium">
 									Gagal menyimpan. Silakan coba lagi.
 								</p>
 							)}
@@ -728,7 +722,7 @@ export default function FinancialParameters({
 								type="button"
 								onClick={handleDelete}
 								disabled={saving}
-								className="px-4 py-2.5 text-sm font-medium rounded-full border border-red-200 text-red-500 hover:bg-red-50 transition cursor-pointer">
+								className="px-4 py-2.5 text-sm font-medium rounded-full border border-red-200 text-rose-600 hover:bg-red-50 transition cursor-pointer">
 								Hapus Aset
 							</button>
 							<div className="flex items-center gap-3">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Calendar, Sparkles } from "lucide-react";
+import { ArrowRight, Calendar, Sparkles } from "lucide-react";
 import Skeleton from "../ui/Skeleton";
 import { evidenceApi } from "../../services/evidence";
 import { evidenceTypeLabels, formatEvidenceDate } from "../../lib/evidence";
@@ -19,7 +19,7 @@ export default function EvidenceSummaryCard({
 	useEffect(() => {
 		let active = true;
 		evidenceApi
-			.list({ limit: 2 })
+			.list({ limit: 3 })
 			.then((res) => {
 				if (active) {
 					setItems(res.items);
@@ -27,7 +27,7 @@ export default function EvidenceSummaryCard({
 				}
 			})
 			.catch(() => {
-				// data tidak tersedia — render sebagai kosong
+				// gagal memuat — biarkan kosong
 			})
 			.finally(() => {
 				if (active) setLoading(false);
@@ -42,8 +42,8 @@ export default function EvidenceSummaryCard({
 			<div>
 				<Skeleton className="h-4 w-48 mb-4" />
 				<div className="space-y-3">
-					<Skeleton className="h-16 w-full rounded-xl" />
-					<Skeleton className="h-16 w-full rounded-xl" />
+					<Skeleton className="h-20 w-full rounded-xl" />
+					<Skeleton className="h-20 w-full rounded-xl" />
 				</div>
 			</div>
 		);
@@ -52,18 +52,19 @@ export default function EvidenceSummaryCard({
 	if (total === 0) {
 		return (
 			<div className="text-center py-6">
-				<p className="text-sm font-semibold text-neutral mb-1">
+				<p className="text-sm font-semibold text-slate-900 mb-1">
 					Belum ada bukti karier
 				</p>
-				<p className="text-xs text-neutral/50 mb-4 max-w-xs mx-auto">
+				<p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">
 					Tambahkan project, pencapaian, atau sertifikat untuk memperkuat profil
 					kariermu.
 				</p>
 				<button
 					type="button"
 					onClick={onSeeMore}
-					className="text-xs font-semibold text-primary hover:opacity-70 transition">
-					Lengkapi sekarang →
+					className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 hover:text-indigo-800 cursor-pointer">
+					Tambah Bukti Karier
+					<ArrowRight size={13} />
 				</button>
 			</div>
 		);
@@ -71,24 +72,26 @@ export default function EvidenceSummaryCard({
 
 	return (
 		<div>
-			<p className="text-sm text-neutral mb-4">
+			<p className="text-sm text-slate-700 mb-4">
 				Kamu memiliki{" "}
-				<span className="font-bold text-primary">{total} bukti karier</span>
+				<span className="font-bold text-indigo-700">{total} bukti karier</span>
 			</p>
 
-			<div className="space-y-3 mb-5">
+			<div className="space-y-3 mb-4">
 				{items.map((item) => (
-					<div key={item.id} className="bg-neutral/5 rounded-xl p-4">
-						<div className="flex items-center justify-between mb-1.5">
-							<span className="text-xs font-semibold text-neutral/50">
+					<div
+						key={item.id}
+						className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5">
+						<div className="flex items-center justify-between mb-1">
+							<span className="text-xs font-medium text-slate-500">
 								{evidenceTypeLabels[item.evidence_type]}
 							</span>
 							{item.ai_generated && (
-								<Sparkles size={12} className="text-primary/50" />
+								<Sparkles size={12} className="text-indigo-600" />
 							)}
 						</div>
-						<p className="text-sm font-bold text-neutral">{item.title}</p>
-						<div className="flex items-center gap-1.5 text-xs text-neutral/50 mt-1.5">
+						<p className="text-sm font-semibold text-slate-900">{item.title}</p>
+						<div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1.5">
 							<Calendar size={12} />
 							<span>{formatEvidenceDate(item.evidence_date)}</span>
 						</div>
@@ -99,8 +102,9 @@ export default function EvidenceSummaryCard({
 			<button
 				type="button"
 				onClick={onSeeMore}
-				className="text-xs font-semibold text-primary hover:opacity-70 transition">
-				Lihat Semua Bukti →
+				className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 hover:text-indigo-800 cursor-pointer">
+				Lihat Semua Bukti
+				<ArrowRight size={13} />
 			</button>
 		</div>
 	);
