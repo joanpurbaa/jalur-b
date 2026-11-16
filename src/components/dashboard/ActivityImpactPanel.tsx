@@ -1,10 +1,13 @@
 import { Sparkles } from "lucide-react";
 import ActivityImpactBar from "../ui/ActivityImpactBar";
-import ExpandableText from "../ui/ExpandableText";
+import Card from "../ui/Card";
+import IconTile from "../ui/IconTile";
+import { parseDecimal } from "../../lib/parseNumeric";
 
 interface ActivityItem {
 	key: string;
 	title: string;
+	score?: string;
 	level: string;
 	explanation?: string;
 }
@@ -30,36 +33,61 @@ export default function ActivityImpactPanel({
 	activities = [],
 }: ActivityImpactPanelProps) {
 	return (
-		<div className="bg-primary/5 rounded-2xl border border-primary/20 border-l-4 border-l-primary shadow-sm p-8 mb-8">
-			<div className="flex items-center gap-2 text-primary font-bold text-sm mb-1">
-				<Sparkles size={16} />
-				<span>{title}</span>
-			</div>
-			<ExpandableText
-				text={
-					description ||
-					"Intensitas dampak AI pada rutinitas kerjamu saat ini."
-				}
-				maxLines={2}
-				buttonClassName="text-[11px]"
-				className="text-xs text-neutral/60 mb-6"
-			/>
-
-			<div className="space-y-4">
-				{activities.map((item) => (
-					<div key={item.key || item.title} className="space-y-1.5">
-						<ActivityImpactBar
-							activity={item.title}
-							level={normalizeImpactLevel(item.level)}
-						/>
-						{item.explanation && (
-							<p className="text-[11px] text-neutral/50 leading-relaxed pl-0 lg:pl-40">
-								{item.explanation}
-							</p>
-						)}
+		<Card
+			padding="lg"
+			className="mb-8 bg-gradient-to-br from-white via-violet-50/35 to-cyan-50/30">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
+				<div className="flex items-center gap-3">
+					<IconTile icon={Sparkles} tone="skill" size="md" />
+					<div>
+						<h3 className="text-base sm:text-lg font-extrabold text-neutral">
+							{title}
+						</h3>
+						<p className="text-xs sm:text-sm text-neutral/65 mt-0.5">
+							{description ||
+								"Intensitas dampak AI pada rutinitas kerjamu saat ini."}
+						</p>
 					</div>
-				))}
+				</div>
+
+				<div className="flex flex-wrap items-center gap-2 text-[11px] font-bold">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+						<span className="w-2 h-2 rounded-full bg-emerald-500" />
+						Rendah
+					</span>
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+						<span className="w-2 h-2 rounded-full bg-amber-500" />
+						Sedang
+					</span>
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+						<span className="w-2 h-2 rounded-full bg-rose-500" />
+						Tinggi
+					</span>
+				</div>
 			</div>
-		</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				{activities.map((item) => {
+					const lvl = normalizeImpactLevel(item.level);
+					const numScore = item.score ? parseDecimal(item.score) : undefined;
+					return (
+						<div
+							key={item.key || item.title}
+							className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 space-y-2 shadow-2xs">
+							<ActivityImpactBar
+								activity={item.title}
+								level={lvl}
+								score={numScore}
+							/>
+							{item.explanation && (
+								<p className="text-xs text-neutral/65 leading-relaxed pt-1">
+									{item.explanation}
+								</p>
+							)}
+						</div>
+					);
+				})}
+			</div>
+		</Card>
 	);
 }

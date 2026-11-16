@@ -1,6 +1,10 @@
 import type { LucideIcon } from "lucide-react";
-import { statusStyles, type StatusVariant } from "../../lib/status";
-import ExpandableText from "../ui/ExpandableText";
+import { type StatusVariant } from "../../lib/status";
+import type { Tone } from "../../lib/modules";
+import ScoreRing from "../ui/ScoreRing";
+import IconTile from "../ui/IconTile";
+import StatusBadge from "../ui/StatusBadge";
+import Card from "../ui/Card";
 
 interface FeaturedMetricCardProps {
 	title: string;
@@ -8,6 +12,9 @@ interface FeaturedMetricCardProps {
 	description: string;
 	icon: LucideIcon;
 	variant: StatusVariant;
+	tone?: Tone;
+	ringColors?: [string, string];
+	badgeLabel?: string;
 }
 
 export default function FeaturedMetricCard({
@@ -16,27 +23,37 @@ export default function FeaturedMetricCard({
 	description,
 	icon: Icon,
 	variant,
+	tone = "skill",
+	ringColors,
+	badgeLabel,
 }: FeaturedMetricCardProps) {
-	const s = statusStyles[variant];
-
 	return (
-		<div className={`rounded-2xl border shadow-sm p-8 ${s.bg} ${s.border}`}>
-			<div className="flex items-center gap-2 mb-6">
-				<div
-					className={`w-9 h-9 rounded-xl flex items-center justify-center ${s.iconBg}`}>
-					<Icon size={18} className={s.text} />
-				</div>
-				<h3 className="text-base font-bold text-neutral">{title}</h3>
-			</div>
-			<div className="flex items-baseline gap-1">
-				<span className="text-5xl font-extrabold text-neutral">{value}</span>
-				<span className="text-2xl font-bold text-neutral/40">%</span>
-			</div>
-			<ExpandableText
-				text={description}
-				maxLines={2}
-				className="text-sm text-neutral/60 mt-3 leading-relaxed"
+		<Card
+			lift
+			tilt
+			padding="lg"
+			className="flex flex-col sm:flex-row items-center gap-6">
+			<ScoreRing
+				value={value}
+				max={100}
+				size={136}
+				stroke={13}
+				status={variant}
+				colors={ringColors}
+				suffix="%"
+				label={title}
 			/>
-		</div>
+
+			<div className="flex-1 min-w-0 text-center sm:text-left">
+				<div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mb-2">
+					<IconTile icon={Icon} tone={tone} size="sm" />
+					<h3 className="text-lg font-extrabold text-neutral">{title}</h3>
+					{badgeLabel && (
+						<StatusBadge label={badgeLabel} variant={variant} size="sm" />
+					)}
+				</div>
+				<p className="text-sm text-neutral/70 leading-relaxed">{description}</p>
+			</div>
+		</Card>
 	);
 }

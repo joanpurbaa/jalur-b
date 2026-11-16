@@ -1,6 +1,7 @@
-import { AlertTriangle } from "lucide-react";
-import { getLevelStatus, statusStyles, type RiskLevel } from "../../lib/status";
+import { getLevelStatus, type RiskLevel } from "../../lib/status";
 import StatusBadge from "../ui/StatusBadge";
+import HalfGauge from "../ui/HalfGauge";
+import Card from "../ui/Card";
 
 interface RiskStatusCardProps {
 	level: RiskLevel;
@@ -14,31 +15,40 @@ export default function RiskStatusCard({
 	score,
 }: RiskStatusCardProps) {
 	const variant = getLevelStatus(level);
-	const s = statusStyles[variant];
 
 	return (
-		<div className="bg-white rounded-2xl p-8 border border-neutral/5 shadow-md flex flex-col sm:flex-row items-start gap-5 mb-6">
-			<div
-				className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${s.iconBg}`}>
-				<AlertTriangle size={22} className={s.text} />
+		<Card
+			padding="lg"
+			className="mb-6 bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30 flex flex-col md:flex-row items-center gap-6 sm:gap-8">
+			<div className="shrink-0 flex flex-col items-center">
+				<HalfGauge
+					value={score ?? null}
+					max={100}
+					width={220}
+					stroke={16}
+					label="Skor Risiko Karier"
+					suffix="Skor Risiko / 100"
+				/>
 			</div>
-			<div className="flex-1">
-				<div className="flex items-center gap-3 flex-wrap">
-					<h2 className="text-xl font-bold text-neutral">Status Risiko</h2>
-					<StatusBadge
-						label={level.toUpperCase()}
-						variant={variant}
-					/>
-					{score != null && (
-						<span className="text-xs font-semibold text-neutral/50">
-							Skor: {score}/100
-						</span>
-					)}
+
+			<div className="flex-1 min-w-0 text-center md:text-left">
+				<div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 mb-2">
+					<span className="text-xs font-extrabold uppercase tracking-wider text-amber-700">
+						Status Risiko Saat Ini
+					</span>
+					<StatusBadge label={`Risiko ${level}`} variant={variant} />
 				</div>
-				<p className="text-sm text-neutral/60 mt-3 leading-relaxed max-w-xl">
+				<h2 className="text-xl sm:text-2xl font-extrabold text-neutral">
+					{level === "Rendah"
+						? "Peranmu tergolong tangguh terhadap guncangan pasar"
+						: level === "Sedang"
+							? "Waspada tenang: ada sinyal pergeseran yang bisa kamu antisipasi"
+							: "Saatnya memperkuat rencana cadangan dan bukti keahlianmu"}
+				</h2>
+				<p className="text-sm sm:text-[15px] text-neutral/75 mt-2.5 leading-relaxed">
 					{summary}
 				</p>
 			</div>
-		</div>
+		</Card>
 	);
 }
