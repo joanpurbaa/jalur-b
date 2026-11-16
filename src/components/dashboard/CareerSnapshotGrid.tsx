@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, GitFork, Sparkles, Wallet } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import MetricCard from "./MetricCard";
-import Skeleton from "../ui/Skeleton";
+import { GitFork, ShieldAlert, Sparkles, Wallet } from "lucide-react";
+import StatCard from "../ui/StatCard";
+import { SkeletonStatCard } from "../ui/Skeleton";
+import { Stagger, StaggerItem, CountUp } from "../ui/Motion";
 import { dashboardApi } from "../../services/dashboard";
 import { careerRiskApi } from "../../services/careerRisk";
 import { careerPivotApi } from "../../services/careerPivot";
 import { aiExposureApi } from "../../services/aiExposure";
+import { financialApi, parseRunwayMonths } from "../../services/financial";
 import { parseDecimal } from "../../lib/parseNumeric";
+import { formatMonths } from "../../lib/format";
 import {
 	getLevelStatus,
+	getRunwayStatus,
+	getScoreStatus,
 	normalizeRiskLevel,
 	type RiskLevel,
 	type StatusVariant,
@@ -20,7 +24,9 @@ interface SnapshotData {
 	riskLevel: RiskLevel | null;
 	skillProgress: number | null;
 	runwayMonths: number | null;
+	targetRunwayMonths: number;
 	pivotMatch: number | null;
+	topPivotTitle: string | null;
 }
 
 export default function CareerSnapshotGrid() {
@@ -30,19 +36,22 @@ export default function CareerSnapshotGrid() {
 		riskLevel: null,
 		skillProgress: null,
 		runwayMonths: null,
+		targetRunwayMonths: 6,
 		pivotMatch: null,
+		topPivotTitle: null,
 	});
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		let active = true;
 		const load = async () => {
-			const [dashResult, riskResult, pivotResult, exposureResult] =
+			const [dashResult, riskResult, pivotResult, exposureResult, finResult] =
 				await Promise.allSettled([
 					dashboardApi.get(),
 					careerRiskApi.latest(),
 					careerPivotApi.latest(),
 					aiExposureApi.latest(),
+					financialApi.get(),
 				]);
 			if (!active) return;
 
@@ -50,17 +59,23 @@ export default function CareerSnapshotGrid() {
 				riskLevel: null,
 				skillProgress: null,
 				runwayMonths: null,
+				targetRunwayMonths: 6,
 				pivotMatch: null,
+				topPivotTitle: null,
 			};
 
 			if (riskResult.status === "fulfilled") {
 				next.riskLevel = normalizeRiskLevel(riskResult.value.level);
 			}
 
-			if (pivotResult.status === "fulfilled" && pivotResult.value.roles.length > 0) {
+			if (
+				pivotResult.status === "fulfilled" &&
+				pivotResult.value.roles.length > 0
+			) {
 				next.pivotMatch = Math.round(
 					parseDecimal(pivotResult.value.roles[0].match_score),
 				);
+				next.topPivotTitle = pivotResult.value.roles[0].role_name;
 			}
 
 			if (exposureResult.status === "fulfilled") {
@@ -68,16 +83,25 @@ export default function CareerSnapshotGrid() {
 					0,
 					Math.min(
 						100,
-						Math.round(parseDecimal(exposureResult.value.skill_relevance_score)),
+						Math.round(
+							parseDecimal(exposureResult.value.skill_relevance_score),
+						),
 					),
 				);
 			}
 
-			if (dashResult.status === "fulfilled") {
-				const { financial } = dashResult.value;
-				if (financial) {
-					next.runwayMonths = parseDecimal(financial.runway_months);
-				}
+			// Utamakan sumber finansial langsung bila ada, fallback ke ringkasan dashboard
+			if (finResult.status === "fulfilled" && finResult.value.runway) {
+				const parsed = parseRunwayMonths(finResult.value.runway);
+				next.runwayMonths = parsed.current;
+				if (parsed.target > 0) next.targetRunwayMonths = parsed.target;
+			} else if (
+				dashResult.status === "fulfilled" &&
+				dashResult.value.financial
+			) {
+				next.runwayMonths = parseDecimal(
+					dashResult.value.financial.runway_months,
+				);
 			}
 
 			setData(next);
@@ -89,98 +113,172 @@ export default function CareerSnapshotGrid() {
 		};
 	}, [refreshKey]);
 
-	const runwayVariant: StatusVariant =
-		data.runwayMonths == null
-			? "neutral"
-			: data.runwayMonths >= 12
-				? "healthy"
-				: data.runwayMonths >= 6
-					? "warning"
-					: "risk";
+	if (loading) {
+		return (
+			<section className="mb-8" aria-label="Career Snapshot">
+				<div className="flex items-center justify-between mb-3.5">
+					<h2 className="text-base font-extrabold text-neutral">
+						Ringkasan 4 Pilar
+					</h2>
+				</div>
+				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+					{[0, 1, 2, 3].map((i) => (
+						<SkeletonStatCard key={i} />
+					))}
+				</div>
+			</section>
+		);
+	}
 
-	const runwayValue =
-		data.runwayMonths != null
-			? data.runwayMonths % 1 === 0
-				? `${Math.round(data.runwayMonths)} bulan`
-				: `${data.runwayMonths.toFixed(1)} bulan`
-			: "—";
+	const riskStatus: StatusVariant = data.riskLevel
+		? getLevelStatus(data.riskLevel)
+		: "neutral";
+	const riskSeg: 1 | 2 | 3 =
+		data.riskLevel === "Rendah" ? 1 : data.riskLevel === "Sedang" ? 2 : 3;
 
-	const pivotVariant: StatusVariant =
+	const skillStatus: StatusVariant =
+		data.skillProgress != null ? getScoreStatus(data.skillProgress) : "neutral";
+
+	const pivotStatus: StatusVariant =
 		data.pivotMatch == null
 			? "neutral"
 			: data.pivotMatch >= 70
 				? "healthy"
-				: data.pivotMatch >= 40
+				: data.pivotMatch >= 45
 					? "warning"
 					: "risk";
 
-	if (loading) {
-		return (
-			<div className="mb-8">
-				<h3 className="text-sm font-bold text-neutral mb-3">Career Snapshot</h3>
-				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-					{[0, 1, 2, 3].map((i) => (
-						<div
-							key={i}
-							className="bg-white rounded-2xl border border-neutral/5 shadow-sm p-5 h-32 flex flex-col justify-between">
-							<Skeleton className="h-9 w-9 rounded-xl" />
-							<div>
-								<Skeleton className="h-3 w-24 mb-2" />
-								<Skeleton className="h-5 w-20" />
-							</div>
-						</div>
-					))}
-				</div>
-			</div>
-		);
-	}
+	const runwayStatus: StatusVariant =
+		data.runwayMonths == null
+			? "neutral"
+			: getRunwayStatus(data.runwayMonths, data.targetRunwayMonths);
 
-	const cards: {
-		title: string;
-		value: string;
-		icon: LucideIcon;
-		variant: StatusVariant;
-	}[] = [
-		{
-			title: "Career Risk",
-			value: data.riskLevel ?? "—",
-			icon: AlertTriangle,
-			variant: data.riskLevel ? getLevelStatus(data.riskLevel) : "neutral",
-		},
-		{
-			title: "Skill Relevance",
-			value: data.skillProgress != null ? `${data.skillProgress}%` : "—",
-			icon: Sparkles,
-			variant: data.skillProgress != null ? "healthy" : "neutral",
-		},
-		{
-			title: "Career Pivot",
-			value: data.pivotMatch != null ? `${data.pivotMatch}%` : "—",
-			icon: GitFork,
-			variant: pivotVariant,
-		},
-		{
-			title: "Financial Runway",
-			value: runwayValue,
-			icon: Wallet,
-			variant: runwayVariant,
-		},
-	];
+	const runwayProgress =
+		data.runwayMonths != null
+			? Math.min(
+					100,
+					Math.round(
+						(data.runwayMonths / Math.max(1, data.targetRunwayMonths)) * 100,
+					),
+				)
+			: null;
 
 	return (
-		<div className="mb-8">
-			<h3 className="text-sm font-bold text-neutral mb-3">Career Snapshot</h3>
-			<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-				{cards.map((item) => (
-					<MetricCard
-						key={item.title}
-						label={item.title}
-						value={item.value}
-						icon={item.icon}
-						variant={item.variant}
-					/>
-				))}
+		<section className="mb-8" aria-label="Ringkasan 4 Pilar Karier">
+			<div className="flex items-center justify-between mb-3.5">
+				<div>
+					<h2 className="text-base sm:text-lg font-extrabold text-neutral">
+						Peta Kondisi Saat Ini
+					</h2>
+					<p className="text-xs sm:text-sm text-neutral/60">
+						Ketuk kartu untuk mendalami tiap modul
+					</p>
+				</div>
 			</div>
-		</div>
+
+			<Stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+				<StaggerItem>
+					<StatCard
+						label="Risiko Karier"
+						value={data.riskLevel ?? "—"}
+						subtitle={
+							data.riskLevel === "Rendah"
+								? "Posisi relatif terjaga"
+								: data.riskLevel === "Sedang"
+									? "Ada sinyal yang perlu dipantau"
+									: data.riskLevel === "Tinggi"
+										? "Siapkan langkah antisipasi"
+										: "Lengkapi penilaian karier"
+						}
+						icon={ShieldAlert}
+						tone="risiko-karier"
+						status={riskStatus}
+						statusLabel={data.riskLevel ?? "Belum dinilai"}
+						segments={
+							data.riskLevel
+								? { active: riskSeg, status: riskStatus }
+								: null
+						}
+						href="/dashboard/risiko-karier"
+					/>
+				</StaggerItem>
+
+				<StaggerItem>
+					<StatCard
+						label="Relevansi Skill"
+						value={
+							data.skillProgress != null ? (
+								<>
+									<CountUp value={data.skillProgress} />%
+								</>
+							) : (
+								"—"
+							)
+						}
+						subtitle="Daya tahan skill di era AI"
+						icon={Sparkles}
+						tone="skill"
+						status={skillStatus}
+						progress={data.skillProgress}
+						href="/dashboard/skill"
+					/>
+				</StaggerItem>
+
+				<StaggerItem>
+					<StatCard
+						label="Kecocokan Pivot"
+						value={
+							data.pivotMatch != null ? (
+								<>
+									<CountUp value={data.pivotMatch} />%
+								</>
+							) : (
+								"—"
+							)
+						}
+						subtitle={
+							data.topPivotTitle
+								? `Opsi terdekat: ${data.topPivotTitle}`
+								: "Alternatif jalur karier"
+						}
+						icon={GitFork}
+						tone="jalur-karier"
+						status={pivotStatus}
+						progress={data.pivotMatch}
+						href="/dashboard/jalur-karier"
+					/>
+				</StaggerItem>
+
+				<StaggerItem>
+					<StatCard
+						label="Runway Finansial"
+						value={
+							data.runwayMonths != null
+								? formatMonths(data.runwayMonths)
+								: "—"
+						}
+						subtitle={
+							data.runwayMonths != null
+								? `Target aman ${formatMonths(data.targetRunwayMonths)}`
+								: "Atur parameter finansial"
+						}
+						icon={Wallet}
+						tone="finansial"
+						status={runwayStatus}
+						statusLabel={
+							data.runwayMonths == null
+								? "Belum diisi"
+								: runwayStatus === "healthy"
+									? "Di atas target"
+									: runwayStatus === "warning"
+										? "Mendekati target"
+										: "Area ditingkatkan"
+						}
+						progress={runwayProgress}
+						href="/dashboard/finansial"
+					/>
+				</StaggerItem>
+			</Stagger>
+		</section>
 	);
 }
