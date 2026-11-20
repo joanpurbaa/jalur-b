@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RefreshCw } from "lucide-react";
+import { Lock, RefreshCw } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
 import { SecondaryButton } from "../ui/PrimaryButton";
+import { CreditCostPill } from "../ui/CreditLockBanner";
 import ProfileHeaderCard from "../profile/ProfileHeaderCard";
 import CareerSummaryCard from "../profile/CareerSummaryCard";
 import ProfileSection from "../profile/ProfileSection";
@@ -20,11 +21,15 @@ import { profileApi } from "../../services/profile";
 import type { OnboardingProfile, OnboardingSkill } from "../../types/onboarding";
 import { useAuth } from "../../context/AuthContext";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
+import { useCredits } from "../../context/CreditsContext";
 
 export default function Profil() {
 	const navigate = useNavigate();
 	const { user } = useAuth();
-	const { openCareerAssessment } = useCareerAssessment();
+	const { openCareerAssessment, hasExistingAssessment } = useCareerAssessment();
+	const { isUnlocked } = useCredits();
+	const needsReassessmentCredit =
+		hasExistingAssessment && !isUnlocked("re_assessment");
 	const [profile, setProfile] = useState<OnboardingProfile | null>(null);
 	const [skills, setSkills] = useState<OnboardingSkill[]>([]);
 	const [profileLoading, setProfileLoading] = useState(true);
@@ -62,9 +67,16 @@ export default function Profil() {
 				subtitle="Kelola informasi diri, pengalaman, dan data analisis yang digunakan Jalur B."
 				action={
 					<SecondaryButton
-						icon={<RefreshCw size={15} />}
+						icon={
+							needsReassessmentCredit ? (
+								<Lock size={14} className="text-indigo-600" />
+							) : (
+								<RefreshCw size={15} />
+							)
+						}
 						onClick={openCareerAssessment}>
-						Perbarui Data Karier
+						<span>Perbarui Data Karier</span>
+						{needsReassessmentCredit && <CreditCostPill cost={2} />}
 					</SecondaryButton>
 				}
 			/>

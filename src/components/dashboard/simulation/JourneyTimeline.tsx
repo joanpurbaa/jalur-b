@@ -56,7 +56,7 @@ export default function JourneyTimeline() {
 					Alur Simulasi · 5 Tahap Proyeksi
 				</span>
 				<span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-white border border-slate-200 text-slate-600">
-					PP 35/2021
+					PP 35/2021 &amp; PP 6/2025
 				</span>
 			</div>
 

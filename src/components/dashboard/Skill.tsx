@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+	Award,
 	Cpu,
 	TrendingUp,
 	ShieldCheck,
@@ -7,6 +8,7 @@ import {
 	Wrench,
 } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
+import IconTile from "../ui/IconTile";
 import FeaturedMetricCard from "./FeaturedMetricCard";
 import ActivityImpactPanel from "./ActivityImpactPanel";
 import SkillAnalysisCard from "./SkillAnalysisCard";
@@ -14,6 +16,7 @@ import EmptyState from "../ui/EmptyState";
 import { PrimaryButton } from "../ui/PrimaryButton";
 import { SkeletonHero, SkeletonStatCard } from "../ui/Skeleton";
 import { aiExposureApi } from "../../services/aiExposure";
+import { loadManualCache, saveManualCache } from "../../lib/manualCache";
 import { parseDecimal } from "../../lib/parseNumeric";
 import { localizeLevelLabel, normalizeConfidence } from "../../lib/status";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
@@ -26,18 +29,24 @@ function clampPercent(value: number): number {
 export default function Skill() {
 	const { refreshKey, openCareerAssessment } = useCareerAssessment();
 
-	const [result, setResult] = useState<AiExposureResult | null>(null);
-	const [loading, setLoading] = useState(true);
+	const cachedAi = loadManualCache<AiExposureResult>("ai_exposure");
+	const [result, setResult] = useState<AiExposureResult | null>(
+		() => cachedAi?.data ?? null,
+	);
+	const [loading, setLoading] = useState(() => !cachedAi?.data);
 
 	useEffect(() => {
 		let active = true;
 		aiExposureApi
 			.latest()
 			.then((res) => {
-				if (active) setResult(res);
+				if (active) {
+					setResult(res);
+					saveManualCache("ai_exposure", res);
+				}
 			})
 			.catch(() => {
-				// belum ada penilaian — biarkan kosong
+				// belum ada penilaian — pertahankan cache jika ada atau biarkan kosong
 			})
 			.finally(() => {
 				if (active) setLoading(false);
@@ -103,14 +112,17 @@ export default function Skill() {
 					)}
 
 					{/* 3. Peta skill & langkah penguatan */}
-					<div className="mb-3.5">
-						<h3 className="text-base font-bold text-slate-900">
-							Portofolio Skill
-						</h3>
-						<p className="text-xs sm:text-sm text-slate-500">
-							Kelompok keahlian berdasarkan kekuatan, tren permintaan, dan area
-							penguatan
-						</p>
+					<div className="mb-3.5 flex items-center gap-2.5">
+						<IconTile icon={Award} tone="indigo" size="xs" />
+						<div>
+							<h3 className="text-base font-bold text-slate-900">
+								Portofolio Skill
+							</h3>
+							<p className="text-xs sm:text-sm text-slate-500">
+								Kelompok keahlian berdasarkan kekuatan, tren permintaan, dan area
+								penguatan
+							</p>
+						</div>
 					</div>
 
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -5,6 +5,7 @@ import {
 	Compass,
 	Layers,
 	Cpu,
+	Lock,
 	Target,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -46,6 +47,7 @@ interface CareerPathMapProps {
 	currentRoleName: string;
 	roles: { name: string; match: number; prepMonths?: number }[];
 	selectedIndex?: number;
+	lockSecondaryRoles?: boolean;
 	onSelectRole?: (index: number) => void;
 }
 
@@ -53,6 +55,7 @@ export default function CareerPathMap({
 	currentRoleName,
 	roles,
 	selectedIndex = 0,
+	lockSecondaryRoles = false,
 	onSelectRole,
 }: CareerPathMapProps) {
 	return (
@@ -124,6 +127,7 @@ export default function CareerPathMap({
 					{roles.map((role, index) => {
 						const pos = positionFor(index);
 						const isSelected = index === selectedIndex;
+						const isLocked = lockSecondaryRoles && index > 0;
 						return (
 							<CareerPathNode
 								key={role.name}
@@ -131,6 +135,7 @@ export default function CareerPathMap({
 								title={role.name}
 								match={role.match}
 								selected={isSelected}
+								locked={isLocked}
 								onClick={() => onSelectRole?.(index)}
 								style={{ top: `${pos.top}%`, left: `${pos.left}%` }}
 							/>
@@ -183,9 +188,17 @@ export default function CareerPathMap({
 											<Icon size={15} />
 										</span>
 										<div className="min-w-0">
-											<p className="text-sm font-semibold text-slate-900 truncate">
-												{role.name}
-											</p>
+											<div className="flex items-center gap-1.5">
+												<p className="text-sm font-semibold text-slate-900 truncate">
+													{role.name}
+												</p>
+												{lockSecondaryRoles && index > 0 && (
+													<Lock
+														size={12}
+														className="text-indigo-600 shrink-0"
+													/>
+												)}
+											</div>
 											{role.prepMonths != null && (
 												<p className="text-xs text-slate-500">
 													Persiapan ~{role.prepMonths} bln

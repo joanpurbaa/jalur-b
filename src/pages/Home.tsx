@@ -1,3 +1,4 @@
+import EnterpriseSection from "../components/home/EnterpriseSection";
 import FinalVideoBanner from "../components/home/FinalVideoBanner";
 import Hero from "../components/home/Hero";
 import HowItWorks from "../components/home/HowItWorks";
@@ -17,6 +18,7 @@ export default function Home() {
 			<SolutionSection />
 			<PreparedVideoBanner />
 			<HowItWorks />
+			<EnterpriseSection />
 			<FinalVideoBanner />
 		</div>
 	);

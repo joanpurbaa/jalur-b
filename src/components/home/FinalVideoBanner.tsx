@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 export default function FinalVideoBanner() {
 	const navigate = useNavigate();
@@ -27,9 +28,10 @@ export default function FinalVideoBanner() {
 
 					<button
 						type="button"
-						onClick={() => navigate("/login")}
-						className="mt-10 rounded-full bg-primary px-8 py-4 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
-						Mulai sekarang →
+						onClick={() => navigate("/register")}
+						className="press mt-10 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 cursor-pointer">
+						<span>Mulai sekarang</span>
+						<ArrowRight size={16} />
 					</button>
 				</div>
 			</div>

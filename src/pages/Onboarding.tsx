@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+	AlertCircle,
 	ArrowLeft,
 	ArrowRight,
 	Award,
@@ -9,12 +10,18 @@ import {
 	Check,
 	Clock,
 	Compass,
+	ExternalLink,
 	FileText,
+	FileUp,
 	GitFork,
+	GraduationCap,
 	HelpCircle,
 	Layers,
+	Loader2,
 	Rocket,
 	Search,
+	ShieldCheck,
+	Sparkles,
 	TrendingUp,
 	User,
 	X,
@@ -24,6 +31,8 @@ import { ApiError } from "../types/api";
 import { onboardingApi } from "../services/onboarding";
 import { masterApi } from "../services/master";
 import { cvApi } from "../services/cv";
+import { useCredits } from "../context/CreditsContext";
+import type { EmploymentStatus } from "../lib/credits";
 import IconTile from "../components/ui/IconTile";
 import Card from "../components/ui/Card";
 import { PageTransition } from "../components/ui/Motion";
@@ -38,6 +47,7 @@ function formatFileSize(bytes: number): string {
 }
 
 interface FormData {
+	workStatus: EmploymentStatus | "";
 	fullName: string;
 	role: string;
 	industry: string;
@@ -49,6 +59,39 @@ interface FormData {
 	targetRole: string;
 	targetIndustry: string;
 }
+
+const WORK_STATUS_OPTIONS: {
+	id: EmploymentStatus;
+	title: string;
+	desc: string;
+	icon: LucideIcon;
+}[] = [
+	{
+		id: "working",
+		title: "Sedang bekerja",
+		desc: "Aktif bekerja sebagai karyawan tetap, kontrak, atau berpenghasilan.",
+		icon: Briefcase,
+	},
+	{
+		id: "stopped",
+		title: "Sudah berhenti",
+		desc: "Baru mengalami PHK, kontrak berakhir, atau mengundurkan diri.",
+		icon: Clock,
+	},
+	{
+		id: "never_worked",
+		title: "Belum pernah bekerja",
+		desc: "Belum pernah memiliki pekerjaan atau penghasilan tetap.",
+		icon: GraduationCap,
+	},
+];
+
+const JOB_PORTAL_LINKS = [
+	{ label: "Glints", href: "https://glints.com/id" },
+	{ label: "JobStreet", href: "https://id.jobstreet.com" },
+	{ label: "Kalibrr", href: "https://www.kalibrr.id" },
+	{ label: "LinkedIn Jobs", href: "https://www.linkedin.com/jobs" },
+];
 
 const STEP_META: Record<
 	number,
@@ -179,7 +222,11 @@ const careerGoalOptions: {
 
 export default function Onboarding() {
 	const navigate = useNavigate();
+	const { setEmploymentStatus } = useCredits();
 	const [step, setStep] = useState<number>(1);
+	const [jumpedToCv, setJumpedToCv] = useState<boolean>(false);
+	const [cvAutofilling, setCvAutofilling] = useState<boolean>(false);
+	const [cvAutofillNote, setCvAutofillNote] = useState<string>("");
 	const [industryDropdownOpen, setIndustryDropdownOpen] =
 		useState<boolean>(false);
 	const [industrySearch, setIndustrySearch] = useState<string>("");
@@ -195,6 +242,7 @@ export default function Onboarding() {
 	const [cvFile, setCvFile] = useState<File | null>(null);
 
 	const [formData, setFormData] = useState<FormData>({
+		workStatus: "",
 		fullName: "",
 		role: "",
 		industry: "",
@@ -246,10 +294,16 @@ export default function Onboarding() {
 		});
 	};
 
+	const isBlockedNeverWorked = formData.workStatus === "never_worked";
+
 	const isStepValid = (): boolean => {
 		switch (step) {
 			case 1:
-				return formData.fullName.trim() !== "";
+				return (
+					(formData.workStatus === "working" ||
+						formData.workStatus === "stopped") &&
+					formData.fullName.trim() !== ""
+				);
 			case 2:
 				return formData.role.trim() !== "";
 			case 3:
@@ -269,10 +323,63 @@ export default function Onboarding() {
 		}
 	};
 
+	const handleSelectWorkStatus = (status: EmploymentStatus) => {
+		setFormData((prev) => ({ ...prev, workStatus: status }));
+		setEmploymentStatus(status);
+		if (errorMessage) setErrorMessage("");
+	};
+
+	const handleJumpToCv = () => {
+		setJumpedToCv(true);
+		setErrorMessage("");
+		setStep(8);
+	};
+
+	const handleAutofillFromCv = async () => {
+		if (!cvFile) {
+			setJumpedToCv(false);
+			setStep(1);
+			return;
+		}
+		setCvAutofilling(true);
+		setErrorMessage("");
+		try {
+			const preview = await cvApi.preview(cvFile);
+			setFormData((prev) => ({
+				...prev,
+				workStatus: prev.workStatus || "working",
+				fullName: prev.fullName || preview.profile?.full_name || "",
+				role: prev.role || preview.profile?.current_role_name || "",
+				industry: prev.industry || preview.profile?.industry_name || "",
+				skills:
+					prev.skills.length > 0
+						? prev.skills
+						: (preview.skills ?? []).slice(0, 8),
+			}));
+			setCvAutofillNote(
+				"Data awal berhasil diambil dari CV. Cek sebentar dan lengkapi kolom yang masih kosong.",
+			);
+		} catch {
+			setCvAutofillNote(
+				"Berkas CV sudah terlampir dan akan diproses saat selesai. Lengkapi langkah singkat berikut dulu ya.",
+			);
+		} finally {
+			setCvAutofilling(false);
+			setJumpedToCv(false);
+			setStep(1);
+		}
+	};
+
 	const handleNext = () => {
+		if (step === 8 && jumpedToCv) {
+			void handleAutofillFromCv();
+			return;
+		}
 		if (!isStepValid()) {
 			setErrorMessage(
-				"Yuk, lengkapi bagian ini dulu supaya kami bisa memetakan profilmu dengan tepat.",
+				isBlockedNeverWorked
+					? "Jalur B khusus untuk yang sedang atau pernah bekerja."
+					: "Yuk, lengkapi bagian ini dulu supaya kami bisa memetakan profilmu dengan tepat.",
 			);
 			return;
 		}
@@ -282,6 +389,11 @@ export default function Onboarding() {
 
 	const handleBack = () => {
 		setErrorMessage("");
+		if (step === 8 && jumpedToCv) {
+			setJumpedToCv(false);
+			setStep(1);
+			return;
+		}
 		setStep((prev) => prev - 1);
 	};
 
@@ -479,35 +591,188 @@ export default function Onboarding() {
 								Halo, kenalan dulu
 							</h1>
 							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
-								Siapa nama lengkapmu? Kami akan menyapamu dengan nama ini di
-								seluruh ruang kerja Jalur B.
+								Pilih kondisi kerjamu saat ini agar Jalur B menyesuaikan perhitungan
+								runway dan hak normatif dengan tepat.
 							</p>
 
-							<div className="mt-7">
-								<label className="block text-xs font-semibold text-slate-600 mb-2">
-									Nama Lengkap
+							{cvAutofillNote && (
+								<div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/80 px-3.5 py-2.5 flex items-start gap-2.5 text-xs text-emerald-900">
+									<ShieldCheck size={15} className="text-emerald-700 shrink-0 mt-0.5" />
+									<span>{cvAutofillNote}</span>
+								</div>
+							)}
+
+							{/* Gerbang Status Kerja (P0 #1) */}
+							<div className="mt-6">
+								<label className="block text-xs font-semibold text-slate-700 mb-2.5">
+									Status Kerja Saat Ini <span className="text-rose-600">*</span>
 								</label>
-								<input
-									type="text"
-									autoFocus
-									placeholder="Contoh: Joan Orlando Purba"
-									value={formData.fullName}
-									onChange={(e) => {
-										setFormData({ ...formData, fullName: e.target.value });
-										if (errorMessage) setErrorMessage("");
-									}}
-									onKeyDown={(e) => {
-										if (e.key === "Enter" && isStepValid()) {
-											e.preventDefault();
-											handleNext();
-										}
-									}}
-									className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 text-base font-medium text-slate-900 placeholder:text-slate-400"
-								/>
-								<p className="text-xs text-slate-500 mt-2">
-									Tenang, namamu hanya tampil untuk mempersonalisasi pengalamanmu.
-								</p>
+								<div
+									role="radiogroup"
+									aria-label="Status kerja saat ini"
+									className="grid grid-cols-1 gap-2.5">
+									{WORK_STATUS_OPTIONS.map((opt) => {
+										const selected = formData.workStatus === opt.id;
+										const isGateOption = opt.id === "never_worked";
+										return (
+											<button
+												key={opt.id}
+												type="button"
+												role="radio"
+												aria-checked={selected}
+												onClick={() => handleSelectWorkStatus(opt.id)}
+												className={`p-3.5 rounded-xl border text-left flex items-center gap-3.5 transition cursor-pointer ${
+													selected
+														? isGateOption
+															? "border-amber-500 bg-amber-50/70 ring-1 ring-amber-500/25"
+															: "border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-500/25"
+														: "border-slate-200 bg-white hover:border-indigo-200"
+												}`}>
+												<IconTile
+													icon={opt.icon}
+													tone={
+														selected && isGateOption
+															? "caution"
+															: selected
+																? "indigo"
+																: "neutral"
+													}
+													size="sm"
+												/>
+												<div className="min-w-0 flex-1">
+													<p className="text-sm font-bold text-slate-900">
+														{opt.title}
+													</p>
+													<p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+														{opt.desc}
+													</p>
+												</div>
+												{selected && (
+													<span
+														className={`w-5 h-5 rounded-full text-white flex items-center justify-center shrink-0 ${
+															isGateOption ? "bg-amber-600" : "bg-indigo-600"
+														}`}>
+														<Check size={12} strokeWidth={3} />
+													</span>
+												)}
+											</button>
+										);
+									})}
+								</div>
 							</div>
+
+							{/* Gate Stop untuk "Belum pernah bekerja" */}
+							{isBlockedNeverWorked ? (
+								<div
+									role="alert"
+									className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/80 p-5 space-y-4">
+									<div className="flex items-start gap-3">
+										<IconTile icon={AlertCircle} tone="caution" size="sm" />
+										<div>
+											<h2 className="text-sm sm:text-base font-bold text-slate-900">
+												Jalur B khusus untuk yang sedang atau pernah bekerja. Mulai
+												dari job portal dulu ya.
+											</h2>
+											<p className="text-xs sm:text-sm text-slate-700 mt-1.5 leading-relaxed">
+												Perhitungan pesangon (PP 35/2021), manfaat JKP (PP 6/2025),
+												dan proyeksi runway membutuhkan riwayat kerja &amp; gaji aktif,
+												sehingga pendaftaran tidak dapat dilanjutkan dengan penghasilan Rp0.
+											</p>
+										</div>
+									</div>
+
+									<div className="pt-3 border-t border-amber-200/80">
+										<p className="text-xs font-semibold text-slate-700 mb-2.5">
+											Rekomendasi job portal untuk mulai melamar kerja pertamamu:
+										</p>
+										<div className="flex flex-wrap gap-2">
+											{JOB_PORTAL_LINKS.map((portal) => (
+												<a
+													key={portal.label}
+													href={portal.href}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="press inline-flex items-center gap-1.5 min-h-[36px] px-3 py-1.5 rounded-xl bg-white border border-amber-200 hover:border-indigo-300 text-xs font-semibold text-slate-800 hover:text-indigo-700 transition">
+													<span>{portal.label}</span>
+													<ExternalLink size={12} />
+												</a>
+											))}
+										</div>
+									</div>
+
+									<div className="pt-1">
+										<button
+											type="button"
+											onClick={() => navigate("/")}
+											className="text-xs font-semibold text-indigo-700 hover:underline inline-flex items-center gap-1 cursor-pointer">
+											<ArrowLeft size={13} />
+											Kembali ke halaman utama
+										</button>
+									</div>
+								</div>
+							) : (
+								<>
+									{formData.workStatus === "stopped" && (
+										<div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50/60 px-3.5 py-2.5 flex items-start gap-2.5 text-xs text-indigo-900">
+											<Clock size={15} className="text-indigo-600 shrink-0 mt-0.5" />
+											<span>
+												Kami akan memprioritaskan informasi{" "}
+												<strong>tenggat klaim JKP (PP 6/2025)</strong> di bagian paling
+												atas hasil simulasimu nanti.
+											</span>
+										</div>
+									)}
+
+									<div className="mt-6">
+										<label className="block text-xs font-semibold text-slate-700 mb-2">
+											Nama Lengkap <span className="text-rose-600">*</span>
+										</label>
+										<input
+											type="text"
+											placeholder="Contoh: Joan Orlando Purba"
+											value={formData.fullName}
+											onChange={(e) => {
+												setFormData({ ...formData, fullName: e.target.value });
+												if (errorMessage) setErrorMessage("");
+											}}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" && isStepValid()) {
+													e.preventDefault();
+													handleNext();
+												}
+											}}
+											className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 text-base font-medium text-slate-900 placeholder:text-slate-400"
+										/>
+										<p className="text-xs text-slate-500 mt-2">
+											Tenang, namamu hanya tampil untuk mempersonalisasi pengalamanmu.
+										</p>
+									</div>
+
+									{/* Shortcut P2 #12: Punya CV? Isi otomatis */}
+									<div className="mt-6 pt-5 border-t border-slate-100">
+										<button
+											type="button"
+											onClick={handleJumpToCv}
+											className="press w-full rounded-xl border border-indigo-200/80 bg-indigo-50/50 hover:bg-indigo-50 px-4 py-3 flex items-center justify-between gap-3 text-left transition cursor-pointer">
+											<div className="flex items-center gap-3 min-w-0">
+												<IconTile icon={FileUp} tone="indigo" size="xs" />
+												<div className="min-w-0">
+													<p className="text-xs sm:text-sm font-bold text-indigo-900">
+														Punya CV? Isi otomatis
+													</p>
+													<p className="text-xs text-slate-600 truncate">
+														Lompat ke langkah unggah CV untuk mempercepat pengisian profil
+													</p>
+												</div>
+											</div>
+											<ArrowRight
+												size={15}
+												className="text-indigo-600 shrink-0"
+											/>
+										</button>
+									</div>
+								</>
+							)}
 						</div>
 					)}
 
@@ -933,12 +1198,14 @@ export default function Onboarding() {
 					{step === 8 && (
 						<div>
 							<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-								Ingin melampirkan CV sekalian? (Opsional)
+								{jumpedToCv
+									? "Unggah CV untuk isi profil otomatis"
+									: "Ingin melampirkan CV sekalian? (Opsional)"}
 							</h1>
 							<p className="text-sm sm:text-[15px] text-slate-600 mt-1.5">
-								CV membantu Jalur B mengekstrak riwayat pengalaman kerjamu secara
-								otomatis. Kamu juga bebas melewati langkah ini dan mengunggahnya
-								nanti di halaman Profil.
+								{jumpedToCv
+									? "Impor CV pertama gratis. Setelah diunggah, kami akan membantu mengisi nama, peran, industri, dan skill awalmu."
+									: "Impor CV pertama gratis — membantu Jalur B mengekstrak riwayat pengalaman kerjamu secara otomatis. Kamu juga bebas melewati langkah ini dan mengunggahnya nanti di halaman Profil."}
 							</p>
 
 							<div className="mt-7">
@@ -1095,14 +1362,32 @@ export default function Onboarding() {
 						<button
 							type="button"
 							onClick={handleNext}
-							disabled={!isStepValid()}
+							disabled={!isStepValid() || cvAutofilling}
 							className={`min-h-[44px] px-6 py-2.5 text-sm font-semibold rounded-xl transition inline-flex items-center gap-2 ${
-								isStepValid()
+								isStepValid() && !cvAutofilling
 									? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs cursor-pointer"
 									: "bg-slate-200 text-slate-400 cursor-not-allowed"
 							}`}>
-							<span>{step === 8 && !cvFile ? "Lewati & Lanjut" : "Lanjut"}</span>
-							<ArrowRight size={15} />
+							{cvAutofilling ? (
+								<>
+									<Loader2 size={15} className="animate-spin" />
+									<span>Membaca CV...</span>
+								</>
+							) : step === 8 && jumpedToCv ? (
+								<>
+									<Sparkles size={15} />
+									<span>
+										{cvFile ? "Isi Otomatis & Lanjutkan" : "Kembali ke Langkah 1"}
+									</span>
+								</>
+							) : (
+								<>
+									<span>
+										{step === 8 && !cvFile ? "Lewati & Lanjut" : "Lanjut"}
+									</span>
+									<ArrowRight size={15} />
+								</>
+							)}
 						</button>
 					) : (
 						<button

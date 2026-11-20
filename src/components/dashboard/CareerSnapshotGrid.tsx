@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { GitFork, ShieldAlert, Cpu, Wallet } from "lucide-react";
+import { GitFork, LayoutGrid, ShieldAlert, Cpu, Wallet } from "lucide-react";
 import StatCard from "../ui/StatCard";
+import IconTile from "../ui/IconTile";
 import { SkeletonStatCard } from "../ui/Skeleton";
 import { Stagger, StaggerItem, CountUp } from "../ui/Motion";
 import { dashboardApi } from "../../services/dashboard";
@@ -150,13 +151,16 @@ export default function CareerSnapshotGrid() {
 	return (
 		<section className="mb-8" aria-label="Ringkasan Kondisi Karier">
 			<div className="flex items-center justify-between mb-3.5">
-				<div>
-					<h2 className="text-base font-bold text-slate-900">
-						Ringkasan 4 Pilar
-					</h2>
-					<p className="text-xs text-slate-500">
-						Pilih kartu untuk melihat faktor dan rincian tiap area
-					</p>
+				<div className="flex items-center gap-2.5">
+					<IconTile icon={LayoutGrid} tone="indigo" size="xs" />
+					<div>
+						<h2 className="text-base font-bold text-slate-900">
+							Ringkasan 4 Pilar
+						</h2>
+						<p className="text-xs text-slate-500">
+							Pilih kartu untuk melihat faktor dan rincian tiap area
+						</p>
+					</div>
 				</div>
 			</div>
 

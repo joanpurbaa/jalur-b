@@ -36,6 +36,7 @@ import { aiExposureApi } from "../../../services/aiExposure";
 import { financialApi } from "../../../services/financial";
 import { careerPivotApi } from "../../../services/careerPivot";
 import { employmentTermsApi } from "../../../services/employmentTerms";
+import { useCredits } from "../../../context/CreditsContext";
 import { parseDecimal } from "../../../lib/parseNumeric";
 import type {
 	ExitType,
@@ -116,6 +117,7 @@ export default function SimulationSetup({
 	onChangeConfig,
 	onStart,
 }: SimulationSetupProps) {
+	const { employmentStatus, setEmploymentStatus } = useCredits();
 	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
 	const [conditions, setConditions] = useState<SetupConditions>(emptyConditions);
 	const [pivotSuggestions, setPivotSuggestions] = useState<string[]>([]);
@@ -483,8 +485,47 @@ export default function SimulationSetup({
 								</h3>
 								<p className="text-sm text-slate-600 mt-1">
 									Jenis berhentinya hubungan kerja menentukan rumus uang pesangon,
-									penghargaan masa kerja, dan kompensasi menurut PP 35/2021.
+									penghargaan masa kerja, dan kompensasi menurut PP 35/2021 &amp;
+									PP 6/2025.
 								</p>
+							</div>
+
+							{/* Status Kerja Saat Ini (memprioritaskan tenggat klaim JKP jika Sudah berhenti) */}
+							<div className="rounded-xl bg-white p-4 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+								<div className="flex items-start gap-2.5">
+									<IconTile icon={Briefcase} tone="indigo" size="xs" />
+									<div>
+										<p className="text-xs font-bold text-slate-900">
+											Kondisi Kerja Saat Ini
+										</p>
+										<p className="text-xs text-slate-500 mt-0.5">
+											Jika sudah berhenti, tenggat klaim JKP (PP 6/2025) akan
+											ditampilkan paling atas.
+										</p>
+									</div>
+								</div>
+								<div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 shrink-0 self-start sm:self-center">
+									<button
+										type="button"
+										onClick={() => setEmploymentStatus("working")}
+										className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+											employmentStatus !== "stopped"
+												? "bg-white text-indigo-700 shadow-2xs"
+												: "text-slate-600 hover:text-slate-900"
+										}`}>
+										Sedang bekerja
+									</button>
+									<button
+										type="button"
+										onClick={() => setEmploymentStatus("stopped")}
+										className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+											employmentStatus === "stopped"
+												? "bg-indigo-600 text-white shadow-2xs"
+												: "text-slate-600 hover:text-slate-900"
+										}`}>
+										Sudah berhenti
+									</button>
+								</div>
 							</div>
 
 							{/* Ketentuan Kerja / Employment Terms */}

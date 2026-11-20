@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import { Lock, type LucideIcon } from "lucide-react";
 
 interface CareerPathNodeProps {
 	title: string;
@@ -6,6 +6,7 @@ interface CareerPathNodeProps {
 	match?: number;
 	icon: LucideIcon;
 	selected?: boolean;
+	locked?: boolean;
 	variant?: "center" | "node";
 	style?: React.CSSProperties;
 	onClick?: () => void;
@@ -17,6 +18,7 @@ export default function CareerPathNode({
 	match,
 	icon: Icon,
 	selected,
+	locked = false,
 	variant = "node",
 	style,
 	onClick,
@@ -61,9 +63,18 @@ export default function CareerPathNode({
 				<Icon size={17} strokeWidth={1.8} />
 			</span>
 			<div className="min-w-0 flex-1">
-				<p className="text-xs sm:text-sm font-semibold text-slate-900 leading-snug line-clamp-2">
-					{title}
-				</p>
+				<div className="flex items-start justify-between gap-1.5">
+					<p className="text-xs sm:text-sm font-semibold text-slate-900 leading-snug line-clamp-2">
+						{title}
+					</p>
+					{locked && (
+						<span
+							title="Peta skill gap peran ke-2 dst. membutuhkan 5 credit"
+							className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-indigo-50 border border-indigo-200 text-indigo-600 shrink-0">
+							<Lock size={11} strokeWidth={2.2} />
+						</span>
+					)}
+				</div>
 				{match != null && (
 					<span
 						className={`inline-block text-xs font-semibold mt-0.5 tabular ${

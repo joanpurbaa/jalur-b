@@ -1,6 +1,13 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInView, useReducedMotion } from "motion/react";
+import {
+	AlertTriangle,
+	ArrowRight,
+	Briefcase,
+	Scale,
+	ShieldCheck,
+} from "lucide-react";
 import Reveal from "./Reveal";
 import { CountUp } from "../ui/Motion";
 
@@ -70,9 +77,10 @@ export default function Hero() {
 						<div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
 							<button
 								type="button"
-								onClick={() => navigate("/login")}
-								className="press rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 cursor-pointer">
-								Hitung runway-ku
+								onClick={() => navigate("/register")}
+								className="press inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 cursor-pointer">
+								<span>Hitung runway-ku</span>
+								<ArrowRight size={15} />
 							</button>
 							<a
 								href="#solusi"
@@ -80,19 +88,30 @@ export default function Hero() {
 								Lihat cara kerjanya
 							</a>
 						</div>
+
+						<p className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-neutral/55">
+							<Briefcase size={13} className="text-primary shrink-0" />
+							<span>Untuk pekerja aktif atau yang pernah bekerja.</span>
+						</p>
 					</div>
 
 					{/* Kanan: kartu persona */}
 					<div
 						ref={cardRef}
 						className="w-full card-surface p-6 sm:p-8 lg:ml-auto lg:max-w-md">
-						<p className="text-xs font-semibold uppercase tracking-widest text-neutral/40">
-							{PERSONA.caption}
-						</p>
+						<div className="flex items-center justify-between gap-2">
+							<p className="text-xs font-semibold uppercase tracking-widest text-neutral/40">
+								{PERSONA.caption}
+							</p>
+							<span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-full">
+								<Scale size={11} />
+								PP 35/2021
+							</span>
+						</div>
 						<p className="mt-2 text-sm text-neutral/60">{PERSONA.description}</p>
 
 						<ul className="mt-6 space-y-7">
-							{PERSONA.scenarios.map((scenario) => {
+							{PERSONA.scenarios.map((scenario, idx) => {
 								const width = Math.min(
 									(scenario.months / MAX_MONTHS) * 100,
 									100,
@@ -101,8 +120,19 @@ export default function Hero() {
 									<li key={scenario.label}>
 										<div className="flex items-end justify-between gap-4">
 											<div>
-												<p className="text-sm font-semibold text-neutral">
-													{scenario.label}
+												<p className="text-sm font-semibold text-neutral inline-flex items-center gap-1.5">
+													{idx === 0 ? (
+														<AlertTriangle
+															size={14}
+															className="text-rose-600 shrink-0"
+														/>
+													) : (
+														<ShieldCheck
+															size={14}
+															className="text-indigo-600 shrink-0"
+														/>
+													)}
+													<span>{scenario.label}</span>
 												</p>
 												{scenario.detail ? (
 													<p className="mt-0.5 text-xs text-neutral/50">

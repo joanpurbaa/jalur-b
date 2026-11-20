@@ -38,7 +38,7 @@ export default function SimulationIntro({ onStart }: SimulationIntroProps) {
 							</div>
 							<div className="rounded-lg bg-white border border-slate-200 px-2.5 py-2">
 								<p className="text-xs font-bold text-indigo-700">Hak Kerja</p>
-								<p className="text-xs text-slate-500 mt-0.5">PP 35/2021</p>
+								<p className="text-xs text-slate-500 mt-0.5">PP 35/2021 &amp; 6/2025</p>
 							</div>
 							<div className="rounded-lg bg-white border border-slate-200 px-2.5 py-2">
 								<p className="text-xs font-bold text-indigo-700">Aksi</p>
@@ -61,7 +61,8 @@ export default function SimulationIntro({ onStart }: SimulationIntroProps) {
 							<Info size={15} className="text-indigo-600 shrink-0 mt-0.5" />
 							<p className="leading-relaxed">
 								Simulasi menggabungkan data profil karier, tabungan likuid, dan
-								ketentuan kerja sesuai PP 35/2021.
+								ketentuan kerja sesuai PP 35/2021 &amp; PP 6/2025. Runway,
+								Transition Gap 1 peran, dan hak pesangon/JKP selalu gratis.
 							</p>
 						</div>
 						<div className="flex items-start gap-2.5">

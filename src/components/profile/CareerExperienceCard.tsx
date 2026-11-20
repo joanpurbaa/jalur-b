@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, CheckCircle2, FileText, Upload } from "lucide-react";
+import { Briefcase, CheckCircle2, FileText, Lock, Upload } from "lucide-react";
 import SkillPill from "../ui/SkillPill";
 import IconTile from "../ui/IconTile";
 import Skeleton from "../ui/Skeleton";
 import { PrimaryButton, SecondaryButton } from "../ui/PrimaryButton";
+import { CreditCostPill } from "../ui/CreditLockBanner";
+import { useCredits } from "../../context/CreditsContext";
 import { initials as getInitials } from "../../lib/format";
 import { ApiError } from "../../types/api";
 import { cvApi } from "../../services/cv";
@@ -19,6 +21,7 @@ export default function CareerExperienceCard({
 	skills,
 	loading = false,
 }: CareerExperienceCardProps) {
+	const { isUnlocked, requestUnlock } = useCredits();
 	const [cvData, setCvData] = useState<CvGetResponse | null>(null);
 	const [cvLoading, setCvLoading] = useState(true);
 	const [cvPreview, setCvPreview] = useState<CvPreviewResponse | null>(null);
@@ -102,6 +105,15 @@ export default function CareerExperienceCard({
 
 	const hasCv = cvData !== null;
 	const showPreview = cvPreview !== null;
+	const needsReimportCredit = hasCv && !isUnlocked("reimport_cv");
+
+	const handleUploadClick = () => {
+		if (needsReimportCredit) {
+			requestUnlock("reimport_cv", () => fileInputRef.current?.click());
+			return;
+		}
+		fileInputRef.current?.click();
+	};
 
 	if (loading || cvLoading) {
 		return (
@@ -288,13 +300,24 @@ export default function CareerExperienceCard({
 						<>
 							<SecondaryButton
 								size="sm"
-								icon={<Upload size={14} />}
-								onClick={() => fileInputRef.current?.click()}>
-								{cvUploading
-									? "Memproses..."
-									: hasCv
-										? "Ganti CV"
-										: "Unggah CV"}
+								icon={
+									needsReimportCredit ? (
+										<Lock size={13} className="text-indigo-600" />
+									) : (
+										<Upload size={14} />
+									)
+								}
+								onClick={handleUploadClick}>
+								<span>
+									{cvUploading
+										? "Memproses..."
+										: hasCv
+											? "Impor CV Ulang"
+											: "Unggah CV (Gratis)"}
+								</span>
+								{needsReimportCredit && !cvUploading && (
+									<CreditCostPill cost={2} />
+								)}
 							</SecondaryButton>
 
 							<input

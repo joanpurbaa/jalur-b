@@ -1,26 +1,43 @@
+import {
+	BarChart3,
+	Compass,
+	GitFork,
+	ShieldCheck,
+	type LucideIcon,
+} from "lucide-react";
 import Reveal from "./Reveal";
+import IconTile from "../ui/IconTile";
 
-const STEPS = [
+const STEPS: {
+	number: string;
+	title: string;
+	description: string;
+	icon: LucideIcon;
+}[] = [
 	{
 		number: "01",
 		title: "Pahami",
 		description: "Kenali kondisi kariermu saat ini.",
+		icon: Compass,
 	},
 	{
 		number: "02",
 		title: "Ukur",
 		description: "Ukur risiko, relevansi skill, dan ketahanan finansialmu.",
+		icon: BarChart3,
 	},
 	{
 		number: "03",
 		title: "Siapkan",
 		description: "Temukan jalur karier alternatif dan bangun bukti kemampuan.",
+		icon: GitFork,
 	},
 	{
 		number: "04",
 		title: "Bertahan",
 		description:
 			"Ketahui apa yang harus dilakukan ketika pendapatan atau pekerjaan berubah.",
+		icon: ShieldCheck,
 	},
 ];
 
@@ -46,9 +63,12 @@ export default function SolutionSection() {
 					<Reveal key={step.number} delay={index * 80}>
 					<li
 						className="group border-t-2 border-neutral/10 pt-6 transition-colors duration-300 hover:border-primary">
-						<span className="text-5xl font-bold tracking-tight text-neutral/15 transition-colors duration-300 group-hover:text-primary lg:text-6xl">
-							{step.number}
-						</span>
+						<div className="flex items-center justify-between">
+							<span className="text-5xl font-bold tracking-tight text-neutral/15 transition-colors duration-300 group-hover:text-primary lg:text-6xl">
+								{step.number}
+							</span>
+							<IconTile icon={step.icon} tone="indigo" size="md" />
+						</div>
 						<h3 className="mt-5 text-xl font-bold text-neutral">{step.title}</h3>
 						<p className="mt-2.5 max-w-xs text-sm leading-relaxed text-neutral/60">
 							{step.description}

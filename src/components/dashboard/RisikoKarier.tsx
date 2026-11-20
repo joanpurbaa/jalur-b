@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
 	ArrowRight,
 	Bot,
+	PlaySquare,
 	ShieldAlert,
 	TrendingDown,
 	TrendingUp,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
+import IconTile from "../ui/IconTile";
 import RiskStatusCard from "./RiskStatusCard";
 import RiskDimensionCard from "./RiskDimensionCard";
 import AIAnalysisPanel from "./AIAnalysisPanel";
@@ -20,6 +22,7 @@ import { PrimaryButton } from "../ui/PrimaryButton";
 import { SkeletonHero, SkeletonStatCard } from "../ui/Skeleton";
 import { Stagger, StaggerItem } from "../ui/Motion";
 import { careerRiskApi } from "../../services/careerRisk";
+import { loadManualCache, saveManualCache } from "../../lib/manualCache";
 import { parseDecimal } from "../../lib/parseNumeric";
 import { normalizeConfidence, normalizeRiskLevel } from "../../lib/status";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
@@ -36,18 +39,24 @@ const factorIcons: Record<string, LucideIcon> = {
 export default function RisikoKarier() {
 	const { refreshKey, openCareerAssessment } = useCareerAssessment();
 
-	const [result, setResult] = useState<CareerRiskResult | null>(null);
-	const [loading, setLoading] = useState(true);
+	const cachedRisk = loadManualCache<CareerRiskResult>("career_risk");
+	const [result, setResult] = useState<CareerRiskResult | null>(
+		() => cachedRisk?.data ?? null,
+	);
+	const [loading, setLoading] = useState(() => !cachedRisk?.data);
 
 	useEffect(() => {
 		let active = true;
 		careerRiskApi
 			.latest()
 			.then((res) => {
-				if (active) setResult(res);
+				if (active) {
+					setResult(res);
+					saveManualCache("career_risk", res);
+				}
 			})
 			.catch(() => {
-				// belum ada penilaian — biarkan kosong
+				// belum ada penilaian — pertahankan cache jika ada atau biarkan kosong
 			})
 			.finally(() => {
 				if (active) setLoading(false);
@@ -87,14 +96,17 @@ export default function RisikoKarier() {
 								score={score}
 							/>
 
-							<div className="mb-3.5">
-								<h3 className="text-base font-bold text-slate-900">
-									Empat Dimensi Risiko
-								</h3>
-								<p className="text-xs sm:text-sm text-slate-500">
-									Indikator 3-level untuk tiap dimensi yang memengaruhi keamanan
-									peranmu
-								</p>
+							<div className="mb-3.5 flex items-center gap-2.5">
+								<IconTile icon={ShieldAlert} tone="indigo" size="xs" />
+								<div>
+									<h3 className="text-base font-bold text-slate-900">
+										Empat Dimensi Risiko
+									</h3>
+									<p className="text-xs sm:text-sm text-slate-500">
+										Indikator 3-level untuk tiap dimensi yang memengaruhi keamanan
+										peranmu
+									</p>
+								</div>
 							</div>
 
 							<Stagger className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -125,14 +137,17 @@ export default function RisikoKarier() {
 						<Card
 							padding="md"
 							className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-							<div>
-								<h3 className="text-sm font-bold text-slate-900">
-									Langkah Antisipasi
-								</h3>
-								<p className="text-sm text-slate-600 mt-0.5">
-									Uji skenario ketahananmu jika perubahan terjadi mendadak atau
-									perkuat skill prioritasmu.
-								</p>
+							<div className="flex items-start gap-3">
+								<IconTile icon={PlaySquare} tone="indigo" size="sm" />
+								<div>
+									<h3 className="text-sm font-bold text-slate-900">
+										Langkah Antisipasi
+									</h3>
+									<p className="text-sm text-slate-600 mt-0.5">
+										Uji skenario ketahananmu jika perubahan terjadi mendadak atau
+										perkuat skill prioritasmu.
+									</p>
+								</div>
 							</div>
 							<Link to="/dashboard/simulasi" className="shrink-0">
 								<PrimaryButton icon={<ArrowRight size={15} />}>

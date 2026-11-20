@@ -5,6 +5,8 @@ import { formatDecimal1 } from "../../../lib/format";
 interface ResultTimelineProps {
 	runwayMonths: number;
 	targetMonths: number;
+	/** Jika true, render isi langsung tanpa bungkus Card agar bebas double-border saat dipakai di LockedPreviewCard. */
+	embedded?: boolean;
 }
 
 interface TimelineMilestone {
@@ -41,6 +43,7 @@ const ZONE_STYLE = {
 export default function ResultTimeline({
 	runwayMonths,
 	targetMonths,
+	embedded = false,
 }: ResultTimelineProps) {
 	const safeRunway = Math.max(0, runwayMonths);
 	const safeTarget = Math.max(1, targetMonths);
@@ -88,18 +91,22 @@ export default function ResultTimeline({
 		zone: safeRunway >= safeTarget ? "safe" : "target",
 	});
 
-	return (
-		<Card padding="lg">
+	const inner = (
+		<>
 			<div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-				<div>
-					<h3 className="text-base sm:text-lg font-bold text-slate-900">
-						Garis Waktu Ketahanan (Hari 0 → Target)
-					</h3>
-					<p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-						Visualisasi zona aman, evaluasi, dan batas kritis dana cadanganmu
-					</p>
-				</div>
-				<div className="flex items-center gap-3 text-xs font-semibold">
+				{!embedded ? (
+					<div>
+						<h3 className="text-base sm:text-lg font-bold text-slate-900">
+							Garis Waktu Ketahanan (Hari 0 → Target)
+						</h3>
+						<p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+							Visualisasi zona aman, evaluasi, dan batas kritis dana cadanganmu
+						</p>
+					</div>
+				) : (
+					<div />
+				)}
+				<div className="flex flex-wrap items-center gap-3 text-xs font-semibold">
 					<span className="inline-flex items-center gap-1 text-emerald-700">
 						<ShieldCheck size={13} /> Zona Aman
 					</span>
@@ -143,6 +150,9 @@ export default function ResultTimeline({
 					);
 				})}
 			</div>
-		</Card>
+		</>
 	);
+
+	if (embedded) return inner;
+	return <Card padding="lg">{inner}</Card>;
 }

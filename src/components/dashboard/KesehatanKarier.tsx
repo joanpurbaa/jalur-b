@@ -8,9 +8,12 @@ import {
 	Wallet,
 	HeartPulse,
 	ArrowRight,
+	Compass,
+	SlidersHorizontal,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import PageHeader from "../layouts/PageHeader";
+import IconTile from "../ui/IconTile";
 import {
 	getHealthStatus,
 	localizeLevelLabel,
@@ -28,6 +31,7 @@ import { SkeletonHero, SkeletonStatCard } from "../ui/Skeleton";
 import { Stagger, StaggerItem } from "../ui/Motion";
 import FactorCard from "./FactorCard";
 import { careerHealthApi } from "../../services/careerHealth";
+import { loadManualCache, saveManualCache } from "../../lib/manualCache";
 import { parseDecimal } from "../../lib/parseNumeric";
 import { formatDateID } from "../../lib/format";
 import { useCareerAssessment } from "../../context/CareerAssessmentContext";
@@ -185,18 +189,24 @@ function FactorRadar({ factors }: { factors: HealthFactor[] }) {
 export default function KesehatanKarier() {
 	const { refreshKey, openCareerAssessment } = useCareerAssessment();
 
-	const [result, setResult] = useState<HealthAssessmentResult | null>(null);
-	const [loading, setLoading] = useState(true);
+	const cachedHealth = loadManualCache<HealthAssessmentResult>("career_health");
+	const [result, setResult] = useState<HealthAssessmentResult | null>(
+		() => cachedHealth?.data ?? null,
+	);
+	const [loading, setLoading] = useState(() => !cachedHealth?.data);
 
 	useEffect(() => {
 		let active = true;
 		careerHealthApi
 			.latest()
 			.then((res) => {
-				if (active) setResult(res);
+				if (active) {
+					setResult(res);
+					saveManualCache("career_health", res);
+				}
 			})
 			.catch(() => {
-				// belum ada penilaian — biarkan kosong
+				// belum ada penilaian — pertahankan cache jika ada atau biarkan kosong
 			})
 			.finally(() => {
 				if (active) setLoading(false);
@@ -318,13 +328,16 @@ export default function KesehatanKarier() {
 
 					{/* 2. Kenapa begitu? */}
 					<section aria-label="Faktor Kesehatan Karier">
-						<div className="mb-4">
-							<h3 className="text-base font-bold text-slate-900">
-								Faktor Kesehatan Karier
-							</h3>
-							<p className="text-xs sm:text-sm text-slate-500">
-								Diurutkan dari area yang paling perlu ditingkatkan lebih dulu
-							</p>
+						<div className="mb-4 flex items-center gap-2.5">
+							<IconTile icon={SlidersHorizontal} tone="indigo" size="xs" />
+							<div>
+								<h3 className="text-base font-bold text-slate-900">
+									Faktor Kesehatan Karier
+								</h3>
+								<p className="text-xs sm:text-sm text-slate-500">
+									Diurutkan dari area yang paling perlu ditingkatkan lebih dulu
+								</p>
+							</div>
 						</div>
 
 						<Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -345,14 +358,17 @@ export default function KesehatanKarier() {
 
 					{/* 3. Apa langkahku? */}
 					<Card padding="md" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-						<div>
-							<h3 className="text-sm font-bold text-slate-900">
-								Langkah Selanjutnya
-							</h3>
-							<p className="text-sm text-slate-600 mt-0.5">
-								Lihat sinyal risiko pasar atau dokumentasikan pencapaian untuk
-								menaikkan skor faktor terendahmu.
-							</p>
+						<div className="flex items-start gap-3">
+							<IconTile icon={Compass} tone="indigo" size="sm" />
+							<div>
+								<h3 className="text-sm font-bold text-slate-900">
+									Langkah Selanjutnya
+								</h3>
+								<p className="text-sm text-slate-600 mt-0.5">
+									Lihat sinyal risiko pasar atau dokumentasikan pencapaian untuk
+									menaikkan skor faktor terendahmu.
+								</p>
+							</div>
 						</div>
 						<div className="flex flex-wrap items-center gap-3 shrink-0">
 							<Link to="/dashboard/risiko-karier">

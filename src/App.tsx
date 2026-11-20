@@ -10,9 +10,11 @@ import RequireAuth from "./components/auth/RequireAuth";
 import GuestOnly from "./components/auth/GuestOnly";
 import OnboardingRoute from "./components/auth/OnboardingRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { CreditsProvider } from "./context/CreditsContext";
 import { SkeletonHero, SkeletonStatCard } from "./components/ui/Skeleton";
 
 const Home = lazy(() => import("./pages/Home"));
+const Harga = lazy(() => import("./pages/Harga"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const GoogleCallback = lazy(() => import("./pages/GoogleCallback"));
@@ -50,11 +52,13 @@ export default function App() {
 		<MotionConfig reducedMotion="user">
 			<Router>
 				<AuthProvider>
-					<Suspense fallback={<RouteFallback />}>
-						<Routes>
-							<Route path="/" element={<Home />} />
-							<Route
-								path="/login"
+					<CreditsProvider>
+						<Suspense fallback={<RouteFallback />}>
+							<Routes>
+								<Route path="/" element={<Home />} />
+								<Route path="/harga" element={<Harga />} />
+								<Route
+									path="/login"
 								element={
 									<GuestOnly>
 										<Login />
@@ -97,8 +101,9 @@ export default function App() {
 								<Route path="simulasi" element={<Simulasi />} />
 								<Route path="profil" element={<Profil />} />
 							</Route>
-						</Routes>
-					</Suspense>
+							</Routes>
+						</Suspense>
+					</CreditsProvider>
 				</AuthProvider>
 			</Router>
 		</MotionConfig>

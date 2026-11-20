@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
 	ChevronLeft,
 	ChevronRight,
+	Coins,
 	LogOut,
 	MoreHorizontal,
 	User,
@@ -101,6 +102,10 @@ export default function Sidebar() {
 		setIsMobileMoreOpen(false);
 		if (id === "keluar") {
 			setIsLogoutModalOpen(true);
+			return;
+		}
+		if (id === "harga") {
+			navigate("/harga");
 			return;
 		}
 		navigate(`/dashboard/${id}`);
@@ -246,6 +251,21 @@ export default function Sidebar() {
 					)}
 
 					<div className="space-y-1">
+						<button
+							type="button"
+							onClick={() => handleNavigation("harga")}
+							title={isCollapsed ? "Harga & B-Credits" : undefined}
+							className={`w-full min-h-[42px] flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-indigo-50/70 hover:text-indigo-700 transition cursor-pointer ${
+								isCollapsed ? "justify-center" : ""
+							}`}>
+							<Coins
+								size={18}
+								strokeWidth={1.75}
+								className="text-indigo-600 shrink-0"
+							/>
+							{!isCollapsed && <span>Harga &amp; Credit</span>}
+						</button>
+
 						{renderNavButton("profil")}
 
 						<button
@@ -398,15 +418,22 @@ export default function Sidebar() {
 						<div className="flex items-center gap-2 pt-3 border-t border-slate-100">
 							<button
 								type="button"
+								onClick={() => handleNavigation("harga")}
+								className="press min-h-[44px] flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-indigo-200 bg-indigo-50/70 text-xs font-semibold text-indigo-700">
+								<Coins size={15} />
+								Harga
+							</button>
+							<button
+								type="button"
 								onClick={() => handleNavigation("profil")}
-								className="press min-h-[44px] flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700">
+								className="press min-h-[44px] flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700">
 								<User size={15} />
 								Profil
 							</button>
 							<button
 								type="button"
 								onClick={() => handleNavigation("keluar")}
-								className="press min-h-[44px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold">
+								className="press min-h-[44px] flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold">
 								<LogOut size={15} />
 								Keluar
 							</button>
